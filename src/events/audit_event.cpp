@@ -124,7 +124,7 @@ Json::Value Audit_Event::getJSON()
     std::string  sTime = std::asctime(std::localtime(&unixTime));
     while (ends_with(sTime,"\n")) sTime.pop_back();
 
-    x["INFO"]["unixTime"]  = unixTime;
+    x["INFO"]["unixTime"]  = (Json::Value::Int64)unixTime;
     x["INFO"]["msecs"]     = std::get<1>(eventId);
     x["INFO"]["id"]        = std::get<2>(eventId);
     x["INFO"]["host"]  = hostName;
