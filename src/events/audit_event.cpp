@@ -126,7 +126,7 @@ Json::Value Audit_Event::getJSON()
 
     x["INFO"]["unixTime"]  = (Json::Value::Int64)unixTime;
     x["INFO"]["msecs"]     = std::get<1>(eventId);
-    x["INFO"]["id"]        = std::get<2>(eventId);
+    x["INFO"]["id"]        =  (Json::Value::UInt64)std::get<2>(eventId);
     x["INFO"]["host"]  = hostName;
     x["INFO"]["time"] = sTime;
 
