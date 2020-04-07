@@ -17,6 +17,8 @@ Mar 19 03:28:34 asd audispd: node=asd.com type=PATH msg=audit(1552987714.396:292
 static boost::regex exSyslogAuditdDecomposer(REGEX_SYSLOG REGEX_AUDITD_HEADER REGEX_AUDTID_DATA);
 static boost::regex exPureAuditdDecomposer(REGEX_AUDITD_HEADER REGEX_AUDTID_DATA);
 
+// TODO: stats de lineas procesadas, cambiar nombres, status de eventos flusheados
+
 void printLastLineProcessed(void * x)
 {
     TCPLineProcessor * tlp = (TCPLineProcessor *)x;
@@ -76,7 +78,7 @@ bool TCPLineProcessor::processParsedLine(const string &line)
             RawLogs_Manager::getHostLogger("invalid2").hostLogs->log(remoteIP, line);*/
 
         // up to here.. 360k lps
-        eventsManager.insertClassContents(hostname,
+        EventsManager::insertClassContents(hostname,
                                           std::make_tuple(auditdEventTime,msecs,eventId),
                                           eventType,
                                           new string(whatSyslogAuditdDecomposed[6].first, whatSyslogAuditdDecomposed[6].second));

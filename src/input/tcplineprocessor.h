@@ -26,8 +26,6 @@ protected:
 private:
     std::thread t;
 
-    EventsManager eventsManager;
-
     std::string remoteIP;
     std::atomic<uint32_t> linesProcessed;
     std::atomic<bool> active;

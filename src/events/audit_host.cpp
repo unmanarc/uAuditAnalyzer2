@@ -10,6 +10,8 @@ using namespace std;
 
 Audit_Host::Audit_Host()
 {
+    countEventsDropped=0;
+    countEventsProcessed=0;
 }
 
 Audit_Host::~Audit_Host()
@@ -40,13 +42,18 @@ void Audit_Host::insertClassContents(const std::tuple<time_t, uint32_t, uint64_t
     {
         // Event reception ready/completed for analysis, take it out from here and put it in the queue!.
         auditEvents.erase(eventId);
-
         mEvents.unlock();
+
         if (!ProcessorThreads_Output::pushAuditEvent(aevent))
         {
             std::tuple<time_t, uint32_t, uint64_t> eventId = aevent->getEventId();
             SERVERAPP->getLogger()->error("Queue full, Event %u.%u:%u Dropped...", (uint32_t) get<0>(eventId),get<1>(eventId),(uint32_t)get<2>(eventId) );
             delete aevent;
+            countEventsDropped++;
+        }
+        else
+        {
+            countEventsProcessed++;
         }
     }
     else
@@ -107,7 +114,30 @@ void Audit_Host::dropOldUncompletedEvents(const uint64_t &maxEventTimeInSeconds)
             snprintf(cEventID,500,"%ld.%u:%lu", get<0>(eventId),get<1>(eventId),get<2>(eventId));
             SERVERAPP->getLogger()->error("Queue full, Event %s Dropped...", string(cEventID) );
             delete aevent;
+            countEventsDropped++;
+        }
+        else
+        {
+            countEventsProcessed++;
         }
     }
+}
 
+size_t Audit_Host::getPendingEventsCount()
+{
+    size_t r;
+    mEvents.lock();
+    r = auditEvents.size();
+    mEvents.unlock();
+    return r;
+}
+
+uint64_t Audit_Host::getCountEventsDropped() const
+{
+    return countEventsDropped;
+}
+
+uint64_t Audit_Host::getCountEventsProcessed() const
+{
+    return countEventsProcessed;
 }

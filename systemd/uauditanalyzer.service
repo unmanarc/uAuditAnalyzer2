@@ -1,0 +1,10 @@
+[Unit]
+Description=Unmanarc's Auditd Analyzer
+
+[Service]
+Type=simple
+Environment="LD_LIBRARY_PATH=/opt/analyzer/lib"
+ExecStart=/opt/analyzer/bin/uAuditAnalyzer -c /opt/analyzer/etc/config.ini -r /opt/analyzer/etc/rules
+
+[Install]
+WantedBy=multi-user.target

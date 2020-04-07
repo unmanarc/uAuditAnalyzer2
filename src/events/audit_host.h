@@ -4,6 +4,7 @@
 #include <string>
 #include <mutex>
 #include <map>
+#include <atomic>
 
 #include "audit_event.h"
 
@@ -21,11 +22,15 @@ public:
 
     void dropOldUncompletedEvents( const uint64_t & maxEventTimeInSeconds );
 
+    size_t getPendingEventsCount();
+    uint64_t getCountEventsDropped() const;
+    uint64_t getCountEventsProcessed() const;
 
 private:
     std::mutex mEvents;
     std::map< std::tuple<time_t,uint32_t,uint64_t>, Audit_Event * > auditEvents;
     std::string hostname;
+    std::atomic<uint64_t> countEventsDropped, countEventsProcessed;
 };
 
 #endif // HOSTEVENTSCONTAINER_H

@@ -6,8 +6,6 @@
 #include <string>
 #include <atomic>
 #include <map>
-#include <thread>
-
 
 class EventsManager
 {
@@ -15,19 +13,21 @@ public:
     EventsManager();
     ~EventsManager();
 
-    void gc();
+    static void writeStats(const std::string & outputDir);
 
-    void insertClassContents(const std::string & hostName, // hostname
+    static void gc();
+    static void startGC();
+
+    static void insertClassContents(const std::string & hostName, // hostname
                            const std::tuple<time_t,uint32_t,uint64_t> & eventId, // event time -> event msecs -> event id
                            const std::string & eventType,
                            std::string *vardata);
 
-    bool getFinished();
+    static bool getFinished();
 
 private:
-    std::map<std::string,Audit_Host> eventsByHostName;
-    std::thread t;
-    std::atomic<bool> finished;
+    static std::map<std::string,Audit_Host> eventsByHostName;
+    static std::mutex mutex_insert;
 
 };
 

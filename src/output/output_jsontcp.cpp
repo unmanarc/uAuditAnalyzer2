@@ -5,6 +5,9 @@
 
 void tcpOutputProcessorThread( Output_JSONTCP * output )
 {
+    std::string threadName = "TCP_OUTPUT";
+    pthread_setname_np(pthread_self(), threadName.c_str());
+
     output->process();
 }
 

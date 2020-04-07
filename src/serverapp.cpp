@@ -31,10 +31,13 @@ static string currentDir = "";
 
 bool rsyslogAuditdServerThread(void *, Socket_Base_Stream * baseClientSocket, const char * remotePair)
 {
-    TCPLineProcessor lineServer(baseClientSocket,true);
+    TCPLineProcessor lineServer(baseClientSocket,true);   
 
     std::string sRemotePair = remotePair;
     lineServer.setRemoteIP(sRemotePair);
+
+    std::string threadName = "IN_" + sRemotePair;
+    pthread_setname_np(pthread_self(), threadName.c_str());
 
     SERVERAPP->getLogger()->information("Starting rsyslog+auditd incomming connection from @%s...", sRemotePair);
 
@@ -216,6 +219,7 @@ int ServerAPP::main(const vector<string> &)
         if (Globals::getConfig_main()->get<bool>("OUTPUT/JSONTCP.Enabled",true))
             Globals::addOutputBaseAndStartThreads(new Output_JSONTCP());
 
+        EventsManager::startGC();
 
         ProcessorThreads_Output::startProcessorThreads( Globals::getConfig_main()->get<size_t>("Processor.Threads",8) );
         ProcessorThreads_Output::setQueueSize(Globals::getConfig_main()->get<size_t>("Processor.QueueSize",1000));

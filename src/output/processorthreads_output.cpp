@@ -21,6 +21,10 @@ std::atomic<uint64_t> ProcessorThreads_Output::eventsDropped;
 
 void outputProcessorThread(int threadid)
 {   
+    std::string threadName = "EVENTS_DEQUEUE";
+    pthread_setname_np(pthread_self(), threadName.c_str());
+
+
     auto start = chrono::high_resolution_clock::now();
     auto finish = chrono::high_resolution_clock::now();
     chrono::duration<double, milli> elapsed = finish - start;
@@ -61,6 +65,9 @@ void outputProcessorThread(int threadid)
 
 void refreshEventsParsedPerSecond()
 {
+    std::string threadName = "EVENTS_COUNTER";
+    pthread_setname_np(pthread_self(), threadName.c_str());
+
     for (;;)
     {
         ProcessorThreads_Output::lRefreshEventsParsedPerSecond();

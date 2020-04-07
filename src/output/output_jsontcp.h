@@ -17,8 +17,6 @@ public:
     void process();
     void writeStats(const std::string & outputDir);
 
-
-
 private:
     TS_Queue<Json::Value> queueValues;
 
