@@ -45,7 +45,7 @@ void Audit_Host::insertClassContents(const std::tuple<time_t, uint32_t, uint64_t
         if (!ProcessorThreads_Output::pushAuditEvent(aevent))
         {
             std::tuple<time_t, uint32_t, uint64_t> eventId = aevent->getEventId();
-            SERVERAPP->getLogger()->error("Queue full, Event %u.%u:%u Dropped...", get<0>(eventId),get<1>(eventId),get<2>(eventId) );
+            SERVERAPP->getLogger()->error("Queue full, Event %u.%u:%u Dropped...", (uint32_t) get<0>(eventId),get<1>(eventId),(uint32_t)get<2>(eventId) );
             delete aevent;
         }
     }
