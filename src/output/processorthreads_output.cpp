@@ -63,7 +63,7 @@ void refreshEventsParsedPerSecond()
 {
     for (;;)
     {
-        ProcessorThreads_Output::refreshEventsParsedPerSecond();
+        ProcessorThreads_Output::lRefreshEventsParsedPerSecond();
         sleep(1);
     }
 }
@@ -142,10 +142,9 @@ void ProcessorThreads_Output::addEventsProcessed()
     eventsProcessedInThisSecond++;
 }
 
-void ProcessorThreads_Output::refreshEventsParsedPerSecond()
+void ProcessorThreads_Output::lRefreshEventsParsedPerSecond()
 {
-    uint64_t x = eventsProcessedInThisSecond;
-    eventsProcessedInLastSecond = x;
+    eventsProcessedInLastSecond = (uint64_t)eventsProcessedInThisSecond;
     eventsProcessedInThisSecond = 0;
 }
 

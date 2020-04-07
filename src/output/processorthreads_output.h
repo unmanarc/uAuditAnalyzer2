@@ -20,7 +20,7 @@ public:
     static Audit_Event * popAuditEvent(const uint32_t &tmout_msecs);
 
     static void addEventsProcessed();
-    static void refreshEventsParsedPerSecond();
+    static void lRefreshEventsParsedPerSecond();
     static void setLastRulesEvaluationTime(double lastRulesEvaluationTime);
 
 
