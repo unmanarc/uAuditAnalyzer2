@@ -32,7 +32,7 @@ void Output_JSONTCP::logAuditEvent(const Json::Value & eventJSON, const std::tup
     // make a copy:
     *value = eventJSON;
     // push, if not report and go.
-    if (!queueValues.push(value,0))
+    if (!queueValues.push(value,push_tmout_msecs))
     {
         SERVERAPP->getLogger()->error("Output_JSONTCP Queue full, Event %u.%u:%u Dropped...", get<0>(eventId),get<1>(eventId),get<2>(eventId) );
         delete value;
