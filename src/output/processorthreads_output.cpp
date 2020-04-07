@@ -115,6 +115,8 @@ void ProcessorThreads_Output::startProcessorThreads(const size_t &threads)
     eventsProcessedInThisSecond=0;
     lastRulesEvaluationTime = 0;
 
+    std::thread(refreshEventsParsedPerSecond).detach();
+
     for (size_t i=1;i<=threads;i++)
     {
         std::thread tx(outputProcessorThread,i);
