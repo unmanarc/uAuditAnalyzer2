@@ -7,8 +7,10 @@
 class Output_ProgreSQL : public Output_Base
 {
 public:
-    Output_ProgreSQL(const uint32_t &threadId);
-    void logAuditEvent(Audit_Event * aevent);
+    Output_ProgreSQL();
+    void logAuditEvent(const Json::Value &eventJSON, const std::tuple<time_t, uint32_t, uint64_t> &eventId);
+    void startThread();
+    void process();
 
 private:
      bool reconnect();

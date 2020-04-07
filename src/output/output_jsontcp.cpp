@@ -1,11 +1,18 @@
 #include "output_jsontcp.h"
 #include "globals_ext.h"
 #include <boost/algorithm/string/replace.hpp>
+#include <thread>
 
-Output_JSONTCP::Output_JSONTCP(const uint32_t &threadId) : Output_Base(threadId)
+void tcpOutputProcessorThread( Output_JSONTCP * output )
+{
+    output->process();
+}
+
+Output_JSONTCP::Output_JSONTCP() : Output_Base()
 {
     connection = new Socket_TCP;
-    while (!reconnect()) {}
+    queueValues.setMaxItems(Globals::getConfig_main()->get<size_t>("OUTPUT/JSONTCP.MaxQueuedItems",1000000));
+    push_tmout_msecs = Globals::getConfig_main()->get<uint32_t>("OUTPUT/JSONTCP.QueuePushTimeoutInMS",0);
 }
 
 Output_JSONTCP::~Output_JSONTCP()
@@ -15,20 +22,50 @@ Output_JSONTCP::~Output_JSONTCP()
 
 std::string toUnStyledString(const Json::Value& value)
 {
-   Json::FastWriter writer;
-   return writer.write( value );
+    Json::FastWriter writer;
+    return writer.write( value );
 }
 
-void Output_JSONTCP::logAuditEvent(Audit_Event *aevent)
+void Output_JSONTCP::logAuditEvent(const Json::Value & eventJSON, const std::tuple<time_t, uint32_t, uint64_t> &eventId)
 {
-    if (!aevent) return;
+    Json::Value * value = new Json::Value;
+    // make a copy:
+    *value = eventJSON;
+    // push, if not report and go.
+    if (!queueValues.push(value,0))
+    {
+        SERVERAPP->getLogger()->error("Output_JSONTCP Queue full, Event %u.%u:%u Dropped...", get<0>(eventId),get<1>(eventId),get<2>(eventId) );
+        delete value;
+    }
+}
 
+void Output_JSONTCP::startThread()
+{
+    std::thread(tcpOutputProcessorThread,this).detach();
+}
+
+void Output_JSONTCP::process()
+{
     uint16_t transmitionMode = Globals::getConfig_main()->get<uint16_t>("OUTPUT/JSONTCP.TransmitionMode",0);
 
-    while (!connection->writeString(
-               transmitionMode==0?toUnStyledString(aevent->getJSON()): aevent->getJSON().toStyledString() + "=++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n" ).succeed)
+    // INITIAL CONNECT ATTEMPT:
+    while (!reconnect()) {}
+
+    // LOOP:
+    for (;;)
     {
-        while (!reconnect()) {}
+        // Take one JSON value from the queue...
+        Json::Value * value = queueValues.pop();
+        if (value)
+        {
+            // Try to send it...
+            while (!connection->writeString(transmitionMode==0?toUnStyledString(*value): value->toStyledString() + "=++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n" ).succeed)
+            {
+                // if not, try to reconnect.
+                while (!reconnect()) {}
+            }
+            delete value;
+        }
     }
 }
 
@@ -52,13 +89,13 @@ bool Output_JSONTCP::reconnect()
     {
         std::string msg = connection->getLastError();
         boost::replace_all(msg,"\n",",");
-        SERVERAPP->getLogger()->error("JSONTCP connection error (thread #%u): %s", threadId ,msg);
+        SERVERAPP->getLogger()->error("JSONTCP connection error: %s" ,msg);
         sleep(Globals::getConfig_main()->get<uint32_t>("OUTPUT/JSONTCP.ReconnectSleepTimeInSecs",3));
         return false;
     }
     else
     {
-        SERVERAPP->getLogger()->information("JSONTCP connected to %s:%u (thread %u)", server, (uint32_t)port, threadId );
+        SERVERAPP->getLogger()->information("JSONTCP connected to %s:%u", server, (uint32_t)port );
         return true;
     }
 }

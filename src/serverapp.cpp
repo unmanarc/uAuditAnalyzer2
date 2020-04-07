@@ -1,5 +1,7 @@
 #include "serverapp.h"
 
+#include "output/output_jsontcp.h"
+#include "output/output_postgresql.h"
 #include "output/processorthreads_output.h"
 #include "input/tcplineprocessor.h"
 #include "vars/namedefs.h"
@@ -201,7 +203,14 @@ int ServerAPP::main(const vector<string> &)
         app.logger().setLevel( Globals::getConfig_main()->get<std::string>("Logs.Level","debug") );
         app.logger().information("Starting auditd analyzer...");
 
-        ProcessorThreads_Output::startDatabaseThreads( Globals::getConfig_main()->get<size_t>("Processor.Threads",8) );
+        // Creating outputs...
+        if (Globals::getConfig_main()->get<bool>("OUTPUT/PostgreSQL.Enabled",false))
+            Globals::addOutputBaseAndStartThreads(new Output_ProgreSQL());
+        if (Globals::getConfig_main()->get<bool>("OUTPUT/JSONTCP.Enabled",true))
+            Globals::addOutputBaseAndStartThreads(new Output_JSONTCP());
+
+
+        ProcessorThreads_Output::startProcessorThreads( Globals::getConfig_main()->get<size_t>("Processor.Threads",8) );
         ProcessorThreads_Output::setQueueSize(Globals::getConfig_main()->get<size_t>("Processor.QueueSize",1000));
         ThreadedStreamAcceptor vstreamer_syslog;
         ThreadedStreamAcceptor vstreamer_auditd;       

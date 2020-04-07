@@ -10,33 +10,32 @@
 
 using namespace std;
 TS_Queue<Audit_Event> ProcessorThreads_Output::eventsQueue;
+uint32_t ProcessorThreads_Output::pushTimeoutInMS;
 
 void outputProcessorThread(int threadid)
 {
-    Output_ProgreSQL * db = (Globals::getConfig_main()->get<bool>("OUTPUT/PostgreSQL.Enabled",false))?  new Output_ProgreSQL(threadid) : nullptr;
-    Output_JSONTCP * jsontcp = (Globals::getConfig_main()->get<bool>("OUTPUT/JSONTCP.Enabled",true))?  new Output_JSONTCP(threadid) : nullptr;
-
     while (1)
     {
         map<string, Audit_Var> contentVars;
-        Audit_Event * event = ProcessorThreads_Output::popAuditEvent( Globals::getConfig_main()->get<uint32_t>("Processor.EventsFlushTimeoutInMSecs",10000)  );
+        Audit_Event * event = ProcessorThreads_Output::popAuditEvent( Globals::getConfig_main()->get<uint32_t>("Processor.EventsFlushTimeoutInMSecs",10000) );
 
         // processing event
         if (event)
         {
             event->process();
-            if (db) db->logAuditEvent(event);
-            if (jsontcp) jsontcp->logAuditEvent(event);
+            Json::Value eventJSON = event->getJSON();
+            delete event;
 
             // Evaluate Rules...
-            Rules::evaluate(event->getJSON());
+            Rules::evaluate(eventJSON);
 
-            delete event;
+            // push to outputs...
+            Globals::pushToOutputBases(eventJSON, event->getEventId());
         }
         else
         {
             SERVERAPP->getLogger()->trace("No events so far for output thread #%d, triggering outputs event flush...", threadid);
-            if (db) db->logAuditEvent(event);
+            //if (db) db->logAuditEvent(event);
         }
     }
 }
@@ -50,8 +49,10 @@ void ProcessorThreads_Output::setQueueSize(const size_t &qSize)
     eventsQueue.setMaxItems(qSize);
 }
 
-void ProcessorThreads_Output::startDatabaseThreads(const size_t &threads)
+void ProcessorThreads_Output::startProcessorThreads(const size_t &threads)
 {
+    pushTimeoutInMS = Globals::getConfig_main()->get<uint32_t>("Processor.QueuePushTimeoutInMS",0);
+
     for (size_t i=1;i<=threads;i++)
     {
         std::thread tx(outputProcessorThread,i);
@@ -61,8 +62,7 @@ void ProcessorThreads_Output::startDatabaseThreads(const size_t &threads)
 
 bool ProcessorThreads_Output::pushAuditEvent(Audit_Event *aevent)
 {
-    // TODO: once filled, start to drop inmmediatly...
-    return eventsQueue.push(aevent);
+    return eventsQueue.push(aevent, 0);
 }
 
 Audit_Event *ProcessorThreads_Output::popAuditEvent(const uint32_t & tmout_msecs)
