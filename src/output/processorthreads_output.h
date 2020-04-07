@@ -11,6 +11,8 @@ class ProcessorThreads_Output
 public:
     ProcessorThreads_Output();
 
+    static void writeStats(const std::string &outputDir);
+
     static void setQueueSize(const size_t & qSize);
     static void startProcessorThreads(const size_t & threads);
 
@@ -23,3 +25,4 @@ private:
 };
 
 #endif // DBTHREADS_H
+

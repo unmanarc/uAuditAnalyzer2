@@ -69,6 +69,24 @@ void Output_JSONTCP::process()
     }
 }
 
+void Output_JSONTCP::writeStats(const string &outputDir)
+{
+    ofstream myfile;
+    myfile.open (outputDir + "/output.jsontcp.queue");
+    myfile << "# OUTPUT-JSONTCP QUEUE\n";
+    myfile << queueValues.size() << "/" << queueValues.getMaxItems() << endl;
+    myfile.close();
+
+    std::string server = Globals::getConfig_main()->get<std::string>("OUTPUT/JSONTCP.Host","127.0.0.1");
+    uint16_t port = Globals::getConfig_main()->get<uint16_t>("OUTPUT/JSONTCP.Port",18200);
+
+    myfile.open (outputDir + "/output.jsontcp.connection");
+    myfile << "# OUTPUT-JSONTCP Connection" << std::endl;
+    myfile << server << ":" << port << " " << (connected? "_CONNECTED_" : "_DISCONNECTED_") << std::endl;
+    myfile.close();
+
+}
+
 bool Output_JSONTCP::reconnect()
 {
     if (connection)
@@ -90,12 +108,14 @@ bool Output_JSONTCP::reconnect()
         std::string msg = connection->getLastError();
         boost::replace_all(msg,"\n",",");
         SERVERAPP->getLogger()->error("JSONTCP connection error: %s" ,msg);
+        connected = false;
         sleep(Globals::getConfig_main()->get<uint32_t>("OUTPUT/JSONTCP.ReconnectSleepTimeInSecs",3));
         return false;
     }
     else
     {
         SERVERAPP->getLogger()->information("JSONTCP connected to %s:%u", server, (uint32_t)port );
+        connected = true;
         return true;
     }
 }

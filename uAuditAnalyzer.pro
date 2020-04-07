@@ -46,6 +46,7 @@ SOURCES += \
         src/rules/rules.cpp \
         src/serverapp.cpp \
         src/input/tcplineprocessor.cpp \
+        src/status.cpp \
         src/vars/namedefs.cpp \
         src/events/audit_var.cpp
 
@@ -65,5 +66,6 @@ HEADERS += \
     src/rules/rules.h \
     src/serverapp.h \
     src/input/tcplineprocessor.h \
+    src/status.h \
     src/vars/namedefs.h \
     src/events/audit_var.h

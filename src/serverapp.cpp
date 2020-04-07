@@ -1,5 +1,7 @@
 #include "serverapp.h"
 
+#include "status.h"
+
 #include "output/output_jsontcp.h"
 #include "output/output_postgresql.h"
 #include "output/processorthreads_output.h"
@@ -204,6 +206,11 @@ int ServerAPP::main(const vector<string> &)
         app.logger().information("Starting auditd analyzer...");
 
         // Creating outputs...
+        if (Globals::getConfig_main()->get<bool>("Stats.Enabled",true))
+        {
+            Status::startThreaded();
+        }
+
         if (Globals::getConfig_main()->get<bool>("OUTPUT/PostgreSQL.Enabled",false))
             Globals::addOutputBaseAndStartThreads(new Output_ProgreSQL());
         if (Globals::getConfig_main()->get<bool>("OUTPUT/JSONTCP.Enabled",true))

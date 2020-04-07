@@ -10,7 +10,7 @@
 
 using namespace std;
 TS_Queue<Audit_Event> ProcessorThreads_Output::eventsQueue;
-uint32_t ProcessorThreads_Output::pushTimeoutInMS;
+uint32_t ProcessorThreads_Output::pushTimeoutInMS = 0;
 
 void outputProcessorThread(int threadid)
 {
@@ -44,6 +44,15 @@ ProcessorThreads_Output::ProcessorThreads_Output()
 {
 }
 
+void ProcessorThreads_Output::writeStats(const string &outputDir)
+{
+    ofstream myfile;
+    myfile.open (outputDir + "/processor.queue");
+    myfile << "# Processor Queue Current Size / Max Items" << endl;
+    myfile << eventsQueue.size() << "/" << eventsQueue.getMaxItems() << endl;
+    myfile.close();
+}
+
 void ProcessorThreads_Output::setQueueSize(const size_t &qSize)
 {
     eventsQueue.setMaxItems(qSize);
@@ -62,7 +71,7 @@ void ProcessorThreads_Output::startProcessorThreads(const size_t &threads)
 
 bool ProcessorThreads_Output::pushAuditEvent(Audit_Event *aevent)
 {
-    return eventsQueue.push(aevent, 0);
+    return eventsQueue.push(aevent, pushTimeoutInMS);
 }
 
 Audit_Event *ProcessorThreads_Output::popAuditEvent(const uint32_t & tmout_msecs)

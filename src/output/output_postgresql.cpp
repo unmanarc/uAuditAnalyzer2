@@ -36,6 +36,11 @@ void Output_ProgreSQL::startThread()
     // TODO:
 }
 
+void Output_ProgreSQL::writeStats(const string &outputDir)
+{
+
+}
+
 void Output_ProgreSQL::process()
 {
     // TODO:

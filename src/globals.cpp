@@ -23,6 +23,14 @@ void Globals::addOutputBaseAndStartThreads(Output_Base *ob)
     ob->startThread();
 }
 
+void Globals::writeStatsOnOutputBases(std::string outputDir)
+{
+    for (Output_Base * ob : outputBases)
+    {
+        ob->writeStats(outputDir);
+    }
+}
+
 std::mutex *Globals::getDatabaseMutex()
 {
     return &mDatabase;

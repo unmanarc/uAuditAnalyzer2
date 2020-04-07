@@ -14,8 +14,9 @@ public:
 
     void logAuditEvent(const Json::Value & eventJSON, const std::tuple<time_t, uint32_t, uint64_t> & eventId);
     void startThread();
-
     void process();
+    void writeStats(const std::string & outputDir);
+
 
 
 private:
@@ -23,6 +24,7 @@ private:
 
     Socket_TCP * connection;
     bool reconnect();
+    std::atomic<bool> connected;
     uint32_t push_tmout_msecs;
 };
 

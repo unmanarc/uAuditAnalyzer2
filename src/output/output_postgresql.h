@@ -10,6 +10,7 @@ public:
     Output_ProgreSQL();
     void logAuditEvent(const Json::Value &eventJSON, const std::tuple<time_t, uint32_t, uint64_t> &eventId);
     void startThread();
+    void writeStats(const std::string & outputDir);
     void process();
 
 private:

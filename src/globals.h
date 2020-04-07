@@ -15,6 +15,8 @@ public:
     static void pushToOutputBases(const Json::Value & eventJSON, const std::tuple<time_t, uint32_t, uint64_t> &eventId);
     static void addOutputBaseAndStartThreads(Output_Base *);
 
+    static void writeStatsOnOutputBases(std::string outputDir);
+
     static std::mutex * getDatabaseMutex();
     static void *getServerApp();
     static void setServerApp(void *value);
