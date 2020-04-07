@@ -144,7 +144,8 @@ void ProcessorThreads_Output::addEventsProcessed()
 
 void ProcessorThreads_Output::refreshEventsParsedPerSecond()
 {
-    eventsProcessedInLastSecond = (uint64_t)eventsProcessedInThisSecond;
+    uint64_t x = eventsProcessedInThisSecond;
+    eventsProcessedInLastSecond = x;
     eventsProcessedInThisSecond = 0;
 }
 
