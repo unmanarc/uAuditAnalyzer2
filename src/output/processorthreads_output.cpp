@@ -92,7 +92,7 @@ void ProcessorThreads_Output::writeStats(const string &outputDir)
 
     myfile.open (outputDir + "/processor.events_dropped");
     myfile << "# Processor Events dropped due to full queue" << endl;
-    myfile << eventsProcessedInLastSecond << endl;
+    myfile << eventsDropped << endl;
     myfile.close();
 
     myfile.open (outputDir + "/processor.last_rule_evaluation_time");
