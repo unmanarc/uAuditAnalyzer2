@@ -15,6 +15,15 @@ INCLUDEPATH += $$PREFIX/include
 QMAKE_INCDIR += src
 INCLUDEPATH += src
 
+#Target directory
+DESTDIR=bin
+#Intermediate object files directory
+OBJECTS_DIR=obj
+
+# INSTALLATION:
+target.path = $$PREFIX/bin
+INSTALLS += target
+
 LIBS+= -lPocoFoundation -lPocoUtil -lpqxx
 LIBS+= -lcx_net_sockets -lcx_mem_streams -lcx_net_threadedacceptor -lcx_mem_streamparser -lcx_protocols_linerecv  -lcx_mem_containers -lcx_mem_abstracts -lcx_scripts_jsonexpreval
 LIBS += -lpthread -lcx_thr_mutex
