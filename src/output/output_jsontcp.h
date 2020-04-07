@@ -25,6 +25,7 @@ private:
     Socket_TCP * connection;
     bool reconnect();
     std::atomic<bool> connected;
+    std::atomic<uint64_t> dropped;
     uint32_t push_tmout_msecs;
 };
 

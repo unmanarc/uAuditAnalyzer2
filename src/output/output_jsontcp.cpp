@@ -35,12 +35,14 @@ void Output_JSONTCP::logAuditEvent(const Json::Value & eventJSON, const std::tup
     if (!queueValues.push(value,push_tmout_msecs))
     {
         SERVERAPP->getLogger()->error("Output_JSONTCP Queue full, Event %u.%u:%u Dropped...", get<0>(eventId),get<1>(eventId),get<2>(eventId) );
+        dropped++;
         delete value;
     }
 }
 
 void Output_JSONTCP::startThread()
 {
+    dropped = 0;
     std::thread(tcpOutputProcessorThread,this).detach();
 }
 
@@ -85,6 +87,11 @@ void Output_JSONTCP::writeStats(const string &outputDir)
     myfile << server << ":" << port << " " << (connected? "_CONNECTED_" : "_DISCONNECTED_") << std::endl;
     myfile.close();
 
+
+    myfile.open (outputDir + "/output.jsontcp.dropped");
+    myfile << "# OUTPUT-JSONTCP Dropped events" << std::endl;
+    myfile << dropped << std::endl;
+    myfile.close();
 }
 
 bool Output_JSONTCP::reconnect()
