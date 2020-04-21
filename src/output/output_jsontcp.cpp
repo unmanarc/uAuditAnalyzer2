@@ -26,7 +26,9 @@ Output_JSONTCP::~Output_JSONTCP()
 std::string toUnStyledString(const Json::Value& value)
 {
     Json::FastWriter writer;
-    return writer.write( value );
+    std::string str = writer.write( value );
+    str.erase(std::remove(str.begin(), str.end(), '\n'), str.end());
+    return str;
 }
 
 void Output_JSONTCP::logAuditEvent(const Json::Value & eventJSON, const std::tuple<time_t, uint32_t, uint64_t> &eventId)

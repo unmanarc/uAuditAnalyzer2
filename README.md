@@ -201,7 +201,7 @@ This should be built on top of:
 
 - cxFramework libraries - https://github.com/unmanarc/cxFramework 
 - POCO Libraries
-- JSONCPP
+- JSONCPP (AT LEAST v1.7.7, for RHEL7 you will have to build it by hand or install an external RPM)
 - C++11
 
 ## Build
