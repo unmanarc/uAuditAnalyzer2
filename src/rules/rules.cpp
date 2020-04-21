@@ -3,6 +3,7 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/optional.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 
 
 #include "globals_ext.h"
@@ -224,6 +225,13 @@ string Rules::getValueForVar(const string &var, const string &ruleName, const Js
         Json::Path path(var.substr(1));
         Json::Value result = path.resolve(values);
         return toUnStyledString(result);
+    }
+    else if (var.at(0) == '+')
+    {
+        // JSONPATH ONE-LINE UNSTYLED MAYUS
+        Json::Path path(var.substr(1));
+        Json::Value result = path.resolve(values);
+        return boost::to_upper_copy(toUnStyledString(result));
     }
     else if (var.at(0) == '#')
     {
