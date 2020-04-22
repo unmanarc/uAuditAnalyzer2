@@ -352,7 +352,7 @@ void Rules::addNewRule(const string &ruleName, const property_tree::ptree &vars)
 
 void Rules::addNewAction(const string &actionName, const property_tree::ptree &vars)
 {
-    if (actions.find(actionName) == actions.end())
+    if (actions.find(actionName) != actions.end())
     {
         SERVERAPP->getLogger()->warning("Action '%s': duplicated name.",actionName);
         return;

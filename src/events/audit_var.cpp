@@ -99,6 +99,11 @@ size_t Audit_Var::getRawPureSize() const
     return rawPureSize;
 }
 
+uint32_t Audit_Var::asUInt() const
+{
+    return stoul(fancy);
+}
+
 string Audit_Var::getFancy() const
 {
     return fancy;

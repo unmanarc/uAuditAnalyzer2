@@ -66,7 +66,7 @@ void Output_JSONTCP::process()
         if (value)
         {
             // Try to send it...
-            while (!connection->writeString(transmitionMode==0?toUnStyledString(*value): value->toStyledString() + "=++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n" ).succeed)
+            while (!connection->writeString(transmitionMode==0?toUnStyledString(*value) + "\n": value->toStyledString()  ).succeed)
             {
                 // if not, try to reconnect.
                 while (!reconnect()) {}

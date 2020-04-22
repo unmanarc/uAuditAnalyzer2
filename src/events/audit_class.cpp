@@ -82,7 +82,7 @@ Json::Value Audit_ClassType::getJSON()
             normal = false;
             v["argc"] = contentVars["argc"].getFancy();
             std::string cmdline;
-            for (uint32_t i=0; i<v["argc"].asUInt() && i<65536; i++)
+            for (uint32_t i=0; i<contentVars["argc"].asUInt() && i<65536; i++)
             {
                 std::string curVar = "a" + to_string(i);
                 if (contentVars.find(curVar)!=contentVars.end())
