@@ -175,10 +175,12 @@ bool Rules::evaluate(const Json::Value &values)
             // Activate
             activated = true;
 
-            if (rule->ruleAction == RULE_ACTION_EXEC)
+            if (rule->ruleAction == RULE_ACTION_EXEC || rule->ruleAction == RULE_ACTION_EXECANDABORT)
             {
                 SERVERAPP->getLogger()->debug("Rule '%s' activated, executing %s",rule->name, string(rule->file));
                 exec(rule->name,rule->file,rule->vArguments,values);
+                if (rule->ruleAction == RULE_ACTION_EXECANDABORT)
+                    break;
             }
             else if (rule->ruleAction == RULE_ACTION_ABORT)
             {
@@ -313,9 +315,9 @@ void Rules::addNewRule(const string &ruleName, const property_tree::ptree &vars)
         return;
     }
 
-    if (vars.get<string>("Action", "") == "EXEC")
+    if (vars.get<string>("Action", "") == "EXEC" || vars.get<string>("Action", "") == "EXECANDABORT")
     {
-        rule->ruleAction = RULE_ACTION_EXEC;
+        rule->ruleAction =  vars.get<string>("Action", "") == "EXEC"? RULE_ACTION_EXEC : RULE_ACTION_EXECANDABORT;
         rule->setFileName(vars.get<string>("ActionBin", ""));
         vector<string> arguments;
         for (size_t i=0;vars.get<string>(string("ActionArgument[") + to_string(i) + "]", "") != "";i++)
