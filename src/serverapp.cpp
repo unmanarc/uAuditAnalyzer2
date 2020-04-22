@@ -14,7 +14,14 @@
 #include <Poco/Util/HelpFormatter.h>
 
 #include <cx_net_sockets/socket_tcp.h>
+#include <cx_net_sockets/socket_unix.h>
 #include <cx_net_threadedacceptor/threadedstreamacceptor.h>
+
+#include <unistd.h>
+
+#include <sys/types.h>
+#include <pwd.h>
+#include <grp.h>
 
 using namespace std;
 
@@ -28,6 +35,33 @@ using namespace std;
 static string currentDir = "";
 
 #define SERVERAPP ((ServerAPP *)Globals::getServerApp())
+
+// From: https://stackoverflow.com/questions/8778834/change-owner-and-group-in-c
+bool do_chown (const char *file_path, const char *user_name, const char *group_name)
+{
+    uid_t          uid;
+    gid_t          gid;
+    struct passwd *pwd;
+    struct group  *grp;
+
+    if ( (pwd = getpwnam(user_name)) == nullptr)
+    {
+        return false;
+    }
+    uid = pwd->pw_uid;
+
+    if ((grp=getgrnam(group_name)) == nullptr)
+    {
+        return false;
+    }
+    gid = grp->gr_gid;
+
+    if (chown(file_path, uid, gid) == -1)
+    {
+        return false;
+    }
+    return true;
+}
 
 bool rsyslogAuditdServerThread(void *, Socket_Base_Stream * baseClientSocket, const char * remotePair)
 {
@@ -96,6 +130,32 @@ bool pureAuditdServerThread(void *, Socket_Base_Stream * baseClientSocket, const
     return true;
 }
 
+bool localUnixCommandsServerThread(void *, Socket_Base_Stream * v, const char *)
+{
+    bool readOK = true;
+    unsigned char c = v->readU8(&readOK);
+    if (readOK)
+    {
+        switch(c)
+        {
+        case 'A':
+            // Reload Actions
+            v->writeU8(Rules::reloadActions( Globals::getActionsDir() )?'1':'0');
+            break;
+        case 'R':
+            // Reload Rules
+            v->writeU8(Rules::reloadRules( Globals::getRulesDir() )?'1':'0');
+            break;
+        case 'E':
+            // Reload Everything
+            v->writeU8(Rules::reloadActions( Globals::getActionsDir() ) && Rules::reloadRules( Globals::getRulesDir() )?'1':'0');
+            break;
+        default:
+            break;
+        }
+    }
+    return true;
+}
 
 ServerAPP::ServerAPP(): _helpRequested(false)
 {
@@ -171,7 +231,7 @@ void ServerAPP::handleHelp(const string &, const string &)
 
 void ServerAPP::handleConfig(const string& , const string& value)
 {
-//    loadConfiguration(value);
+    //    loadConfiguration(value);
     Application& app = Application::instance();
 
     app.logger().information("Loading configuration file: %s", value);
@@ -193,6 +253,7 @@ void ServerAPP::handleRules(const string& , const string& value)
 {
     Application& app = Application::instance();
     app.logger().information("Loading rules directory: %s", value);
+    Globals::setRulesDir(value);
     Rules::reloadRules( value );
 }
 
@@ -200,6 +261,7 @@ void ServerAPP::handleActions(const string &, const string &value)
 {
     Application& app = Application::instance();
     app.logger().information("Loading actions directory: %s", value);
+    Globals::setActionsDir(value);
     Rules::reloadActions( value );
 }
 
@@ -239,8 +301,30 @@ int ServerAPP::main(const vector<string> &)
 
         ProcessorThreads_Output::startProcessorThreads( Globals::getConfig_main()->get<size_t>("Processor.Threads",8) );
         ProcessorThreads_Output::setQueueSize(Globals::getConfig_main()->get<size_t>("Processor.QueueSize",1000));
+
         ThreadedStreamAcceptor vstreamer_syslog;
-        ThreadedStreamAcceptor vstreamer_auditd;       
+        ThreadedStreamAcceptor vstreamer_auditd;
+
+        // unix communication
+        {
+            Socket_UNIX * unixServer = new Socket_UNIX();
+            if (access("/var/run/uauditanalyzer", W_OK)) mkdir("/var/run/uauditanalyzer/control.sock",0770);
+            unlink("/var/run/uauditanalyzer/control.sock");
+            if (!unixServer->listenOn(0,"/var/run/uauditanalyzer/control.sock"))
+            {
+                app.logger().fatal("Can't control/listen on /var/run/uauditanalyzer/control.sock");
+                return -1;            
+            }
+            if (chmod("/var/run/uauditanalyzer/control.sock", 0770)==-1) //|| !do_chown("/var/run/uauditanalyzer/control.sock", "root", "root"))
+            {
+                app.logger().fatal("Can't chmod 770 on /var/run/uauditanalyzer/control.sock");
+                return -2;
+            }
+            ThreadedStreamAcceptor * vstreamer = new ThreadedStreamAcceptor;
+            vstreamer->setAcceptorSocket(unixServer);
+            vstreamer->setCallbackOnConnect(&localUnixCommandsServerThread, nullptr);
+            vstreamer->startThreaded();
+        }
 
         if (Globals::getConfig_main()->get<bool>("INPUT/SYSLOG.Enabled",true))
         {

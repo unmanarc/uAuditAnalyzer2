@@ -194,6 +194,27 @@ ReconnectSleepTimeInSecs=3
 
 Just change the destination host and port given your needs, and restart the service.
 
+## External Interactions
+
+Reloading/Modifying things should not imply a full program reset, so the program includes a control unix socket to interact.
+
+### Rules/Actions Reset
+
+To reload all rules and actions:
+
+``$ echo -n 'E' | nc -U /run/uauditanalyzer/control.sock``
+
+To reload all actions:
+
+``$ echo -n 'A' | nc -U /run/uauditanalyzer/control.sock``
+
+To reload all rules:
+
+``$ echo -n 'R' | nc -U /run/uauditanalyzer/control.sock``
+
+### Answer
+
+You should monitor the application for detailed output (eg. ``journalctl -xef``), and you also have to check the return code, ``0`` for error, and ``1`` for success.
 
 ## Requirements 
 

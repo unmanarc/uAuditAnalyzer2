@@ -33,11 +33,7 @@ RawLogs_Host::RawLogs_Host(const std::string &dir, const std::string &hostname)
         pos[1]='_';
     }
 
-#ifndef WIN32
     fileName = dir + "/" + string(basename) + ".log";
-#else
-    fileName = dir + "\\" + string(basename) + ".log";
-#endif
     free(basename);
 
     fp = fopen( fileName.c_str(), "a+" );

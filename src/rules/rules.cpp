@@ -107,11 +107,7 @@ bool Rules::reloadRules(const string &dirPath)
                 if ((ent->d_type & DT_REG) != 0)
                 {
                     property_tree::ptree filters;
-#ifdef WIN32
-                    string filterFilePath = dirPath + "\\" + ent->d_name;
-#else
                     string filterFilePath = dirPath + "/" + ent->d_name;
-#endif
                     SERVERAPP->getLogger()->information("Loading filters from file: %s", filterFilePath);
 
                     property_tree::ini_parser::read_ini( filterFilePath, filters );
