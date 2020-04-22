@@ -13,6 +13,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#include <random>
+#include <string>
 
 using namespace std;
 using namespace boost;
@@ -56,6 +58,22 @@ void forkExec(const std::string & ruleName, const char *file, char ** envp, std:
 
     for (int i=0; argv[i]; i++) free(argv[i]);
     free(argv);
+}
+
+
+std::string createRandomString16()
+{
+     std::string str("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+     std::random_device rd;
+     std::mt19937 generator(rd());
+     std::shuffle(str.begin(), str.end(), generator);
+     return str.substr(0, 16);
+}
+
+
+std::string getRandomTag(const std::string & str, uint64_t t)
+{
+    return "__" + str + "[" + std::to_string(t) + "]";
 }
 
 
@@ -193,6 +211,10 @@ void Rules::replaceArgumentsVar(string &vArgument, const std::string &ruleName, 
 {
     boost::match_flag_type flags = boost::match_default;
     // PRECOMPILE _STATIC_TEXT
+    std::string secureTag = createRandomString16();
+    uint64_t tagCount=0;
+    std::map<std::string,std::string> intermediateTags;
+
     boost::regex exVar("(?<STATIC_TEXT>\\%[^\\%]*\\%)");
     boost::match_results<string::const_iterator> whatStaticText;
     for (string::const_iterator start = vArgument.begin(), end =  vArgument.end();
@@ -201,13 +223,19 @@ void Rules::replaceArgumentsVar(string &vArgument, const std::string &ruleName, 
     {
         std::string xValue = string(whatStaticText[1].first, whatStaticText[1].second).substr(1);
         xValue.pop_back();
-        boost::replace_all(vArgument, string(whatStaticText[1].first, whatStaticText[1].second) ,getValueForVar(xValue,ruleName,values));
+        boost::replace_all(vArgument, string(whatStaticText[1].first, whatStaticText[1].second), getRandomTag(secureTag,tagCount) );
+        intermediateTags[ getRandomTag(secureTag,tagCount++) ] = xValue;
+    }
+    for (const auto & repl : intermediateTags)
+    {
+        boost::replace_all(vArgument, repl.first, getValueForVar(repl.second,ruleName,values));
     }
 }
 
 string Rules::getValueForVar(const string &var, const string &ruleName, const Json::Value &values)
 {
     if (var.empty()) return "%";
+
     else if (var == "N")
     {
         return "\n";
