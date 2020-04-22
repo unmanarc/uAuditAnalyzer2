@@ -35,7 +35,7 @@ void Audit_Host::insertClassContents(const std::tuple<time_t, uint32_t, uint64_t
         aevent = new Audit_Event;
         auditEvents[eventId] = aevent;
         aevent->setEventId(eventId);
-        aevent->setHostName(hostname);
+        aevent->setHostId(hostid);
     }
 
     if (aevent->insertClassContents(eventType,varData))
@@ -62,9 +62,9 @@ void Audit_Host::insertClassContents(const std::tuple<time_t, uint32_t, uint64_t
     }
 }
 
-void Audit_Host::setHostname(const std::string &value)
+void Audit_Host::setHostID(const auditHostID &value)
 {
-    if (hostname.empty()) hostname = value;
+    if (hostid.hostname.empty()) hostid = value;
 }
 
 void Audit_Host::dropOldUncompletedEvents(const uint64_t &maxEventTimeInSeconds)
@@ -102,7 +102,7 @@ void Audit_Host::dropOldUncompletedEvents(const uint64_t &maxEventTimeInSeconds)
     if (!uncompletedEventIDs.empty())
     {
         uncompletedEventIDs.pop_back();
-        SERVERAPP->getLogger()->error("Queueing uncompleted events for host='%s' (%s)...", this->hostname, uncompletedEventIDs );
+        SERVERAPP->getLogger()->error("Queueing uncompleted events for host='%s' (%s)...", this->hostid, uncompletedEventIDs );
     }
 
     for (Audit_Event * aevent : uncompleted_phase2)

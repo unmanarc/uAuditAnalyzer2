@@ -60,14 +60,14 @@ void Audit_Event::setEventId(const std::tuple<time_t, uint32_t, uint64_t> &value
     eventId = value;
 }
 
-std::string Audit_Event::getHostName() const
+auditHostID Audit_Event::getHostId() const
 {
-    return hostName;
+    return hostId;
 }
 
-void Audit_Event::setHostName(const std::string &value)
+void Audit_Event::setHostId(const auditHostID &value)
 {
-    hostName = value;
+    hostId = value;
 }
 
 bool Audit_Event::process()
@@ -132,7 +132,8 @@ Json::Value Audit_Event::getJSON()
     x["INFO"]["msecs"]     = std::get<1>(eventId);
     x["INFO"]["id"]        = (Json::Value::UInt64)std::get<2>(eventId);
 
-    x["INFO"]["host"]      = hostName;
+    x["INFO"]["host"]      = hostId.hostname;
+    x["INFO"]["ip"]        = hostId.ip;
     x["INFO"]["time"]      = sTime;
 
     std::set<string> classes = getClassesNames();

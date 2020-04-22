@@ -11,7 +11,7 @@
 class TCPLineProcessor : public LineRecv
 {
 public:
-    TCPLineProcessor(StreamableObject *sock, bool usingSyslogHeader);
+    TCPLineProcessor(StreamableObject *sock, bool usingSyslogHeader, bool usingSyslogIPHeader);
     virtual ~TCPLineProcessor();
     bool getActive();
 
@@ -30,8 +30,8 @@ private:
     std::atomic<uint32_t> linesProcessed;
     std::atomic<bool> active;
 
-    bool rawLogsEnabled;
     bool usingSyslogHeader;
+    bool usingSyslogIPHeader;
 };
 
 #endif // LINERECEPTOR_H

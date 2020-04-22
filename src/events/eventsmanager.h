@@ -18,7 +18,7 @@ public:
     static void gc();
     static void startGC();
 
-    static void insertClassContents(const std::string & hostName, // hostname
+    static void insertClassContents(const std::string & hostName, const std::string &ip, // hostname/ip
                            const std::tuple<time_t,uint32_t,uint64_t> & eventId, // event time -> event msecs -> event id
                            const std::string & eventType,
                            std::string *vardata);

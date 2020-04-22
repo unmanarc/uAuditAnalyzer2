@@ -31,7 +31,7 @@ static string currentDir = "";
 
 bool rsyslogAuditdServerThread(void *, Socket_Base_Stream * baseClientSocket, const char * remotePair)
 {
-    TCPLineProcessor lineServer(baseClientSocket,true);   
+    TCPLineProcessor lineServer(baseClientSocket,true, Globals::getConfig_main()->get<bool>("INPUT/SYSLOG.ReceiveIP",false));
 
     std::string sRemotePair = remotePair;
     lineServer.setRemoteIP(sRemotePair);
@@ -67,7 +67,7 @@ bool rsyslogAuditdServerThread(void *, Socket_Base_Stream * baseClientSocket, co
 
 bool pureAuditdServerThread(void *, Socket_Base_Stream * baseClientSocket, const char * remotePair)
 {
-    TCPLineProcessor lineServer(baseClientSocket,false);
+    TCPLineProcessor lineServer(baseClientSocket,false,false);
     std::string sRemotePair = remotePair;
 
     SERVERAPP->getLogger()->information("Starting pure auditd incomming connection from @%s...", sRemotePair);

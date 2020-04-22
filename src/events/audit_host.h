@@ -8,6 +8,7 @@
 
 #include "audit_event.h"
 
+
 class Audit_Host
 {
 public:
@@ -18,7 +19,7 @@ public:
                              const std::string & eventType,
                              std::string *varData);
 
-    void setHostname(const std::string &value);
+    void setHostID(const auditHostID &value);
 
     void dropOldUncompletedEvents( const uint64_t & maxEventTimeInSeconds );
 
@@ -29,7 +30,7 @@ public:
 private:
     std::mutex mEvents;
     std::map< std::tuple<time_t,uint32_t,uint64_t>, Audit_Event * > auditEvents;
-    std::string hostname;
+    auditHostID hostid;
     std::atomic<uint64_t> countEventsDropped, countEventsProcessed;
 };
 

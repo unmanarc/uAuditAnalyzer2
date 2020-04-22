@@ -4,6 +4,11 @@
 
 #include <list>
 #include "audit_class.h"
+struct auditHostID
+{
+    std::string hostname;
+    std::string ip;
+};
 
 class Audit_Event
 {
@@ -18,8 +23,8 @@ public:
     std::tuple<time_t, uint32_t, uint64_t> getEventId() const;
     void setEventId(const std::tuple<time_t, uint32_t, uint64_t> &value);
 
-    std::string getHostName() const;
-    void setHostName(const std::string &value);
+    auditHostID getHostId() const;
+    void setHostId(const auditHostID &value);
 
     bool process();
 
@@ -34,7 +39,7 @@ private:
     // eventType -> ClassEvent
     std::multimap<std::string, Audit_Class *> classVars;
     std::tuple<time_t, uint32_t, uint64_t> eventId;
-    std::string hostName;
+    auditHostID hostId;
     time_t creationTime;
 
 };

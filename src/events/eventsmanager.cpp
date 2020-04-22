@@ -60,10 +60,10 @@ void EventsManager::startGC()
     std::thread(garbageCollector).detach();
 }
 
-void EventsManager::insertClassContents(const std::string &hostName, const std::tuple<time_t, uint32_t, uint64_t> &eventId, const std::string &eventType, std::string *vardata )
+void EventsManager::insertClassContents(const std::string &hostName, const std::string &ip, const std::tuple<time_t, uint32_t, uint64_t> &eventId, const std::string &eventType, std::string *vardata )
 {
     mutex_insert.lock();
-    eventsByHostName[hostName].setHostname(hostName);
+    eventsByHostName[hostName].setHostID({hostName,ip});
     eventsByHostName[hostName].insertClassContents(eventId,eventType,vardata);
     mutex_insert.unlock();
 }
