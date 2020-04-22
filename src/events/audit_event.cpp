@@ -124,11 +124,16 @@ Json::Value Audit_Event::getJSON()
     std::string  sTime = std::asctime(std::localtime(&unixTime));
     while (ends_with(sTime,"\n")) sTime.pop_back();
 
+    std::string auditdComposedID =  to_string(unixTime) + "." + to_string(std::get<1>(eventId)) + ":" + to_string(std::get<2>(eventId));
+
+    x["AUDITD"]["composedId"]  = auditdComposedID;
+
     x["INFO"]["unixTime"]  = (Json::Value::Int64)unixTime;
     x["INFO"]["msecs"]     = std::get<1>(eventId);
-    x["INFO"]["id"]        =  (Json::Value::UInt64)std::get<2>(eventId);
-    x["INFO"]["host"]  = hostName;
-    x["INFO"]["time"] = sTime;
+    x["INFO"]["id"]        = (Json::Value::UInt64)std::get<2>(eventId);
+
+    x["INFO"]["host"]      = hostName;
+    x["INFO"]["time"]      = sTime;
 
     std::set<string> classes = getClassesNames();
     for (const string & className : classes)
