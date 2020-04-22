@@ -119,7 +119,7 @@ bool Output_JSONTCP::reconnect()
     {
         std::string msg = connection->getLastError();
         boost::replace_all(msg,"\n",",");
-        SERVERAPP->getLogger()->error("JSONTCP connection error: %s" ,msg);
+        SERVERAPP->getLogger()->error("JSONTCP connection error to %s:%u: %s", server, (uint32_t)port  ,msg);
         connected = false;
         sleep(Globals::getConfig_main()->get<uint32_t>("OUTPUT/JSONTCP.ReconnectSleepTimeInSecs",3));
         return false;
