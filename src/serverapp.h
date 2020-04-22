@@ -24,6 +24,7 @@ protected:
     void handleHelp(const std::string& , const std::string&);
     void handleConfig(const std::string &, const std::string &value);
     void handleRules(const std::string &, const std::string &value);
+    void handleActions(const std::string &, const std::string &value);
 
     int main(const std::vector<std::string>& );
 

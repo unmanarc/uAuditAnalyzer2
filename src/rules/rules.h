@@ -24,11 +24,29 @@ struct sRule
     {
         ruleAction = RULE_ACTION_UNDEFINED;
         expr = nullptr;
-        file = nullptr;
     }
     ~sRule()
     {
         if (expr) delete expr;
+    }
+
+    eRuleAction ruleAction;
+
+    std::string name;
+    std::string actionId;
+
+    std::string filter;
+    JSONExprEval *expr;
+};
+
+struct sAction
+{
+    sAction()
+    {
+        file = nullptr;
+    }
+    ~sAction()
+    {
         if (file) free(file);
     }
 
@@ -42,12 +60,8 @@ struct sRule
         this->vArguments = vArguments;
     }
 
-    eRuleAction ruleAction;
-    std::string name;
-    std::string filter;
     char * file;
     std::vector<std::string> vArguments;
-    JSONExprEval *expr;
 };
 
 std::string toUnStyledString(const Json::Value& value);
@@ -59,7 +73,8 @@ public:
     ~Rules();
 
     static void startExecFork();
-    static bool reload(const std::string &dirPath);
+    static bool reloadRules(const std::string &dirPath);
+    static bool reloadActions(const std::string &dirPath);
     static bool evaluate( const Json::Value & values );
 
 private:
@@ -69,18 +84,16 @@ private:
     static void replaceArgumentsVar(std::string & vArgument,const std::string &ruleName, const Json::Value &values);
     static std::string getValueForVar(const std::string &var, const std::string &ruleName, const Json::Value &values);
 
-
-
     static void addNewRule(const std::string & ruleName, const boost::property_tree::ptree &vars );
-    static void setEnvironment(const std::vector<std::string> & vEnvVars);
+    static void addNewAction(const std::string & actionName, const boost::property_tree::ptree &vars );
 
-    static void reset();
-    static void resetEnvironment();
     static void resetRules();
+    static void resetActions();
 
     static std::mutex mtRules;
-    static char ** envp;
     static std::list<sRule *> rules;
+    static std::map<std::string,sAction *> actions;
 };
 
 #endif // RULEACTION_H
+

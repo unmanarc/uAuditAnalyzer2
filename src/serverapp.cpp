@@ -151,6 +151,15 @@ void ServerAPP::defineOptions(OptionSet &options)
                 .repeatable(true)
                 .argument("file")
                 .callback(OptionCallback<ServerAPP>(this, &ServerAPP::handleRules)));
+
+
+    options.addOption(
+                Option("actions-dir", "a", "load actions configuration from directory")
+                .required(false)
+                .repeatable(true)
+                .argument("file")
+                .callback(OptionCallback<ServerAPP>(this, &ServerAPP::handleActions)));
+
 }
 
 void ServerAPP::handleHelp(const string &, const string &)
@@ -184,7 +193,14 @@ void ServerAPP::handleRules(const string& , const string& value)
 {
     Application& app = Application::instance();
     app.logger().information("Loading rules directory: %s", value);
-    Rules::reload( value );
+    Rules::reloadRules( value );
+}
+
+void ServerAPP::handleActions(const string &, const string &value)
+{
+    Application& app = Application::instance();
+    app.logger().information("Loading actions directory: %s", value);
+    Rules::reloadActions( value );
 }
 
 void ServerAPP::displayHelp()
