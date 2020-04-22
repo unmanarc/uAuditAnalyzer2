@@ -30,14 +30,14 @@ public:
 
     std::set<std::string> getClassesNames();
     bool isMultiContainer(const std::string & groupName);
-    std::list<Audit_Class *> getMultiLineClassVars(const std::string & groupName);
-    Audit_Class * getClassVars(const std::string & groupName);
+    std::list<Audit_ClassType *> getMultiLineClassVars(const std::string & groupName);
+    Audit_ClassType * getClassVars(const std::string & groupName);
 
     Json::Value getJSON();
 
 private:
     // eventType -> ClassEvent
-    std::multimap<std::string, Audit_Class *> classVars;
+    std::multimap<std::string, Audit_ClassType *> classVars;
     std::tuple<time_t, uint32_t, uint64_t> eventId;
     auditHostID hostId;
     time_t creationTime;

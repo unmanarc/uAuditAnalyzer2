@@ -34,14 +34,14 @@ bool Audit_Event::insertClassContents(const string &eventType, std::string * var
     if (eventType == "PATH" || classVars.find(eventType) == classVars.end() )
     {
         // This is multi...
-        Audit_Class * avars = new Audit_Class;
+        Audit_ClassType * avars = new Audit_ClassType;
         avars->setRawInput(varData);
-        avars->setClassName(eventType);
+        avars->setClassTypeName(eventType);
         classVars.insert( make_pair( eventType, avars ) );
     }
     else
     {
-        Audit_Class * avars = classVars.find(eventType)->second;
+        Audit_ClassType * avars = classVars.find(eventType)->second;
         avars->getRawInput()->append(" ");
         avars->getRawInput()->append(*varData);
         delete varData;
@@ -96,9 +96,9 @@ bool Audit_Event::isMultiContainer(const string &groupName)
     return std::distance(result.first, result.second) > 1;
 }
 
-std::list<Audit_Class *> Audit_Event::getMultiLineClassVars(const string &groupName)
+std::list<Audit_ClassType *> Audit_Event::getMultiLineClassVars(const string &groupName)
 {
-    list<Audit_Class *> r;
+    list<Audit_ClassType *> r;
     for (const auto & i : classVars)
     {
         if (i.first == groupName) r.push_back(i.second);
@@ -107,7 +107,7 @@ std::list<Audit_Class *> Audit_Event::getMultiLineClassVars(const string &groupN
 }
 
 
-Audit_Class *Audit_Event::getClassVars(const string &groupName)
+Audit_ClassType *Audit_Event::getClassVars(const string &groupName)
 {
     if (classVars.find(groupName) != classVars.end())
     {
@@ -128,6 +128,8 @@ Json::Value Audit_Event::getJSON()
 
     x["AUDITD"]["composedId"]  = auditdComposedID;
 
+    x["INFO"]["parserVersion"]  = 1;
+
     x["INFO"]["unixTime"]  = (Json::Value::Int64)unixTime;
     x["INFO"]["msecs"]     = std::get<1>(eventId);
     x["INFO"]["id"]        = (Json::Value::UInt64)std::get<2>(eventId);
@@ -139,10 +141,8 @@ Json::Value Audit_Event::getJSON()
     std::set<string> classes = getClassesNames();
     for (const string & className : classes)
     {
-        /*    if (isMultiContainer(className))
-        {*/
         int i=0;
-        typedef std::multimap<std::string, Audit_Class *>::iterator MMAPIterator;
+        typedef std::multimap<std::string, Audit_ClassType *>::iterator MMAPIterator;
         std::pair<MMAPIterator, MMAPIterator> result = classVars.equal_range(className);
         for (MMAPIterator it = result.first; it != result.second; it++)
         {
@@ -157,12 +157,6 @@ Json::Value Audit_Event::getJSON()
         {
             x["INFO"]["key"] = x[className][0]["key"];
         }
-        /*     }
-        else
-        {
-            x["classes"][className]["multi"] = false;
-            x["classes"][className]["items"][0] = classVars.find(className)->second->getJSON();
-        }*/
     }
     return x;
 }
