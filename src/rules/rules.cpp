@@ -376,7 +376,7 @@ void Rules::addNewAction(const string &actionName, const property_tree::ptree &v
     {
         //AppendNewLineToEarchArgument
         std::string argument = vars.get<string>(string("Argv[") + to_string(i) + "]", "");
-        if (vars.get<bool>("AppendNewLineToEarchArgument", false)) argument+="%N%";
+        if (vars.get<bool>("AppendNewLineToEarchArgv", false)) argument+="%N%";
         arguments.push_back(argument);
     }
     action->setArguments(arguments);
