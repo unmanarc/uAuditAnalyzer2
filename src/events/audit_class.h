@@ -8,19 +8,19 @@
 #include <map>
 #include <set>
 
-class Audit_Class
+class Audit_ClassType
 {
 public:
-    Audit_Class();
-    ~Audit_Class();
+    Audit_ClassType();
+    ~Audit_ClassType();
 
     std::string *getRawInput() const;
     void setRawInput(std::string *value);
 
     bool processToVarContent();
 
-    std::string getClassName() const;
-    void setClassName(const std::string &value);
+    std::string getClassTypeName() const;
+    void setClassTypeName(const std::string &value);
 
     Json::Value getJSON();
 
@@ -31,7 +31,7 @@ private:
 
     std::set<std::string> getSpplitedVarNames();
     std::string * rawInput;
-    std::string className;
+    std::string classTypeName;
     std::map<std::string, Audit_Var> contentVars;
 
     std::string getVarNameByPos(const std::string & varName, const size_t &pos);

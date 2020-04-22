@@ -16,29 +16,29 @@ static boost::regex exSyslogAuditdData2("(?<AUDITD_DATA_VARNAME>[^=^ ]+)=(?<AUDI
 
 using namespace std;
 
-Audit_Class::Audit_Class()
+Audit_ClassType::Audit_ClassType()
 {
     rawInput = nullptr;
 }
 
-Audit_Class::~Audit_Class()
+Audit_ClassType::~Audit_ClassType()
 {
     if (rawInput) delete rawInput;
 }
 
-string *Audit_Class::getRawInput() const
+string *Audit_ClassType::getRawInput() const
 {
     return rawInput;
 }
 
-void Audit_Class::setRawInput(string *value)
+void Audit_ClassType::setRawInput(string *value)
 {
     rawInput = value;
 }
 
 unsigned char fromHex16(const char *value);
 
-bool Audit_Class::processToVarContent()
+bool Audit_ClassType::processToVarContent()
 {
     boost::match_results<string::const_iterator> whatDataDecomposed;
     boost::match_flag_type flags = boost::match_default;
@@ -60,35 +60,67 @@ bool Audit_Class::processToVarContent()
     return mergeSpplitedVars();
 }
 
-string Audit_Class::getClassName() const
+string Audit_ClassType::getClassTypeName() const
 {
-    return className;
+    return classTypeName;
 }
 
-void Audit_Class::setClassName(const string &value)
+void Audit_ClassType::setClassTypeName(const string &value)
 {
-    className = value;
+    classTypeName = value;
 }
 
-Json::Value Audit_Class::getJSON()
+Json::Value Audit_ClassType::getJSON()
 {
     Json::Value v;
-    for ( auto & i : contentVars)
+
+    bool normal = true;
+    if (classTypeName == "EXECVE")
     {
-        v[i.first] = i.second.getFancy();
+        if (contentVars.find("argc")!=contentVars.end())
+        {
+            normal = false;
+            v["argc"] = contentVars["argc"].getFancy();
+            std::string cmdline;
+            for (uint32_t i=0; i<v["argc"].asUInt() && i<65536; i++)
+            {
+                std::string curVar = "a" + to_string(i);
+                if (contentVars.find(curVar)!=contentVars.end())
+                {
+                    v["argv"][i] = contentVars[curVar].getFancy();
+                    cmdline += contentVars[curVar].getFancy() + " ";
+                }
+                else
+                {
+                    v["argv"][i] = "__UAA_PARSER_NOT_FOUND__";
+                    cmdline += "__UAA_PARSER_NOT_FOUND__ ";
+                }
+            }
+            if (!cmdline.empty()) cmdline.pop_back();
+            v["cmdline"] = cmdline;
+        }
     }
+
+    if (normal)
+    {
+        for ( auto & i : contentVars)
+        {
+            v[i.first] = i.second.getFancy();
+        }
+    }
+
     return v;
 }
 
-void Audit_Class::parseVar(const string &varName, const string &varValue)
+void Audit_ClassType::parseVar(const string &varName, const string &varValue)
 {
 
-    if (!contentVars[varName].parse( className, varName,  varValue ))
+    if (!contentVars[varName].parse( classTypeName, varName,  varValue ))
     {
         SERVERAPP->getLogger()->error("Unable to parse variable '%s' with value '%s'" , varName, varValue);
     }
 
-    if (className == "SOCKADDR" && varName=="saddr" && varValue.size()<250)
+    if (classTypeName == "SOCKADDR" && varName=="saddr" && varValue.size()<250)
     {
         string family, laddr, path;
         unsigned short port = 0;
@@ -132,14 +164,14 @@ void Audit_Class::parseVar(const string &varName, const string &varValue)
             break;
         }
 
-        contentVars["family"].parse( className, "family",  family );
-        contentVars["ipaddr"].parse( className, "ipaddr",  laddr );
-        if (path.size()) contentVars["unix_path"].parse( className, "unix_path",  path );
-        contentVars["port"].parse( className, "port",  to_string(port) );
+        contentVars["family"].parse( classTypeName, "family",  family );
+        contentVars["ipaddr"].parse( classTypeName, "ipaddr",  laddr );
+        if (path.size()) contentVars["unix_path"].parse( classTypeName, "unix_path",  path );
+        contentVars["port"].parse( classTypeName, "port",  to_string(port) );
     }
 }
 
-bool Audit_Class::mergeSpplitedVars()
+bool Audit_ClassType::mergeSpplitedVars()
 {
     set<string> spplitedVars = getSpplitedVarNames();
     for (const auto & varName : spplitedVars)
@@ -171,7 +203,7 @@ bool Audit_Class::mergeSpplitedVars()
     return true;
 }
 
-set<string> Audit_Class::getSpplitedVarNames()
+set<string> Audit_ClassType::getSpplitedVarNames()
 {
     set<string> spplitedVars;
     for ( const auto & i :  contentVars)
@@ -186,7 +218,7 @@ set<string> Audit_Class::getSpplitedVarNames()
     return spplitedVars;
 }
 
-string Audit_Class::getVarNameByPos(const string &varName, const size_t & pos)
+string Audit_ClassType::getVarNameByPos(const string &varName, const size_t & pos)
 {
     return varName + "[" + to_string(pos) + "]";
 }
