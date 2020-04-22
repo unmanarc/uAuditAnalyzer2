@@ -124,9 +124,9 @@ Json::Value Audit_Event::getJSON()
     std::string  sTime = std::asctime(std::localtime(&unixTime));
     while (ends_with(sTime,"\n")) sTime.pop_back();
 
-    std::string auditdComposedID =  to_string(unixTime) + "." + to_string(std::get<1>(eventId)) + ":" + to_string(std::get<2>(eventId));
+    std::string auditdID =  to_string(unixTime) + "." + to_string(std::get<1>(eventId)) + ":" + to_string(std::get<2>(eventId));
 
-    x["AUDITD"]["composedId"]  = auditdComposedID;
+    x["AUDITD"]["id"]  = auditdID;
 
     x["INFO"]["parserVersion"]  = 1;
 
