@@ -14,8 +14,8 @@ uint32_t ProcessorThreads_Output::pushTimeoutInMS = 0;
 
 std::atomic<double> ProcessorThreads_Output::lastRulesEvaluationTime;
 std::atomic<uint64_t> ProcessorThreads_Output::eventsProcessed;
-std::atomic<uint64_t> ProcessorThreads_Output::eventsProcessedInLastSecond;
-std::atomic<uint64_t> ProcessorThreads_Output::eventsProcessedInThisSecond;
+std::atomic<uint64_t> ProcessorThreads_Output::eventsProcessedInLast10Second;
+std::atomic<uint64_t> ProcessorThreads_Output::eventsProcessedInThisPeriod;
 std::atomic<uint64_t> ProcessorThreads_Output::eventsDropped;
 
 
@@ -70,8 +70,8 @@ void refreshEventsParsedPerSecond()
 
     for (;;)
     {
-        ProcessorThreads_Output::lRefreshEventsParsedPerSecond();
-        sleep(1);
+        ProcessorThreads_Output::lRefreshEventsParsedPer10Second();
+        sleep(10);
     }
 }
 
@@ -93,8 +93,8 @@ void ProcessorThreads_Output::writeStats(const string &outputDir)
     myfile.close();
 
     myfile.open (outputDir + "/processor.events_parsed_last_second");
-    myfile << "# Processor Events parsed in the last second (events per second)" << endl;
-    myfile << eventsProcessedInLastSecond << endl;
+    myfile << "# Processor Events parsed in the last 10 second (events per 10 seconds)" << endl;
+    myfile << eventsProcessedInLast10Second << endl;
     myfile.close();
 
     myfile.open (outputDir + "/processor.events_dropped");
@@ -118,8 +118,8 @@ void ProcessorThreads_Output::startProcessorThreads(const size_t &threads)
     pushTimeoutInMS = Globals::getConfig_main()->get<uint32_t>("Processor.QueuePushTimeoutInMS",0);
     eventsProcessed = 0;
     eventsDropped = 0;
-    eventsProcessedInLastSecond=0;
-    eventsProcessedInThisSecond=0;
+    eventsProcessedInLast10Second=0;
+    eventsProcessedInThisPeriod=0;
     lastRulesEvaluationTime = 0;
 
     std::thread(refreshEventsParsedPerSecond).detach();
@@ -146,13 +146,13 @@ Audit_Event *ProcessorThreads_Output::popAuditEvent(const uint32_t & tmout_msecs
 void ProcessorThreads_Output::addEventsProcessed()
 {
     eventsProcessed++;
-    eventsProcessedInThisSecond++;
+    eventsProcessedInThisPeriod++;
 }
 
-void ProcessorThreads_Output::lRefreshEventsParsedPerSecond()
+void ProcessorThreads_Output::lRefreshEventsParsedPer10Second()
 {
-    eventsProcessedInLastSecond = (uint64_t)eventsProcessedInThisSecond;
-    eventsProcessedInThisSecond = 0;
+    eventsProcessedInLast10Second = (uint64_t)eventsProcessedInThisPeriod;
+    eventsProcessedInThisPeriod = 0;
 }
 
 void ProcessorThreads_Output::setLastRulesEvaluationTime(double _lastRulesEvaluationTime)

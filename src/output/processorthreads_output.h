@@ -20,13 +20,13 @@ public:
     static Audit_Event * popAuditEvent(const uint32_t &tmout_msecs);
 
     static void addEventsProcessed();
-    static void lRefreshEventsParsedPerSecond();
+    static void lRefreshEventsParsedPer10Second();
     static void setLastRulesEvaluationTime(double lastRulesEvaluationTime);
 
 
 private:
     static std::atomic<double> lastRulesEvaluationTime;
-    static std::atomic<uint64_t> eventsProcessed, eventsProcessedInLastSecond, eventsProcessedInThisSecond, eventsDropped;
+    static std::atomic<uint64_t> eventsProcessed, eventsProcessedInLast10Second, eventsProcessedInThisPeriod, eventsDropped;
     static TS_Queue<Audit_Event> eventsQueue;
     static uint32_t pushTimeoutInMS;
 };
