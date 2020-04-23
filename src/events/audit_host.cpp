@@ -102,7 +102,7 @@ void Audit_Host::dropOldUncompletedEvents(const uint64_t &maxEventTimeInSeconds)
     if (!uncompletedEventIDs.empty())
     {
         uncompletedEventIDs.pop_back();
-        SERVERAPP->getLogger()->error("Queueing uncompleted events for host='%s' (%s)...", this->hostid, uncompletedEventIDs );
+        SERVERAPP->getLogger()->error("Queueing uncompleted events for host='%s' (%s)...", this->hostid.hostname, uncompletedEventIDs );
     }
 
     for (Audit_Event * aevent : uncompleted_phase2)
