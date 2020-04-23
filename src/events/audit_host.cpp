@@ -12,6 +12,7 @@ Audit_Host::Audit_Host()
 {
     countEventsDropped=0;
     countEventsProcessed=0;
+    enforceMaxAge = Globals::getConfig_main()->get<uint64_t>("GC.EnforceMaxAge",true);
 }
 
 Audit_Host::~Audit_Host()
@@ -24,7 +25,6 @@ Audit_Host::~Audit_Host()
 
 void Audit_Host::insertClassContents(const std::tuple<time_t, uint32_t, uint64_t> &eventId, const std::string &eventType, std::string * varData)
 {
-
     mEvents.lock();
     Audit_Event * aevent = nullptr;
 
@@ -38,7 +38,7 @@ void Audit_Host::insertClassContents(const std::tuple<time_t, uint32_t, uint64_t
         aevent->setHostId(hostid);
     }
 
-    if (aevent->insertClassContents(eventType,varData))
+    if (aevent->insertClassContents(eventType,varData) && !enforceMaxAge)
     {
         // Event reception ready/completed for analysis, take it out from here and put it in the queue!.
         auditEvents.erase(eventId);
@@ -96,7 +96,7 @@ void Audit_Host::dropOldUncompletedEvents(const uint64_t &maxEventTimeInSeconds)
         char cEventID[512];
         std::tuple<time_t, uint32_t, uint64_t> eventId = aevent->getEventId();
         snprintf(cEventID,500,"%ld.%u:%lu,", get<0>(eventId),get<1>(eventId),get<2>(eventId));
-        uncompletedEventIDs+=cEventID;
+        if (!enforceMaxAge) uncompletedEventIDs+=cEventID;
     }
 
     if (!uncompletedEventIDs.empty())

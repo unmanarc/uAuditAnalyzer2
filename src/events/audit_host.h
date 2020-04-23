@@ -28,6 +28,7 @@ public:
     uint64_t getCountEventsProcessed() const;
 
 private:
+    bool enforceMaxAge;
     std::mutex mEvents;
     std::map< std::tuple<time_t,uint32_t,uint64_t>, Audit_Event * > auditEvents;
     auditHostID hostid;
