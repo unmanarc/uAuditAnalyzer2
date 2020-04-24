@@ -5,7 +5,7 @@
 #include <thread>
 
 
-std::map<std::string,Audit_Host> EventsManager::eventsByHostName;
+std::map<auditHostID,Audit_Host> EventsManager::eventsByHostName;
 std::mutex EventsManager::mutex_insert;
 
 
@@ -30,7 +30,7 @@ void EventsManager::writeStats(const string &outputDir)
     mutex_insert.lock();
     for ( auto & i : eventsByHostName )
     {
-        myfile << "HOSTNAME=" << i.first << "\tPENDING=" << i.second.getPendingEventsCount( ) << "\tPROCESSED=" << i.second.getCountEventsProcessed() << "\tDROPPED=" << i.second.getCountEventsDropped() << endl;
+        myfile << "HOSTNAME=" << i.first.hostname << "\tIP=" << i.first.ip << "\tPENDING=" << i.second.getPendingEventsCount( ) << "\tPROCESSED=" << i.second.getCountEventsProcessed() << "\tDROPPED=" << i.second.getCountEventsDropped() << endl;
     }
     mutex_insert.unlock();
 
@@ -60,10 +60,10 @@ void EventsManager::startGC()
     std::thread(garbageCollector).detach();
 }
 
-void EventsManager::insertClassContents(const std::string &hostName, const std::string &ip, const std::tuple<time_t, uint32_t, uint64_t> &eventId, const std::string &eventType, std::string *vardata )
+void EventsManager::insertClassContents(const auditHostID & hostID, const std::tuple<time_t, uint32_t, uint64_t> &eventId, const std::string &eventType, std::string *vardata )
 {
     mutex_insert.lock();
-    eventsByHostName[hostName].setHostID({hostName,ip});
-    eventsByHostName[hostName].insertClassContents(eventId,eventType,vardata);
+    eventsByHostName[hostID].setHostID(hostID);
+    eventsByHostName[hostID].insertClassContents(eventId,eventType,vardata);
     mutex_insert.unlock();
 }

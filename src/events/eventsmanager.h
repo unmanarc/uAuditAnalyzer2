@@ -18,7 +18,7 @@ public:
     static void gc();
     static void startGC();
 
-    static void insertClassContents(const std::string & hostName, const std::string &ip, // hostname/ip
+    static void insertClassContents(const auditHostID & hostID,  // hostname/ip
                            const std::tuple<time_t,uint32_t,uint64_t> & eventId, // event time -> event msecs -> event id
                            const std::string & eventType,
                            std::string *vardata);
@@ -26,7 +26,7 @@ public:
     static bool getFinished();
 
 private:
-    static std::map<std::string,Audit_Host> eventsByHostName;
+    static std::map<auditHostID,Audit_Host> eventsByHostName;
     static std::mutex mutex_insert;
 
 };

@@ -4,10 +4,22 @@
 
 #include <list>
 #include "audit_class.h"
+
+
 struct auditHostID
 {
     std::string hostname;
     std::string ip;
+
+    bool operator==(const auditHostID &o) const
+    {
+        return hostname == o.hostname && ip == o.ip;
+    }
+
+    bool operator<(const auditHostID &o)  const
+    {
+        return hostname < o.hostname || (hostname == o.hostname && ip < o.ip);
+    }
 };
 
 class Audit_Event

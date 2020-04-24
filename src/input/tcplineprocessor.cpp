@@ -74,7 +74,8 @@ bool TCPLineProcessor::processParsedLine(const string &line)
         uint64_t eventId = stoull(string(whatSyslogAuditdDecomposed[6].first, whatSyslogAuditdDecomposed[6].second));
 
         // up to here.. 360k lps
-        EventsManager::insertClassContents(hostname,usingSyslogIPHeader?ip:remoteIP,
+        EventsManager::insertClassContents( {hostname,
+                                             usingSyslogIPHeader?ip:remoteIP},
                                           std::make_tuple(auditdEventTime,msecs,eventId),
                                           eventType,
                                           new string(whatSyslogAuditdDecomposed[7].first, whatSyslogAuditdDecomposed[7].second));
