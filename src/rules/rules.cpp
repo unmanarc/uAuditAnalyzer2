@@ -102,27 +102,36 @@ bool Rules::reloadRules(const string &dirPath)
         struct dirent *ent;
         if ((dir = opendir (dirPath.c_str())) != NULL)
         {
+            std::set<std::string> files;
+
             while ((ent = readdir (dir)) != NULL)
             {
                 if ((ent->d_type & DT_REG) != 0)
                 {
-                    property_tree::ptree filters;
-                    string filterFilePath = dirPath + "/" + ent->d_name;
-                    SERVERAPP->getLogger()->information("Loading filters from file: %s", filterFilePath);
+                    files.insert(ent->d_name);
 
-                    property_tree::ini_parser::read_ini( filterFilePath, filters );
-
-                    for ( auto & i : filters)
-                    {
-                        addNewRule(i.first,filters.get_child(i.first));
-                    }
                 }
             }
             closedir (dir);
+
+            for (const std::string & file: files)
+            {
+                property_tree::ptree filters;
+                string filterFilePath = dirPath + "/" + file;
+                SERVERAPP->getLogger()->information("Loading filters from file: %s", filterFilePath);
+
+                property_tree::ini_parser::read_ini( filterFilePath, filters );
+
+                for ( auto & i : filters)
+                {
+                    addNewRule(i.first,filters.get_child(i.first));
+                }
+            }
+
         }
         else
         {
-            SERVERAPP->getLogger()->error("Failed to list directory: %s", dirPath);
+            SERVERAPP->getLogger()->error("Failed to list directory: %s, no rules loaded", dirPath);
         }
         return true;
     }
@@ -144,32 +153,34 @@ bool Rules::reloadActions(const string &dirPath)
         struct dirent *ent;
         if ((dir = opendir (dirPath.c_str())) != NULL)
         {
+            std::set<std::string> files;
+
             while ((ent = readdir (dir)) != NULL)
             {
                 if ((ent->d_type & DT_REG) != 0)
                 {
-                    property_tree::ptree filters;
-#ifdef WIN32
-                    string filterFilePath = dirPath + "\\" + ent->d_name;
-#else
-                    string filterFilePath = dirPath + "/" + ent->d_name;
-#endif
-                    SERVERAPP->getLogger()->information("Loading actions from file: %s", filterFilePath);
-
-                    property_tree::ini_parser::read_ini( filterFilePath, filters );
-
-                    for ( auto & i : filters)
-                    {
-                        addNewAction(i.first,filters.get_child(i.first));
-                    }
+                    files.insert(ent->d_name);
                 }
             }
             closedir (dir);
+
+            for (const std::string & file: files)
+            {
+                property_tree::ptree filters;
+                string filterFilePath = dirPath + "/" + file;
+                SERVERAPP->getLogger()->information("Loading actions from file: %s", filterFilePath);
+                property_tree::ini_parser::read_ini( filterFilePath, filters );
+                for ( auto & i : filters)
+                {
+                    addNewAction(i.first,filters.get_child(i.first));
+                }
+            }
         }
         else
         {
-            SERVERAPP->getLogger()->error("Failed to list directory: %s", dirPath);
+            SERVERAPP->getLogger()->error("Failed to list directory: %s, no actions loaded.", dirPath);
         }
+
         return true;
     }
     else
