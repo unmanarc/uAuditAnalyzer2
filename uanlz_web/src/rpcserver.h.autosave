@@ -1,0 +1,16 @@
+#ifndef RPC_H
+#define RPC_H
+
+#include <cx2_net_sockets/streamsocket.h>
+
+class RPCServer
+{
+public:
+    RPCServer();
+    static bool createRPCListener();
+
+private:
+    static bool callbackOnRPCConnect(void *, CX2::Network::Streams::StreamSocket *sock, const char *);
+};
+
+#endif // RPC_H

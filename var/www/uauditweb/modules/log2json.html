@@ -1,0 +1,42 @@
+
+
+  <div class="container-fluid h-100">
+    <div class="row h-100">
+      <aside class="col-12 col-md-2 p-0 bg-secondary rounded">
+        <nav class="navbar navbar-expand navbar-dark bg-secondary flex-md-column flex-row align-items-start rounded">
+          <div class="collapse navbar-collapse">
+            <ul class="flex-md-column flex-row navbar-nav w-100 justify-content-between" id="log2json-menu">
+            </ul>
+          </div>
+        </nav>
+      </aside>
+
+      <cinc_main class="col" id="mainview-log2json-inputs" style="display: none;" name="mainview-log2json">/modules/log2json-inputs.html</cinc_main>
+      <cinc_main class="col" id="mainview-log2json-events" style="display: none;" name="mainview-log2json">/modules/log2json-events.html</cinc_main>
+      <cinc_main class="col" id="mainview-log2json-eventsperhost" style="display: none;" name="mainview-log2json">/modules/log2json-eventsperhost.html</cinc_main>
+      <cinc_main class="col" id="mainview-log2json-output" style="display: none;" name="mainview-log2json">/modules/log2json-outputs.html</cinc_main>
+    </div>
+  </div>
+
+    
+  <script type="text/javascript">
+    $("#headermenu").append('<li class="nav-item"><a class="nav-link" id="mainview-log2json-link" href="javascript:cActivateView(\'mainviews\',\'mainview-log2json\')">Log2JSON</a></li> ');
+   
+    $("#log2json-menu").append('<li class="nav-item"><a class="nav-link pl-0" id="mainview-log2json-inputs-link"     href="javascript:cActivateView(\'mainview-log2json\',\'mainview-log2json-inputs\')">Inputs</a></li>');
+    $("#log2json-menu").append('<li class="nav-item"><a class="nav-link pl-0" id="mainview-log2json-eventsperhost-link"     href="javascript:cActivateView(\'mainview-log2json\',\'mainview-log2json-eventsperhost\')">Events Per Host</a></li>');
+    $("#log2json-menu").append('<li class="nav-item"><a class="nav-link pl-0" id="mainview-log2json-events-link"     href="javascript:cActivateView(\'mainview-log2json\',\'mainview-log2json-events\')">Events Processor</a></li>');
+    $("#log2json-menu").append('<li class="nav-item"><a class="nav-link pl-0" id="mainview-log2json-output-link"     href="javascript:cActivateView(\'mainview-log2json\',\'mainview-log2json-output\')">Outputs</a></li>');
+
+    function mainview_log2json_start()
+    {
+      // Default Log2JSON View:
+      cActivateView('mainview-log2json','mainview-log2json-output');
+    }
+    function mainview_log2json_stop()
+    {
+      // Deactivate all active screens:
+      cActivateView('mainview-log2json','none');
+    }
+
+  </script>
+    

@@ -1,0 +1,37 @@
+  <div class="container-fluid h-100">
+    <div class="row h-100">
+      <aside class="col-12 col-md-2 p-0 bg-secondary rounded">
+        <nav class="navbar navbar-expand navbar-dark bg-secondary flex-md-column flex-row align-items-start rounded">
+          <div class="collapse navbar-collapse">
+            <ul class="flex-md-column flex-row navbar-nav w-100 justify-content-between" id="alerts-menu">
+            </ul>
+          </div>
+        </nav>
+      </aside>
+
+      <cinc_main class="col" id="mainview-alerts-inputs"  style="display: none;" name="mainview-alerts">/modules/alerts-inputs.html</cinc_main>
+      <cinc_main class="col" id="mainview-alerts-events"  style="display: none;" name="mainview-alerts">/modules/alerts-events.html</cinc_main>
+
+    </div>
+  </div>
+
+    
+  <script type="text/javascript">
+    $("#headermenu").append('<li class="nav-item"><a class="nav-link" id="mainview-alerts-link" href="javascript:cActivateView(\'mainviews\',\'mainview-alerts\')">Alerts</a></li> ');
+    
+    $("#alerts-menu").append('<li class="nav-item"><a class="nav-link pl-0" id="mainview-alerts-events-link" href="javascript:cActivateView(\'mainview-alerts\',\'mainview-alerts-events\')">Events Queue / Filters</a></li>');
+    $("#alerts-menu").append('<li class="nav-item"><a class="nav-link pl-0" id="mainview-alerts-inputs-link" href="javascript:cActivateView(\'mainview-alerts\',\'mainview-alerts-inputs\')">Inputs</a></li>');
+
+    function mainview_alerts_start()
+    {
+      // Default Alert View:
+      cActivateView('mainview-alerts','mainview-alerts-events');
+    }
+    function mainview_alerts_stop()
+    {
+      // Deactivate all screens...
+      cActivateView('mainview-alerts','none');
+    }
+     
+  </script>
+    

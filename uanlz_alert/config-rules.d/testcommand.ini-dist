@@ -1,0 +1,5 @@
+[TEST EXECUTION]
+Filter=CONTAINS($.EXECVE[0].cmdline,"TEST123")
+# && !CONTAINS($.PROCTITLE[0].proctitle,"/etc/opt/ft/snmp/scripts") && !CONTAINS($.PATH[0].name,"bin/whoami") && !CONTAINS($.CONFIG_CHANGE[0].op,"rule") && CONTAINS($.SYSCALL[0].success,"yes") && !CONTAINS($.PROCTITLE[0].proctitle,"/usr/sbin/logwatch") && !(CONTAINS($.PROCTITLE[0].proctitle,"-l vi5ftpb") && CONTAINS($.PROCTITLE[0].proctitle,"ssh"))
+Action=EXEC
+ActionID=INVALID

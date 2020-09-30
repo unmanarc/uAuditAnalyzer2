@@ -1,0 +1,11 @@
+[Unit]
+Description=Unmanarc's Auditd Analyzer Framework - RSYSLOG 2 JSON
+
+[Service]
+Type=simple
+#Environment="LD_LIBRARY_PATH=/opt/analyzer/lib"
+ExecStart=/sbin/uanlz_log2json
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

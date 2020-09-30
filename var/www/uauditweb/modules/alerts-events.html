@@ -1,0 +1,142 @@
+<h2>Alerts - Events Queue / Filters</h2>
+
+<hr>
+
+
+<table width="100%">
+
+  <tr valign=top>
+
+    <td>
+      <h2 class="h6 font-weight-bold text-center mb-4">JSON Queue</h2>
+      <div class="progress mx-auto" data-value='x' id=eventsQueuePercentage0>
+        <span class="progress-left"><span class="progress-bar border-success" id=eventsQueuePercentageCOLOR0></span></span>
+        <span class="progress-right"><span class="progress-bar border-success" id=eventsQueuePercentageCOLOR1></span></span>
+        <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
+          <span class="h2 font-weight-bold" id=eventsQueuePercentage1></span> <span><sup class="small">%</sup></span>
+        </div>
+      </div>
+
+      <br>
+      <div class="font-weight-bold text-center mb-4" id=eventsQueueSize>1/x</span>
+
+    </td>
+
+    <td width="75%">
+
+      <h3> Values: </h3><br>
+
+      <table class="table table-hover">
+
+        <thead>
+          <tr>
+            <th>JSON Queue Speed</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Queue IN - Last Second</td>
+            <td id="queueInLastSec">x</td>
+          </tr>
+          <tr>
+            <td>Queue OUT - Last Second</td>
+            <td id="queueOutLastSec">x</td>
+          </tr>
+          <tr>
+            <td>Last Evaluation Time (In Milliseconds)</td>
+            <td id="lastEvaluationTimeInMS">0.xx</td>
+          </tr>
+        </tbody>
+
+        <thead>
+          <tr>
+            <th>JSON Queue Interpreter</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Bad Format</td>
+            <td id="badFormatLines">x</td>
+          </tr>
+          <tr>
+            <td>Dropped (Full Queue)</td>
+            <td id="droppedInQueue">x</td>
+          </tr>
+          <tr>
+            <td>Processed JSON Elements</td>
+            <td id="processedLines">x</td>
+          </tr>
+        </tbody>
+
+
+        <thead>
+          <tr>
+            <th>JSON Filter Engine</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Activated Filters</td>
+            <td id="rulesActivated">x</td>
+          </tr>
+        </tbody>
+
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+<script>
+
+  function drawFilterStats(filterStats) {
+
+   // document.getElementById("span-alerts-events-body").innerHTML = "";
+
+   $(`#queueInLastSec`).text(filterStats["queueInLastSec"]);
+   $(`#queueOutLastSec`).text(filterStats["queueOutLastSec"]);
+   $(`#lastEvaluationTimeInMS`).text(filterStats["lastEvaluationTimeInMS"]);
+
+   $(`#badFormatLines`).text(filterStats["badFormatLines"]);
+   $(`#droppedInQueue`).text(filterStats["droppedInQueue"]);
+   $(`#processedLines`).text(filterStats["processedLines"]);
+   
+   $(`#rulesActivated`).text(filterStats["rulesActivated"]);
+
+   $(`#eventsQueueSize`).text( filterStats["queue"]["count"] + "/" + filterStats["queue"]["max"] );
+   
+    let percentage = (filterStats["queue"]["count"]*100)/filterStats["queue"]["max"];
+    //percentage = 80.43;
+    percentage = parseInt(percentage);
+
+    fillPercentage(`eventsQueuePercentage1`, "eventsQueuePercentage0", "eventsQueuePercentageCOLOR0","eventsQueuePercentageCOLOR1", percentage );
+
+    redrawProgressBars();
+  }
+
+  function mainview_alerts_events_start() {
+    var method = "remote.stats";
+    var payloadData = { "target": "ALERTS", "remoteMethod": "stats.Rules" }
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+        drawFilterStats(result["filterStats"]);
+      },
+      error: function (result) {
+        console.log("ERR");
+      }
+    });
+  }
+  function mainview_alerts_events_stop() {
+    //   alert('Stopping alert inputs');
+  }
+</script>

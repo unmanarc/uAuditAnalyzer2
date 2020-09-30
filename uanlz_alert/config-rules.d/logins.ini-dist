@@ -1,0 +1,4 @@
+[SSH Logins]
+Filter=iIS_EQUAL($.USER_AUTH[0].exe,"/usr/sbin/sshd")
+Action=EXEC
+ActionID=SendXMPP-RAW
