@@ -51,4 +51,4 @@ Tekium is a cybersecurity startup specialized in red team and blue team activiti
 
 Tekium is currently sponsoring this project, and is also in charge of maintaining the project support at a commercial level.
 
-If you need commercial support, integrations with other platforms such as ELK, managed SOC, and / or change requests for new functionalities that you want to be included in the next GPL version, do not hesitate to contact us: `info@tekium.mx`
+If you need commercial support, integrations with other platforms such as ELK, managed SOC, and / or change requests for new functionalities that you want to be included in the next GPL version, do not hesitate to contact us: [info at tekium.mx](mailto:info@tekium.mx)
