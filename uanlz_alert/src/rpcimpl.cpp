@@ -45,7 +45,7 @@ void RPCImpl::runRPClient()
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_ERR, "Error connecting to remote API Server @%s:%d: %s", remoteAddr.c_str(), remotePort, sockRPCClient.getLastError());
+            Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_ERR, "Error connecting to remote API Server @%s:%d: %s", remoteAddr.c_str(), remotePort, sockRPCClient.getLastError().c_str());
             sleep(3);
         }
     }
