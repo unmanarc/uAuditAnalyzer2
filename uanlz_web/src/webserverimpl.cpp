@@ -79,7 +79,6 @@ bool WebServerImpl::createWebServer()
         auth->attribAccountAdd("stats","control"); // Add stats to control.
 
         // Add functions
-
         methodsManagers->addRPCMethod( "remote.stats",     {"stats"},   {&WebServerImpl::statMethods,nullptr} );
         methodsManagers->addRPCMethod( "remote.control",   {"control"}, {&WebServerImpl::controlMethods,nullptr} );
 

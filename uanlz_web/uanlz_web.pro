@@ -34,7 +34,7 @@ DESTDIR=bin
 OBJECTS_DIR=obj
 
 # INSTALLATION:
-target.path = $$PREFIX/sbin
+target.path = $$PREFIX/bin
 INSTALLS += target
 
 
