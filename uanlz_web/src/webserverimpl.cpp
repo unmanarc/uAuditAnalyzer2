@@ -13,7 +13,6 @@
 #include <ostream>
 
 using namespace CX2::Application;
-using namespace CX2::Authentication;
 using namespace CX2::RPC::Web;
 using namespace CX2::RPC;
 using namespace CX2;
@@ -23,7 +22,7 @@ WebServerImpl::WebServerImpl()
 {
 }
 
-Json::Value WebServerImpl::controlMethods(void *, Manager *, Session *, const Json::Value & jInput)
+Json::Value WebServerImpl::controlMethods(void *, Authentication::Manager *, Authentication::Session *, const Json::Value & jInput)
 {
     std::string remoteMethod = jInput["remoteMethod"].asString();
     Json::Value j;
@@ -32,7 +31,7 @@ Json::Value WebServerImpl::controlMethods(void *, Manager *, Session *, const Js
     return j;
 }
 
-Json::Value WebServerImpl::statMethods(void *, Manager *, Session *, const Json::Value &jInput)
+Json::Value WebServerImpl::statMethods(void *, Authentication::Manager *, Authentication::Session *, const Json::Value &jInput)
 {
     std::string remoteMethod = jInput["remoteMethod"].asString();
     Json::Value j;
@@ -61,10 +60,10 @@ bool WebServerImpl::createWebServer()
 
     if (sockWebListen->listenOn(listenPort ,listenAddr.c_str(), !Globals::getConfig_main()->get<bool>("WebServer.ipv6",false) ))
     {
-        Domains * authDomains = new Domains;
+        Authentication::Domains * authDomains = new Authentication::Domains;
         MethodsManager *methodsManagers = new MethodsManager;
-        Manager_Volatile * auth = new Manager_Volatile;
-        Secret passDataStats, passDataControl;
+        Authentication::Manager_Volatile * auth = new Authentication::Manager_Volatile;
+        Authentication::Secret passDataStats, passDataControl;
 
         // Create api account (stats):
         passDataStats.hash = Globals::getConfig_main()->get<std::string>("WebServer.StatsKey","stats");
