@@ -21,20 +21,20 @@ bool RPCServerImpl::callbackOnRPCConnect(void *, CX2::Network::Streams::StreamSo
 {
     std::string rpcApiKey = sock->readString(nullptr,16);
 
-    Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_INFO, "Incomming %sRPC connection from %s", secure?"secure ":"", remoteAddr);
+    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Incomming %sRPC connection from %s", secure?"secure ":"", remoteAddr);
 
     if (rpcApiKey == Globals::getConfig_main()->get<std::string>("RPCServer.AlertsApiKey","REPLACEME_XABCXAPIX_ALERTS"))
     {
         if (Globals::getFastRPC()->processConnection(sock,"ALERTS")==-2)
         {
-            Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_ERR, "ALERTS RPC Already Connected, giving up from %s.", remoteAddr);
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "ALERTS RPC Already Connected, giving up from %s.", remoteAddr);
         }
     }
     else if (rpcApiKey == Globals::getConfig_main()->get<std::string>("RPCServer.Log2JSONApiKey","REPLACEME_XABCXAPIX_LOG2JSON"))
     {
         if (Globals::getFastRPC()->processConnection(sock,"LOG2JSON")==-2)
         {
-            Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_ERR, "LOG2JSON RPC Already Connected, giving up from %s.", remoteAddr);
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "LOG2JSON RPC Already Connected, giving up from %s.", remoteAddr);
         }
     }
 
@@ -50,12 +50,12 @@ bool RPCServerImpl::createRPCListener()
 
     if (!sockRPCListen->setTLSPublicKeyPath( Globals::getConfig_main()->get<std::string>("RPCServer.CertFile","snakeoil.crt").c_str() ))
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_CRITICAL, "Error starting RPC Server @%s:%d: %s", listenAddr.c_str(), listenPort, "Bad TLS RPC Server Public Key");
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error starting RPC Server @%s:%d: %s", listenAddr.c_str(), listenPort, "Bad TLS RPC Server Public Key");
         return false;
     }
     if (!sockRPCListen->setTLSPrivateKeyPath( Globals::getConfig_main()->get<std::string>("RPCServer.KeyFile","snakeoil.key").c_str() ))
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_CRITICAL, "Error starting RPC Server @%s:%d: %s", listenAddr.c_str(), listenPort, "Bad TLS RPC Server Private Key");
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error starting RPC Server @%s:%d: %s", listenAddr.c_str(), listenPort, "Bad TLS RPC Server Private Key");
         return false;
     }
 
@@ -69,12 +69,12 @@ bool RPCServerImpl::createRPCListener()
     {
         multiThreadedAcceptor->setAcceptorSocket(sockRPCListen);
         multiThreadedAcceptor->startThreaded();
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_INFO,  "Accepting RPC clients @%s:%d via TLS", listenAddr.c_str(), listenPort);
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  "Accepting RPC clients @%s:%d via TLS", listenAddr.c_str(), listenPort);
         return true;
     }
     else
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_CRITICAL, "Error starting RPC Server @%s:%d: %s", listenAddr.c_str(), listenPort, sockRPCListen->getLastError());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error starting RPC Server @%s:%d: %s", listenAddr.c_str(), listenPort, sockRPCListen->getLastError().c_str());
         return false;
     }
 }

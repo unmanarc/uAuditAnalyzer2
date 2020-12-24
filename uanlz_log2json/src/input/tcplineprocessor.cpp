@@ -91,7 +91,7 @@ bool TCPLineProcessor::processParsedLine(const string &line)
     {
         ((TCPServer *)server)->incInvalidLines();
         invalidLinesCount++;
-        Globals::getAppLog()->log1(__func__,remoteIP,CX2::Application::Logs::LOG_LEVEL_WARN,"Incomming invalid line: %s", line.c_str());
+        Globals::getAppLog()->log1(__func__,remoteIP,CX2::Application::Logs::LEVEL_WARN,"Incomming invalid line: %s", line.c_str());
     }
 
     return true;

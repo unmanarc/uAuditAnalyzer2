@@ -32,8 +32,8 @@ public:
         std::string configDir = globalArguments->getCommandLineOptionValue("config-dir")->toString();
 
         // start program.
-        Globals::getAppLog()->log(__func__, "","", Logs::LOG_LEVEL_INFO, 2048, "Starting... (Build date %s %s), PID: %u",__DATE__, __TIME__, getpid());
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_INFO, "Using config dir: %s", configDir.c_str());
+        Globals::getAppLog()->log(__func__, "","", Logs::LEVEL_INFO, 2048, "Starting... (Build date %s %s), PID: %u",__DATE__, __TIME__, getpid());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Using config dir: %s", configDir.c_str());
 
         if (!UANLZ::WEB::RPCServerImpl::createRPCListener())
         {
@@ -45,7 +45,7 @@ public:
             _exit(-1);
         }
 
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_INFO,  (globalArguments->getDaemonName() + " initialized with PID: %d").c_str(), getpid());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  (globalArguments->getDaemonName() + " initialized with PID: %d").c_str(), getpid());
 
         return 0;
     }
@@ -61,30 +61,30 @@ public:
         globalArguments->setVersion(UANZL_VER_MAJOR, UANZL_VER_MINOR, UANZL_VER_SUBMINOR, UANZL_VER_CODENAME);
         globalArguments->setDescription(std::string("Unmanarc's Auditd Analyzer Framework - Web Server"));
 
-        globalArguments->addCommandLineOption("Service Options", 'c', "config-dir" , "Configuration directory"  , "/etc/uauditanalyzer/" + globalArguments->getDaemonName(), CX2::Memory::Vars::ABSTRACT_STRING );
+        globalArguments->addCommandLineOption("Service Options", 'c', "config-dir" , "Configuration directory"  , "/etc/uauditanalyzer/" + globalArguments->getDaemonName(), CX2::Memory::Abstract::TYPE_STRING );
     }
 
     bool _config(int , char *argv[], Arguments::GlobalArguments * globalArguments)
     {
         // process config:
-        unsigned int logMode = Logs::LOG_MODE_STANDARD;
+        unsigned int logMode = Logs::MODE_STANDARD;
 
         CX2::Network::TLS::Socket_TLS::prepareTLS();
 
-        Logs::AppLog initLog(argv[0],"main", Logs::LOG_MODE_STANDARD);
+        Logs::AppLog initLog(argv[0],"main", Logs::MODE_STANDARD);
         initLog.setPrintEmptyFields(true);
         initLog.setUsingAttributeName(false);
         initLog.setUserAlignSize(1);
 
         std::string configDir = globalArguments->getCommandLineOptionValue("config-dir")->toString();
 
-        initLog.log0(__func__,Logs::LOG_LEVEL_INFO, "Loading configuration: %s", (configDir + "/config.ini").c_str());
+        initLog.log0(__func__,Logs::LEVEL_INFO, "Loading configuration: %s", (configDir + "/config.ini").c_str());
 
         boost::property_tree::ptree config_main;
 
         if (access(configDir.c_str(),R_OK))
         {
-            initLog.log0(__func__,Logs::LOG_LEVEL_CRITICAL, "Missing configuration dir: %s", configDir.c_str());
+            initLog.log0(__func__,Logs::LEVEL_CRITICAL, "Missing configuration dir: %s", configDir.c_str());
             return false;
         }
 
@@ -94,13 +94,13 @@ public:
             boost::property_tree::ini_parser::read_ini("config.ini",config_main);
         else
         {
-            initLog.log0(__func__,Logs::LOG_LEVEL_CRITICAL, "Missing configuration: %s", "/config.ini");
+            initLog.log0(__func__,Logs::LEVEL_CRITICAL, "Missing configuration: %s", "/config.ini");
             return false;
         }
 
         *(Globals::getConfig_main()) = config_main;
 
-        if ( config_main.get<bool>("Logs.ToSyslog",true) ) logMode|=Logs::LOG_MODE_SYSLOG;
+        if ( config_main.get<bool>("Logs.ToSyslog",true) ) logMode|=Logs::MODE_SYSLOG;
         Globals::setAppLog(new Logs::AppLog(argv[0], "main", logMode));
         Globals::getAppLog()->setPrintEmptyFields(true);
         Globals::getAppLog()->setUsingColors(config_main.get<bool>("Logs.ShowColors",true));

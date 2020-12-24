@@ -69,7 +69,7 @@ void forkExec(const std::string & ruleName, const char *file, std::vector<string
         waitpid(pid, &status, 0);
         if (status!=0)
         {
-            Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_WARN,"Rule '%s': execution of '%s' failed with %d (%s).", ruleName.c_str(), string(file).c_str(), status, strerror(errno));
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Rule '%s': execution of '%s' failed with %d (%s).", ruleName.c_str(), string(file).c_str(), status, strerror(errno));
         }
     }
     else
@@ -199,7 +199,7 @@ bool Rules::reloadRules(const string &dirPath)
                 property_tree::ptree filters;
                 string filterFilePath = dirPath + "/" + file;
 
-                Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_INFO,"Loading filters from file: %s", filterFilePath.c_str());
+                Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Loading filters from file: %s", filterFilePath.c_str());
 
                 property_tree::ini_parser::read_ini( filterFilePath, filters );
 
@@ -212,13 +212,13 @@ bool Rules::reloadRules(const string &dirPath)
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_ERR,"Failed to list directory: %s, no rules loaded", dirPath.c_str());
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Failed to list directory: %s, no rules loaded", dirPath.c_str());
         }
         return true;
     }
     else
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_CRITICAL,"Missing/Unreadable filters directory: %s", dirPath.c_str());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL,"Missing/Unreadable filters directory: %s", dirPath.c_str());
         return false;
     }
 }
@@ -252,7 +252,7 @@ bool Rules::reloadActions(const string &dirPath)
                 property_tree::ptree filters;
                 string filterFilePath = dirPath + "/" + file;
 
-                Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_INFO,"Loading actions from file: %s", filterFilePath.c_str());
+                Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Loading actions from file: %s", filterFilePath.c_str());
 
                 property_tree::ini_parser::read_ini( filterFilePath, filters );
                 for ( auto & i : filters)
@@ -263,13 +263,13 @@ bool Rules::reloadActions(const string &dirPath)
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_ERR,"Failed to list directory: %s, no actions loaded.", dirPath.c_str());
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Failed to list directory: %s, no actions loaded.", dirPath.c_str());
         }
         return true;
     }
     else
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_CRITICAL,"Missing/Unreadable filters directory: %s", dirPath.c_str());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL,"Missing/Unreadable filters directory: %s", dirPath.c_str());
         return false;
     }
 }
@@ -290,18 +290,18 @@ bool Rules::evaluate(const Json::Value &values)
             {
                 if (actions.find(rule->actionId) == actions.end())
                 {
-                    Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_ERR,"Rule '%s' activated, but action '%s' not found", rule->name.c_str(), rule->actionId.c_str());
+                    Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Rule '%s' activated, but action '%s' not found", rule->name.c_str(), rule->actionId.c_str());
                 }
                 else
                 {
-                    Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_DEBUG,"Rule '%s' activated, executing action '%s'", rule->name.c_str(), rule->actionId.c_str());
+                    Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG,"Rule '%s' activated, executing action '%s'", rule->name.c_str(), rule->actionId.c_str());
                     exec(rule->name, actions[rule->actionId]->file,  actions[rule->actionId]->vArguments,values);
                     if (rule->ruleAction == RULE_ACTION_EXECANDABORT) break;
                 }
             }
             else if (rule->ruleAction == RULE_ACTION_ABORT)
             {
-                Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_DEBUG,"Rule '%s' activated, aborting next rules...", rule->name.c_str());
+                Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG,"Rule '%s' activated, aborting next rules...", rule->name.c_str());
                 break;
             }
         }
@@ -337,7 +337,7 @@ void Rules::threadEvaluation(const uint32_t &threadId)
             }
             else
             {
-                Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_ERR,"Evaluation Thread #%d received invalid JSON...", threadId);
+                Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Evaluation Thread #%d received invalid JSON...", threadId);
                 badFormatLines++;
             }
             delete s;
@@ -349,7 +349,7 @@ void Rules::threadEvaluation(const uint32_t &threadId)
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_DEBUG,"Evaluation Thread #%d timed out (no elements)...", threadId);
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG,"Evaluation Thread #%d timed out (no elements)...", threadId);
         }
     }
 }
@@ -448,12 +448,12 @@ string Rules::getValueForVar(const string &var, const string &ruleName, const Js
         {
             return ruleName;
         }
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_DEBUG,"Invalid Argument Variable '%s' on rule '%s'", var.c_str(),ruleName.c_str());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG,"Invalid Argument Variable '%s' on rule '%s'", var.c_str(),ruleName.c_str());
         return "INVALID_VARGUMENT_VARIABLE";
     }
     else
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_DEBUG,"Invalid Argument Variable '%s' on rule '%s'", var.c_str(),ruleName.c_str());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG,"Invalid Argument Variable '%s' on rule '%s'", var.c_str(),ruleName.c_str());
         return "INVALID_VARGUMENT_VARIABLE";
     }
 
@@ -463,21 +463,21 @@ void Rules::addNewRule(const string &ruleName, const property_tree::ptree &vars)
 {
     if (vars.get<string>("Filter", "") == "")
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_WARN,"Rule '%s': 'Filter' required variable is missing, aborting.",ruleName.c_str());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Rule '%s': 'Filter' required variable is missing, aborting.",ruleName.c_str());
         return;
     }
     if (vars.get<string>("Action", "") == "")
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_WARN,"Rule '%s': 'Action' required variable is missing, aborting.",ruleName.c_str());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Rule '%s': 'Action' required variable is missing, aborting.",ruleName.c_str());
         return;
     }
     if (vars.get<string>("Action", "") == "EXEC" && vars.get<string>("ActionID", "") == "")
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_WARN,"Rule '%s': 'ActionID' required variable is missing, aborting.",ruleName.c_str());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Rule '%s': 'ActionID' required variable is missing, aborting.",ruleName.c_str());
         return;
     }
 
-    Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_INFO,"Creating Rule '%s'",ruleName.c_str());
+    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Creating Rule '%s'",ruleName.c_str());
 
     sRule * rule = new sRule;
     rule->name = ruleName;
@@ -485,7 +485,7 @@ void Rules::addNewRule(const string &ruleName, const property_tree::ptree &vars)
 
     if (!rule->expr->getIsCompiled())
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_WARN,"Rule '%s': 'Filter' compilation failed with '%s'.",ruleName.c_str(), rule->expr->getLastCompilerError().c_str());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Rule '%s': 'Filter' compilation failed with '%s'.",ruleName.c_str(), rule->expr->getLastCompilerError().c_str());
         delete rule;
         return;
     }
@@ -508,22 +508,22 @@ void Rules::addNewAction(const string &actionName, const property_tree::ptree &v
 {
     if (actions.find(actionName) != actions.end())
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_WARN,"Action '%s': duplicated name.",actionName.c_str());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Action '%s': duplicated name.",actionName.c_str());
         return;
     }
 
     if ( vars.get<string>("PathName", "") == "")
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_WARN,"Action '%s': 'PathName' required variable is missing, aborting.",actionName.c_str());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Action '%s': 'PathName' required variable is missing, aborting.",actionName.c_str());
         return;
     }
     if (vars.get<string>("Argv[0]", "") == "")
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_WARN,"Action '%s': 'Argv[0]' required variable is missing, aborting.",actionName.c_str());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Action '%s': 'Argv[0]' required variable is missing, aborting.",actionName.c_str());
         return;
     }
 
-    Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_INFO,"Creating Action '%s'",actionName.c_str());
+    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Creating Action '%s'",actionName.c_str());
 
     sAction * action = new sAction;
     action->setFileName(vars.get<string>("PathName", ""));

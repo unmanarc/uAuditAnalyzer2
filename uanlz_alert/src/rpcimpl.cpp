@@ -33,19 +33,19 @@ void RPCImpl::runRPClient()
 
         if (!sockRPCClient.setTLSCertificateAuthorityPath( "rpcca.crt" ))
         {
-            Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_ERR, "Error starting RPC Connector to %s:%d: %s", remoteAddr.c_str(), remotePort, "Bad TLS Certificate Authority (rpcca.crt)");
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "Error starting RPC Connector to %s:%d: %s", remoteAddr.c_str(), remotePort, "Bad TLS Certificate Authority (rpcca.crt)");
             _exit(-3);
         }
 
         if ( sockRPCClient.connectTo( remoteAddr.c_str(), remotePort ) )
         {
-            Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_INFO,  "Connected to %s:%d", remoteAddr.c_str(), remotePort);
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  "Connected to %s:%d", remoteAddr.c_str(), remotePort);
             sockRPCClient.writeString16(rpcApiKey);
             fastRPC.processConnection(&sockRPCClient,"SERVER");
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_ERR, "Error connecting to remote API Server @%s:%d: %s", remoteAddr.c_str(), remotePort, sockRPCClient.getLastError().c_str());
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "Error connecting to remote API Server @%s:%d: %s", remoteAddr.c_str(), remotePort, sockRPCClient.getLastError().c_str());
             sleep(3);
         }
     }

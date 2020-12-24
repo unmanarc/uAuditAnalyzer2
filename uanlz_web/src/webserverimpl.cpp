@@ -3,7 +3,7 @@
 #include "defs.h"
 
 
-#include <cx2_auth_volatile/iauth_volatile.h>
+#include <cx2_auth_volatile/manager_volatile.h>
 #include <cx2_xrpc_webserver/webserver.h>
 #include <cx2_net_sockets/socket_tls.h>
 
@@ -13,7 +13,7 @@
 #include <ostream>
 
 using namespace CX2::Application;
-using namespace CX2::Authorization;
+using namespace CX2::Authentication;
 using namespace CX2::RPC::Web;
 using namespace CX2::RPC;
 using namespace CX2;
@@ -23,7 +23,7 @@ WebServerImpl::WebServerImpl()
 {
 }
 
-Json::Value WebServerImpl::controlMethods(void *, IAuth *, Session::IAuth_Session *, const Json::Value & jInput)
+Json::Value WebServerImpl::controlMethods(void *, Manager *, Session *, const Json::Value & jInput)
 {
     std::string remoteMethod = jInput["remoteMethod"].asString();
     Json::Value j;
@@ -32,7 +32,7 @@ Json::Value WebServerImpl::controlMethods(void *, IAuth *, Session::IAuth_Sessio
     return j;
 }
 
-Json::Value WebServerImpl::statMethods(void *, IAuth *, Session::IAuth_Session *, const Json::Value &jInput)
+Json::Value WebServerImpl::statMethods(void *, Manager *, Session *, const Json::Value &jInput)
 {
     std::string remoteMethod = jInput["remoteMethod"].asString();
     Json::Value j;
@@ -50,21 +50,21 @@ bool WebServerImpl::createWebServer()
 
     if (!sockWebListen->setTLSPublicKeyPath(  Globals::getConfig_main()->get<std::string>("WebServer.CertFile","snakeoil.crt").c_str()  ))
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_CRITICAL, "Error starting Web Server @%s:%d: %s", listenAddr.c_str(), listenPort, "Bad TLS WEB Server Public Key");
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error starting Web Server @%s:%d: %s", listenAddr.c_str(), listenPort, "Bad TLS WEB Server Public Key");
         return false;
     }
     if (!sockWebListen->setTLSPrivateKeyPath( Globals::getConfig_main()->get<std::string>("WebServer.KeyFile","snakeoil.key").c_str()  ))
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_CRITICAL, "Error starting Web Server @%s:%d: %s", listenAddr.c_str(), listenPort, "Bad TLS WEB Server Private Key");
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error starting Web Server @%s:%d: %s", listenAddr.c_str(), listenPort, "Bad TLS WEB Server Private Key");
         return false;
     }
 
     if (sockWebListen->listenOn(listenPort ,listenAddr.c_str(), !Globals::getConfig_main()->get<bool>("WebServer.ipv6",false) ))
     {
-        IAuth_Domains * authDomains = new IAuth_Domains;
+        Domains * authDomains = new Domains;
         MethodsManager *methodsManagers = new MethodsManager;
-        IAuth_Volatile * auth = new IAuth_Volatile;
-        DataStructs::sPasswordData passDataStats, passDataControl;
+        Manager_Volatile * auth = new Manager_Volatile;
+        Secret passDataStats, passDataControl;
 
         // Create api account (stats):
         passDataStats.hash = Globals::getConfig_main()->get<std::string>("WebServer.StatsKey","stats");
@@ -91,7 +91,7 @@ bool WebServerImpl::createWebServer()
         std::string resourcesPath = Globals::getConfig_main()->get<std::string>("WebServer.ResourcesPath","/var/www/uauditweb");
         if (!webServer->setResourcesLocalPath( resourcesPath ))
         {
-            Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_CRITICAL, "Error locating web server resources at %s",resourcesPath.c_str() );
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error locating web server resources at %s",resourcesPath.c_str() );
             return false;
         }
         webServer->setAuthenticator(authDomains);
@@ -101,12 +101,12 @@ bool WebServerImpl::createWebServer()
 
         webServer->acceptPoolThreaded(sockWebListen);
 
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_INFO,  "Status Web Server Listening @%s:%d", listenAddr.c_str(), listenPort);
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  "Status Web Server Listening @%s:%d", listenAddr.c_str(), listenPort);
         return true;
     }
     else
     {
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_CRITICAL, "Error starting Status Web Server @%s:%d: %s", listenAddr.c_str(), listenPort, sockWebListen->getLastError());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error starting Status Web Server @%s:%d: %s", listenAddr.c_str(), listenPort, sockWebListen->getLastError().c_str());
         return false;
     }
 }
@@ -117,7 +117,7 @@ bool WebServerImpl::protoInitFail(void * , Network::Streams::StreamSocket * sock
 
     for (const auto & i :secSocket->getTLSErrorsAndClear())
     {
-        Globals::getAppLog()->log1(__func__, remoteIP,Logs::LOG_LEVEL_ERR, "TLS Protocol Initialization: %s", i.c_str());
+        Globals::getAppLog()->log1(__func__, remoteIP,Logs::LEVEL_ERR, "TLS Protocol Initialization: %s", i.c_str());
     }
     return true;
 }

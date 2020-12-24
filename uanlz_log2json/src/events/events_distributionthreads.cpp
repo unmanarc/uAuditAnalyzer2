@@ -60,7 +60,7 @@ void outputDistributionThread(int threadid)
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,CX2::Application::Logs::LOG_LEVEL_INFO, "No events so far for output thread #%d, triggering no event alert JSON...", threadid);
+            Globals::getAppLog()->log0(__func__,CX2::Application::Logs::LEVEL_INFO, "No events so far for output thread #%d, triggering no event alert JSON...", threadid);
             Json::Value noEventsAlertJSON;
             noEventsAlertJSON["noEventsAlert"] = true;
             Output::Outputs::pushToOutputBases(noEventsAlertJSON, {0,0,0});

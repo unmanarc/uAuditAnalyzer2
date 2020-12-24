@@ -1,5 +1,5 @@
 #include <cx2_prg_service/service.h>
-#include <cx2_auth_volatile/iauth_volatile.h>
+#include <cx2_auth_volatile/manager_volatile.h>
 #include <cx2_xrpc_webserver/webserver.h>
 #include <cx2_net_sockets/socket_tcp.h>
 
@@ -24,7 +24,7 @@
 using namespace UANLZ::LOG2JSON;
 
 using namespace CX2::Application;
-using namespace CX2::Authorization;
+using namespace CX2::Authentication;
 using namespace CX2::RPC::Web;
 using namespace CX2::RPC;
 
@@ -40,8 +40,8 @@ public:
         std::string configDir = globalArguments->getCommandLineOptionValue("config-dir")->toString();
 
         // start program.
-        Globals::getAppLog()->log(__func__, "","", Logs::LOG_LEVEL_INFO, 2048, "Starting... (Build date %s %s), PID: %u",__DATE__, __TIME__, getpid());
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_INFO, "Using config dir: %s", configDir.c_str());
+        Globals::getAppLog()->log(__func__, "","", Logs::LEVEL_INFO, 2048, "Starting... (Build date %s %s), PID: %u",__DATE__, __TIME__, getpid());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Using config dir: %s", configDir.c_str());
 
         // Start modules here...
         AuditdEvents::Events_Manager::startGC();
@@ -57,7 +57,7 @@ public:
 
         std::thread(RPCImpl::runRPClient).detach();
 
-        Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_INFO,  (globalArguments->getDaemonName() + " initialized with PID: %d").c_str(), getpid());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  (globalArguments->getDaemonName() + " initialized with PID: %d").c_str(), getpid());
         return 0;
     }
 
@@ -72,30 +72,30 @@ public:
         globalArguments->setVersion(UANZL_VER_MAJOR, UANZL_VER_MINOR, UANZL_VER_SUBMINOR, UANZL_VER_CODENAME);
         globalArguments->setDescription(std::string("Unmanarc's Auditd Analyzer Framework - Log to JSON Translator"));
 
-        globalArguments->addCommandLineOption("Service Options", 'c', "config-dir" , "Configuration directory"  , "/etc/uauditanalyzer/" + globalArguments->getDaemonName(), CX2::Memory::Vars::ABSTRACT_STRING );
+        globalArguments->addCommandLineOption("Service Options", 'c', "config-dir" , "Configuration directory"  , "/etc/uauditanalyzer/" + globalArguments->getDaemonName(), CX2::Memory::Abstract::TYPE_STRING );
     }
 
     bool _config(int , char *argv[], Arguments::GlobalArguments * globalArguments)
     {
         // process config:
-        unsigned int logMode = Logs::LOG_MODE_STANDARD;
+        unsigned int logMode = Logs::MODE_STANDARD;
 
         AuditdEvents::NameDefs::init();
 
-        Logs::AppLog initLog(argv[0],"main", Logs::LOG_MODE_STANDARD);
+        Logs::AppLog initLog(argv[0],"main", Logs::MODE_STANDARD);
         initLog.setPrintEmptyFields(true);
         initLog.setUsingAttributeName(false);
         initLog.setUserAlignSize(1);
 
         std::string configDir = globalArguments->getCommandLineOptionValue("config-dir")->toString();
 
-        initLog.log0(__func__,Logs::LOG_LEVEL_INFO, "Loading configuration: %s", (configDir + "/config.ini").c_str());
+        initLog.log0(__func__,Logs::LEVEL_INFO, "Loading configuration: %s", (configDir + "/config.ini").c_str());
 
         boost::property_tree::ptree config_main;
 
         if (access(configDir.c_str(),R_OK))
         {
-            initLog.log0(__func__,Logs::LOG_LEVEL_CRITICAL, "Missing configuration dir: %s", configDir.c_str());
+            initLog.log0(__func__,Logs::LEVEL_CRITICAL, "Missing configuration dir: %s", configDir.c_str());
             return false;
         }
 
@@ -105,13 +105,13 @@ public:
             boost::property_tree::ini_parser::read_ini( (configDir + "/config.ini").c_str(),config_main);
         else
         {
-            initLog.log0(__func__,Logs::LOG_LEVEL_CRITICAL, "Missing configuration: %s", (configDir + "/config.ini").c_str());
+            initLog.log0(__func__,Logs::LEVEL_CRITICAL, "Missing configuration: %s", (configDir + "/config.ini").c_str());
             return false;
         }
 
         *(Globals::getConfig_main()) = config_main;
 
-        if ( config_main.get<bool>("Logs.ToSyslog",true) ) logMode|=Logs::LOG_MODE_SYSLOG;
+        if ( config_main.get<bool>("Logs.ToSyslog",true) ) logMode|=Logs::MODE_SYSLOG;
         Globals::setAppLog(new Logs::AppLog(argv[0], "main", logMode));
         Globals::getAppLog()->setPrintEmptyFields(true);
         Globals::getAppLog()->setUsingColors(config_main.get<bool>("Logs.ShowColors",true));
@@ -140,16 +140,16 @@ public:
                 {
                     boost::property_tree::ptree filters;
                     std::string fullFilePath = dirPath + "/" + file;
-                    Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_INFO, "Loading Log Receptor configuration from file: %s", fullFilePath.c_str());
+                    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Loading Log Receptor configuration from file: %s", fullFilePath.c_str());
                     Input::Inputs::loadConfig(fullFilePath);
                 }
             }
             else
-                Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_ERR, "Failed to list directory: %s, no receptors loaded.", dirPath.c_str());
+                Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "Failed to list directory: %s, no receptors loaded.", dirPath.c_str());
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_CRITICAL, "Missing/Unreadable receptors directory: %s", dirPath.c_str());
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Missing/Unreadable receptors directory: %s", dirPath.c_str());
             return false;
         }
 
@@ -174,16 +174,16 @@ public:
                 {
                     boost::property_tree::ptree filters;
                     std::string fullFilePath = dirPath + "/" + file;
-                    Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_INFO, "Loading TCP JSON Dispatcher configuration from file: %s", fullFilePath.c_str());
+                    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Loading TCP JSON Dispatcher configuration from file: %s", fullFilePath.c_str());
                     Output::Outputs::loadConfig(fullFilePath);
                 }
             }
             else
-                Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_ERR, "Failed to list directory: %s, no TCP JSON dispatchers loaded.", dirPath.c_str());
+                Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "Failed to list directory: %s, no TCP JSON dispatchers loaded.", dirPath.c_str());
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,Logs::LOG_LEVEL_CRITICAL, "Missing/Unreadable TCP JSON dispatchers directory: %s", dirPath.c_str());
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Missing/Unreadable TCP JSON dispatchers directory: %s", dirPath.c_str());
             return false;
         }
 

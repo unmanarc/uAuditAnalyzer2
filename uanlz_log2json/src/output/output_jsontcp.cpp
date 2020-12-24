@@ -30,7 +30,7 @@ bool Output_JSONTCP::loadConfig(const std::string &file)
         boost::property_tree::ini_parser::read_ini( file.c_str(),config);
     else
     {
-        Globals::getAppLog()->log0(__func__,CX2::Application::Logs::LOG_LEVEL_ERR, "Unable to load Output JSON TCP Configuration: %s... Invalid Permissions", file.c_str());
+        Globals::getAppLog()->log0(__func__,CX2::Application::Logs::LEVEL_ERR, "Unable to load Output JSON TCP Configuration: %s... Invalid Permissions", file.c_str());
         return false;
     }
 
@@ -59,7 +59,7 @@ void Output_JSONTCP::logAuditEvent(const Json::Value & eventJSON, const std::tup
     // push, if not report and go.
     if (!queueValues.push(value,push_tmout_msecs))
     {
-        Globals::getAppLog()->log0(__func__,CX2::Application::Logs::LOG_LEVEL_WARN, "Output_JSONTCP Queue full, Event %ld.%d:%lu Dropped...", get<0>(eventId),get<1>(eventId),get<2>(eventId));
+        Globals::getAppLog()->log0(__func__,CX2::Application::Logs::LEVEL_WARN, "Output_JSONTCP Queue full, Event %ld.%d:%lu Dropped...", get<0>(eventId),get<1>(eventId),get<2>(eventId));
         dropped++;
         delete value;
     }
@@ -132,14 +132,14 @@ bool Output_JSONTCP::reconnect()
     {
         std::string msg = connection->getLastError();
         boost::replace_all(msg,"\n",",");
-        Globals::getAppLog()->log0(__func__,CX2::Application::Logs::LOG_LEVEL_ERR, "JSONTCP connection error to %s:%d: %s",  server.c_str(), port  ,msg.c_str());
+        Globals::getAppLog()->log0(__func__,CX2::Application::Logs::LEVEL_ERR, "JSONTCP connection error to %s:%d: %s",  server.c_str(), port  ,msg.c_str());
         connected = false;
         sleep(config.get<uint32_t>("ReconnectSleepTimeInSecs",3));
         return false;
     }
     else
     {
-        Globals::getAppLog()->log0(__func__,CX2::Application::Logs::LOG_LEVEL_INFO, "JSONTCP connected to %s:%u",  server.c_str(), port);
+        Globals::getAppLog()->log0(__func__,CX2::Application::Logs::LEVEL_INFO, "JSONTCP connected to %s:%u",  server.c_str(), port);
         connected = true;
         return true;
     }
