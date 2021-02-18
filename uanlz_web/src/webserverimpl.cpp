@@ -2,8 +2,8 @@
 #include "globals.h"
 #include "defs.h"
 
-
-#include <cx2_auth_volatile/manager_volatile.h>
+#include <cx2_db_sqlite3/sqlconnector_sqlite3.h>
+#include <cx2_auth_db/manager_db.h>
 #include <cx2_xrpc_webserver/webserver.h>
 #include <cx2_net_sockets/socket_tls.h>
 
@@ -13,10 +13,13 @@
 #include <ostream>
 
 using namespace CX2::Application;
+using namespace CX2::Authentication;
 using namespace CX2::RPC::Web;
 using namespace CX2::RPC;
 using namespace CX2;
 using namespace UANLZ::WEB;
+
+#define UAUDITANLZ_APPNAME "UAUDITANLZ"
 
 WebServerImpl::WebServerImpl()
 {
@@ -61,29 +64,57 @@ bool WebServerImpl::createWebServer()
     if (sockWebListen->listenOn(listenPort ,listenAddr.c_str(), !Globals::getConfig_main()->get<bool>("WebServer.ipv6",false) ))
     {
         Authentication::Domains * authDomains = new Authentication::Domains;
-        MethodsManager *methodsManagers = new MethodsManager;
-        Authentication::Manager_Volatile * auth = new Authentication::Manager_Volatile;
-        Authentication::Secret passDataStats, passDataControl;
+
+        ////////////////////////////////////////////////////////////////
+        /// Authentication DB
+        ///
+        Database::SQLConnector_SQLite3 * authDb = new Database::SQLConnector_SQLite3();
+        //authDb->connect("/tmp/testdb.sqlite3");
+        authDb->connectInMemory();
+        Manager_DB * authManager = new Manager_DB(authDb);
+        Secret passDataStats, passDataControl;
+
+        if (!authManager->initScheme())
+        {
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error (Driver: SQLite3), Unknown error during database scheme initialization.");
+            return false;
+        }
 
         // Create api account (stats):
         passDataStats.hash = Globals::getConfig_main()->get<std::string>("WebServer.StatsKey","stats");
-        auth->accountAdd("stats",passDataStats);
-        auth->attribAdd("stats","Stats Access");
-        auth->attribAccountAdd("stats","stats");
-
+        authManager->accountAdd("stats",passDataStats);
         // Create api account (control):
         passDataControl.hash = Globals::getConfig_main()->get<std::string>("WebServer.ControlKey","control");
-        auth->accountAdd("control",passDataControl);
-        auth->attribAdd("control","Control Access");
-        auth->attribAccountAdd("control","control"); // Add control to control.
-        auth->attribAccountAdd("stats","control"); // Add stats to control.
+        authManager->accountAdd("control",passDataControl);
 
+        // Add application:
+        if (!authManager->applicationAdd(UAUDITANLZ_APPNAME,"uAuditAnalyzer", "control"))
+        {
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Unexpected Error.");
+            return false;
+        }
+
+        // Add users control+stats to our application
+        authManager->applicationAccountAdd(UAUDITANLZ_APPNAME,"control");
+        authManager->applicationAccountAdd(UAUDITANLZ_APPNAME,"stats");
+
+        // Create attribute to applications:
+        authManager->attribAdd({UAUDITANLZ_APPNAME,"control"},"Control Access");
+        authManager->attribAdd({UAUDITANLZ_APPNAME,"stats"},"Stats Access");
+
+        // Assign attributes to accounts:
+        authManager->attribAccountAdd({UAUDITANLZ_APPNAME,"control"},"control"); // Add control attrib to control acct.
+        authManager->attribAccountAdd({UAUDITANLZ_APPNAME,"stats"},"control"); // Add stats attrib to control acct.
+        authManager->attribAccountAdd({UAUDITANLZ_APPNAME,"stats"},"stats");// Add stats attrib to stat acct.
+
+        // Add the default domain / auth:
+        authDomains->addDomain("",authManager);
+        ////////////////////////////////////////////////////////////////
+
+        MethodsManager *methodsManagers = new MethodsManager(UAUDITANLZ_APPNAME);
         // Add functions
         methodsManagers->addRPCMethod( "remote.stats",     {"stats"},   {&WebServerImpl::statMethods,nullptr} );
         methodsManagers->addRPCMethod( "remote.control",   {"control"}, {&WebServerImpl::controlMethods,nullptr} );
-
-        // Add the default domain / auth:
-        authDomains->addDomain("",auth);
 
         WebServer * webServer = new WebServer;
         std::string resourcesPath = Globals::getConfig_main()->get<std::string>("WebServer.ResourcesPath","/var/www/uauditweb");
@@ -115,7 +146,8 @@ bool WebServerImpl::protoInitFail(void * , Network::Streams::StreamSocket * sock
 
     for (const auto & i :secSocket->getTLSErrorsAndClear())
     {
-        Globals::getAppLog()->log1(__func__, remoteIP,Logs::LEVEL_ERR, "TLS Protocol Initialization: %s", i.c_str());
+        if (!strstr(i.c_str(),"certificate unknown"))
+            Globals::getAppLog()->log1(__func__, remoteIP,Logs::LEVEL_ERR, "TLS Protocol Initialization: %s", i.c_str());
     }
     return true;
 }
