@@ -71,7 +71,7 @@ public:
 
         CX2::Network::TLS::Socket_TLS::prepareTLS();
 
-        Logs::AppLog initLog(argv[0],"main", Logs::MODE_STANDARD);
+        Logs::AppLog initLog( Logs::MODE_STANDARD);
         initLog.setPrintEmptyFields(true);
         initLog.setUsingAttributeName(false);
         initLog.setUserAlignSize(1);
@@ -101,7 +101,7 @@ public:
         *(Globals::getConfig_main()) = config_main;
 
         if ( config_main.get<bool>("Logs.ToSyslog",true) ) logMode|=Logs::MODE_SYSLOG;
-        Globals::setAppLog(new Logs::AppLog(argv[0], "main", logMode));
+        Globals::setAppLog(new Logs::AppLog( logMode));
         Globals::getAppLog()->setPrintEmptyFields(true);
         Globals::getAppLog()->setUsingColors(config_main.get<bool>("Logs.ShowColors",true));
         Globals::getAppLog()->setUsingPrintDate(config_main.get<bool>("Logs.ShowDate",true));
