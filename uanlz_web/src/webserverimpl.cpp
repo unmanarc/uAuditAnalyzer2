@@ -117,6 +117,8 @@ bool WebServerImpl::createWebServer()
         methodsManagers->addRPCMethod( "remote.control",   {"control"}, {&WebServerImpl::controlMethods,nullptr} );
 
         WebServer * webServer = new WebServer;
+        webServer->setRPCLog(Globals::getRPCLog());
+
         std::string resourcesPath = Globals::getConfig_main()->get<std::string>("WebServer.ResourcesPath","/var/www/uauditweb");
         if (!webServer->setResourcesLocalPath( resourcesPath ))
         {

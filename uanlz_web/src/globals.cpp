@@ -6,6 +6,7 @@ CX2::Application::Logs::AppLog * Globals::applog = nullptr;
 std::string Globals::rulesDir,Globals::actionsDir;
 std::mutex Globals::mDatabase, Globals::mDirs;
 boost::property_tree::ptree Globals::config_main;
+CX2::Application::Logs::RPCLog * Globals::rpclog = nullptr;
 
 CX2::RPC::Fast::FastRPC * Globals::fastRPC = nullptr;
 
@@ -69,3 +70,14 @@ void Globals::setFastRPC(CX2::RPC::Fast::FastRPC *value)
 {
     fastRPC = value;
 }
+
+CX2::Application::Logs::RPCLog *Globals::getRPCLog()
+{
+    return rpclog;
+}
+
+void Globals::setRPCLog(CX2::Application::Logs::RPCLog *value)
+{
+    rpclog = value;
+}
+

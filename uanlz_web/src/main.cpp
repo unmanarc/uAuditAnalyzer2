@@ -105,9 +105,22 @@ public:
         Globals::getAppLog()->setPrintEmptyFields(true);
         Globals::getAppLog()->setUsingColors(config_main.get<bool>("Logs.ShowColors",true));
         Globals::getAppLog()->setUsingPrintDate(config_main.get<bool>("Logs.ShowDate",true));
-        Globals::getAppLog()->setUserAlignSize(1);
+        //Globals::getAppLog()->setUserAlignSize(1);
+        Globals::getAppLog()->setModuleAlignSize(26);
         Globals::getAppLog()->setUsingAttributeName(false);
         Globals::getAppLog()->setDebug(Globals::getConfig_main()->get<bool>("Logs.Debug",false));
+
+        Globals::setRPCLog(new Logs::RPCLog(logMode));
+        Globals::getRPCLog()->setPrintEmptyFields(true);
+        Globals::getRPCLog()->setUsingColors(config_main.get<bool>("Logs.ShowColors",true));
+        Globals::getRPCLog()->setUsingPrintDate(config_main.get<bool>("Logs.ShowDate",true));
+        //Globals::getRPCLog()->setUserAlignSize(1);
+        Globals::getRPCLog()->setDisableDomain(true);
+        Globals::getRPCLog()->setDisableModule(true);
+        Globals::getRPCLog()->setModuleAlignSize(26);
+        Globals::getRPCLog()->setUsingAttributeName(false);
+        Globals::getRPCLog()->setStandardLogSeparator(",");
+        Globals::getRPCLog()->setDebug(config_main.get<bool>("Logs.Debug",false));
 
         return true;
     }
