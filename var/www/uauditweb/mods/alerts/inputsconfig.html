@@ -1,0 +1,161 @@
+<cinc_>/mods/alerts/z.inc.header.html</cinc_>
+
+<script>
+  document.getElementById("apptitle").innerHTML = "Alerts &#9658; JSON Alerts Inputs Configuration";
+
+  // Default Main View:
+  function csrfReady() {
+    document.getElementById('mainview-alerts-inputsconfig-link').style.color = "white";
+    mainview_alerts_inputs_start();
+  }
+
+  function reloadAlerts()
+  {
+    var method = "remote.control";
+    var payloadData = { "target": "ALERTS", 
+                        "remoteMethod": "control.ReloadApp",
+                        "payload": {}
+                      }
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+        if (result == true)
+        {
+          document.getElementById("span-alerts-reload-body").style.visibility = "visible";
+          document.getElementById("span-alerts-reload-body").style.display = "block";
+
+          document.getElementById("span-alerts-inputsmodified-body").style.visibility = "collapse";
+          document.getElementById("span-alerts-inputsmodified-body").style.display = "none";
+
+          setTimeout(() => { document.location = "./events"; }, 4000);         
+        }
+        else
+        {
+          alert("Internal error reloading the alerts service");
+        }
+      },
+      error: function (result) {
+        console.log("ERR");
+      }
+    });
+
+  }
+
+</script>
+
+<div class="alert alert-warning alert-dismissible fade show text-center" role="alert" id="span-alerts-reload-body"
+  style="visibility: collapse; display: none;">
+  <strong>Reloading!</strong> <br>
+  Please wait...<br>
+</div>
+
+
+<div class="alert alert-warning alert-dismissible fade show text-center" role="alert"
+  id="span-alerts-inputsmodified-body" style="visibility: collapse; display: none;">
+  <strong>The input configuration has been modified!</strong> <br>
+  Please reload the alert service to adopt the new changes.<br>
+  <button class="btn btn-danger btn-sm" role="button" onclick="javascript:reloadAlerts()">Reload...</a>
+</div>
+
+
+<div class="d-flex flex-row-reverse">
+  <a href="./input-add" class="btn btn-info btn-sm" role="button">Add New Input...</a>
+</div>
+
+<hr>
+
+<span id="span-alerts-inputsconfig-body">
+</span>
+
+<script>
+  function removeInput(localId)
+  {
+    let id =  document.getElementById(`span-alerts-inputsconfig-id-${localId}`).value;
+
+
+    var method = "remote.control";
+    var payloadData = { "target": "ALERTS", 
+                        "remoteMethod": "control.RemInputFromFileConfig",
+                        "payload": {
+                          "id" : id
+                        }
+                      }
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+        if (result == true)
+          document.location = "./inputsconfig";
+        else
+        {
+          alert("Internal Error Removing Input");
+        }
+      },
+      error: function (result) {
+        console.log("ERR");
+      }
+    });
+
+
+
+  }
+
+  function drawInputs(inputs) {
+
+    document.getElementById("span-alerts-inputsconfig-body").innerHTML = "";
+    let i = 0;
+
+    for (let input of inputs) {
+      $("#span-alerts-inputsconfig-body").append(
+        '<div class="alert alert-dark alert-dismissible fade show" role="alert">' +
+        `<b>Description: </b><span id="span-alerts-inputsconfig-description-${i}"></span><br>` +
+        `<b>Listen Address: </b><span id="span-alerts-inputsconfig-laddr-${i}"></span><br>` +
+        `<b>Listen Port: </b><span id="span-alerts-inputsconfig-lport-${i}"></span><br>` +
+        `<input type="hidden" id="span-alerts-inputsconfig-id-${i}">`+
+        `<button type="button" class="close" onclick="javascript:removeInput('${i}')" aria-label="Close">`+
+          '<span aria-hidden="true">&times;</span>' +
+        '</button>' +
+        '</div>'
+      );
+      $(`#span-alerts-inputsconfig-description-${i}`).text(input["Description"]);
+      $(`#span-alerts-inputsconfig-laddr-${i}`).text(input["ListenAddr"]);
+      $(`#span-alerts-inputsconfig-lport-${i}`).text(input["ListenPort"]);
+      document.getElementById(`span-alerts-inputsconfig-id-${i}`).value = input["id"];
+      i++;
+    }
+  }
+
+  function mainview_alerts_inputs_start() {
+    var method = "remote.stats";
+    var payloadData = { "target": "ALERTS", "remoteMethod": "stats.ReadInputsFileConfig" }
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+        if (result["modified"] == true)
+        {
+
+          document.getElementById("span-alerts-inputsmodified-body").style.visibility = "visible";
+          document.getElementById("span-alerts-inputsmodified-body").style.display = "block";
+        }
+
+        drawInputs(result["inputs"]);
+      },
+      error: function (result) {
+        console.log("ERR");
+      }
+    });
+  }
+  function mainview_alerts_inputs_stop() {
+    //   alert('Stopping alert inputs');
+  }
+</script>
+
+<cinc_>/mods/alerts/z.inc.footer.html</cinc_>

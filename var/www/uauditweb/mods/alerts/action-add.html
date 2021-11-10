@@ -1,0 +1,187 @@
+<cinc_>/mods/alerts/z.inc.header.html</cinc_>
+
+<script>
+  document.getElementById("apptitle").innerHTML = "Alerts &#9658; JSON Alerts - Add New Action";
+  argn = 1;
+
+  // Default Main View:
+  function csrfReady() {
+    document.getElementById('mainview-alerts-actions-link').style.color = "white";
+
+    let actionId = atob(window.location.search.substr(1));
+
+    if (actionId != "")
+      displayAction(actionId);
+  }
+
+  function displayAction(actionId) {
+    var method = "remote.stats";
+
+    var payloadData = {
+      "target": "ALERTS",
+      "remoteMethod": "stats.ReadRunningAction",
+      "payload": {
+        "name": actionId
+      }
+    }
+
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+        if (result == null)
+        {
+          alert("Error loading action (2)...");
+          return;
+        }
+
+        document.getElementById("EditButton").style.visibility = "visible";
+        document.getElementById("EditButton").style.display = "block";
+
+        document.getElementById("AddButton").style.visibility = "collapse";
+        document.getElementById("AddButton").style.display = "none";
+
+        document.getElementById("appendNewLineToEachArgv").checked = result['appendNewLineToEachArgv'];
+        document.getElementById("actionName").value = result['name'];
+        document.getElementById("actionDescription").value = result['description'];
+        document.getElementById("actionExecPath").value = result['path'];
+        document.getElementById("inputArg0").value = result['args'][0];
+        
+        for(var i = 1; i < result['args'].length; i++) {
+          addNewArgument();
+          document.getElementById(`inputArg${i}`).value = result['args'][i];
+        }
+      },
+      error: function (result) {
+        alert("Error loading action...");
+      }
+    });
+
+    return true;
+  }
+
+  function addAction(editMode) {
+
+    var method = "remote.control";
+    
+    if (editMode == "add")
+    {
+      remoteMethod = "control.AddAction";
+    }
+    else
+    {
+      remoteMethod = "control.EditAction";
+    }
+
+    var payloadData = {
+      "target": "ALERTS",
+      "remoteMethod": remoteMethod,
+      "payload": {
+        "name": $("#actionName").val(),
+        "appendNewLineToEachArgv": document.getElementById("appendNewLineToEachArgv").checked,
+        "description": $("#actionDescription").val(),
+        "path" :  $("#actionExecPath").val(),
+        "args": [$("#inputArg0").val()]
+      }
+    }
+
+    for (i = 1; i < argn; i++) {
+      payloadData["payload"]["args"][i] = $(`#inputArg${i}`).val();
+    }
+
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+        if (result == true)
+          document.location = "./actions";
+        else {
+          alert("Internal Error Adding new Action");
+        }
+      },
+      error: function (result) {
+        console.log("ERR");
+      }
+    });
+
+    return true;
+  }
+
+  function addNewArgument() {
+    $("#arguments").append(
+      `    <div class="form-group" id="formArg${argn}">
+             <input type="text" class="form-control" value="" id="inputArg${argn}" style="font-family:monospace;" placeholder="Enter Argument ${argn}">
+             </div> `
+    );
+    argn = argn + 1;
+  }
+
+  function remLastArgument() {
+    if (argn > 1) {
+      argn = argn - 1;
+      document.getElementById(`formArg${argn}`).remove();
+    }
+  }
+
+</script>
+
+
+<form>
+  <div class="form-group">
+    <label for="actionName"><b>Action Name:</b></label>
+    <input type="text" class="form-control" value="Action Name" id="actionName" placeholder="Enter Name">
+  </div>
+  <div class="form-group">
+    <label for="actionDescription"><b>Action Description:</b></label>
+    <input type="text" class="form-control" value="Action Description" id="actionDescription"
+      placeholder="Enter Description">
+  </div>
+  <div class="form-group">
+    <label for="actionExecPath"><b>Executable Path:</b></label>
+    <input type="text" class="form-control" value="/usr/bin/sendmsg.sh" id="actionExecPath"
+      placeholder="Enter Executable Path">
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="" id="appendNewLineToEachArgv" checked>
+    <label class="form-check-label" for="appendNewLineToEachArgv">
+      Append New Line To Each Program Argument
+    </label>
+  </div>
+
+  <hr>
+
+  <table width=80% align=center>
+    <tr>
+      <td>
+        <label for="actionDescription"><b>Program Arguments:</b></label>
+      </td>
+      <td align="right">
+        <a href="javascript:remLastArgument()" class="btn btn-danger btn-sm" role="button">Remove Last Argument...</a>
+        <a href="javascript:addNewArgument()" class="btn btn-success btn-sm" role="button">Add New Argument...</a>
+        <br><br>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2" id="arguments">
+        <div class="form-group">
+          <input type="text" class="form-control" value="" id="inputArg0" placeholder="Enter Argument 0 (program name)" style="font-family:monospace;">
+        </div>
+
+      </td>
+    </tr>
+  </table>
+
+</form>
+<hr>
+
+<div class="d-flex flex-row-reverse">
+  <button class="btn btn-success " id="AddButton" role="button" onclick="javascript:addAction('add')">Add...</a>
+  <button class="btn btn-success " id="EditButton" role="button" onclick="javascript:addAction('edit')" style="visibility: collapse; display: none;">Edit...</a>
+</div>
+
+<cinc_>/mods/alerts/z.inc.footer.html</cinc_>

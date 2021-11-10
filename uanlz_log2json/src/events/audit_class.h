@@ -3,7 +3,7 @@
 
 #include "audit_var.h"
 
-#include <json/json.h>
+#include <cx2_hlp_functions/json.h>
 
 #include <map>
 #include <set>
@@ -24,7 +24,7 @@ public:
     std::string getClassTypeName() const;
     void setClassTypeName(const std::string &value);
 
-    Json::Value getJSON();
+    json getJSON();
 
 private:
 

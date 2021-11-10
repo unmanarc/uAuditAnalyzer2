@@ -1,0 +1,122 @@
+<cinc_>/mods/log2json/z.inc.header.html</cinc_>
+
+<script>
+  document.getElementById("apptitle").innerHTML = "Log Dissector &#9658; JSON Outputs";
+  document.getElementById('mainview-log2json-outputs-link').style.color = "white";
+ 
+
+  // Default Main View:
+  function csrfReady() {
+    mainview_log2json_output_start();
+  }
+</script>
+
+<div id="span-log2json-output-body" class="container">
+</div>
+
+<script>
+    function drawLog2JSONOutputStats(outputStats) {
+        document.getElementById("span-log2json-output-body").innerHTML = "";
+        let i = 0;
+
+        for (let output of outputStats) {
+
+
+            $("#span-log2json-output-body").append(
+                '<div class="border rounded">' +
+                `<b>Host/Port:</b> <span id="span-log2json-output-hostport-${i}"></span><br>` +
+                `<b>Status:</b> <span id="span-log2json-output-status-${i}"></span>` +
+                '<hr>' +
+                '<table width="100%">' +
+                '<tr valign=top>' +
+                '<td>' +
+                '<br>' +
+                '<h2 class="h6 font-weight-bold text-center mb-4">Output JSON Queue</h2>' +
+                `<div class="progress mx-auto" data-value="x" id="span-log2json-output-perc0-${i}">` +
+                `<span class="progress-left"><span class="progress-bar border-success" id="span-log2json-output-color0-${i}"></span></span>` +
+                `<span class="progress-right"><span class="progress-bar border-success" id="span-log2json-output-color1-${i}"></span></span>` +
+                '<div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">' +
+                `<span class="h2 font-weight-bold" id="span-log2json-output-perc1-${i}"></span> <span><sup class="small">%</sup></span>` +
+                '</div>' +
+                '</div>' +
+                '<br>' +
+                `<div class="font-weight-bold text-center mb-4" id=span-log2json-output-perctext-${i}>1/x</span>` +
+                '</td>' +
+                '<td width="75%">' +
+                '<table class="table table-hover">' +
+                '<thead>' +
+                '<tr>' +
+                '<th>JSON Queue Status</th>' +
+                '<th></th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>' +
+                '<tr>' +
+                '<td>Dropped</td>' +
+                `<td align=right id="span-log2json-output-dropped-${i}">x</td>` +
+                '</tr>' +
+                '<tr>' +
+                '<td>Sent</td>' +
+                `<td align=right id="span-log2json-output-processed-${i}">x</td>` +
+                '</tr>' +
+                '</tbody>' +
+                '</table>' +
+                '</td>' +
+                '</tr>' +
+                '</table>' +
+                '</div><br>'
+            );
+            $(`#span-log2json-output-hostport-${i}`).text(output["id"]);
+            
+            $(`#span-log2json-output-dropped-${i}`).text(output["queue"]["dropped"]);
+            $(`#span-log2json-output-processed-${i}`).text(output["queue"]["processed"]);           
+
+            if (output["connected"] == true)
+            {
+                $(`#span-log2json-output-status-${i}`).append("<span class=\"badge badge-success\">Connected</span>");
+            }
+            else
+            {
+                $(`#span-log2json-output-status-${i}`).append("<span class=\"badge badge-danger\">Disconnected</span>");
+            }
+            
+            $(`#span-log2json-output-perctext-${i}`).text( output["queue"]["size"] + "/" + output["queue"]["maxItems"] );
+   
+            let percentage = (output["queue"]["size"]*100)/output["queue"]["maxItems"];
+            //percentage = 80.43;
+            percentage = parseInt(percentage);
+
+           fillPercentage(  `span-log2json-output-perc1-${i}`, 
+                            `span-log2json-output-perc0-${i}`, 
+                            `span-log2json-output-color0-${i}`,
+                            `span-log2json-output-color1-${i}`, 
+                            percentage );
+
+            i++;
+        }
+
+        redrawProgressBars();
+    }
+
+    function mainview_log2json_output_start() {
+        var method = "remote.stats";
+        var payloadData = { "target": "LOG2JSON", "remoteMethod": "stats.Outputs" }
+        $.ajax({
+            url: '/api?mode=EXEC&method=' + method,
+            type: 'POST',
+            headers: { "CSRFToken": $("#csrfToken").val() },
+            data: { payload: JSON.stringify(payloadData) },
+            success: function (result) {
+                drawLog2JSONOutputStats(result["outputs"]);
+            },
+            error: function (result) {
+                console.log("ERR");
+            }
+        });
+    }
+    function mainview_log2json_output_stop() {
+        //   alert('Stopping alert outputs');
+    }
+</script>
+
+<cinc_>/mods/log2json/z.inc.footer.html</cinc_>

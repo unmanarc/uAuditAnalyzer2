@@ -1,0 +1,76 @@
+<cinc_>/mods/alerts/z.inc.header.html</cinc_>
+
+<script>
+  document.getElementById("apptitle").innerHTML = "Alerts &#9658; JSON Alerts Current Inputs Stats";
+
+  // Default Main View:
+  function csrfReady() {
+    document.getElementById('mainview-alerts-inputs-link').style.color = "white";
+    mainview_alerts_inputs_start();
+  }
+</script>
+
+
+
+
+
+<span id="span-alerts-input-body">
+</span>
+
+
+
+
+<script>
+
+  function drawInputStats(inputStats) {
+
+    document.getElementById("span-alerts-input-body").innerHTML = "";
+    let i = 0;
+
+    for (let input of inputStats) {
+      $("#span-alerts-input-body").append(
+        '<hr><br><div class="container">' +
+        `<b>Source Description: </b><span id="span-alerts-input-description-${i}"></span>` +
+        '<table class="table table-striped">' +
+        '<thead><tr><th width=50%>Incomming connection from<br>(IP Address)</th><th>Processed JSON Elements</th><th>Dropped JSON Elements</th></tr></thead>' +
+        `<tbody id="tbody-alerts-input-${i}"></tbody>` +
+        '</table>' +
+        '</div>'
+      );
+      $(`#span-alerts-input-description-${i}`).text(input["description"]);
+      let x = 0;
+      for (let client of input["clients"]) {
+        $("#tbody-alerts-input-" + i).append(
+          `<tr><td id=alerts-inputs-${i}-${x}-0></td><td id=alerts-inputs-${i}-${x}-1></td><td id=alerts-inputs-${i}-${x}-2></td></tr>`
+        );
+        $(`#alerts-inputs-${i}-${x}-0`).text(client["ip"]);
+        $(`#alerts-inputs-${i}-${x}-1`).text(client["processedLinesCount"]);
+        $(`#alerts-inputs-${i}-${x}-2`).text(client["droppedElements"]);
+        x++;
+      }
+      i++;
+    }
+  }
+
+  function mainview_alerts_inputs_start() {
+    var method = "remote.stats";
+    var payloadData = { "target": "ALERTS", "remoteMethod": "stats.ReadRunningInputs" }
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+        drawInputStats(result);
+      },
+      error: function (result) {
+        console.log("ERR");
+      }
+    });
+  }
+  function mainview_alerts_inputs_stop() {
+    //   alert('Stopping alert inputs');
+  }
+</script>
+
+<cinc_>/mods/alerts/z.inc.footer.html</cinc_>

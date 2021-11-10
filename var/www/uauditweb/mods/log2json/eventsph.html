@@ -1,0 +1,70 @@
+<cinc_>/mods/log2json/z.inc.header.html</cinc_>
+
+<script>
+  document.getElementById("apptitle").innerHTML = "Log Dissector &#9658; Auditd Events Per Host";
+  document.getElementById('mainview-log2json-eventsph-link').style.color = "white";
+
+  // Default Main View:
+  function csrfReady() {
+    mainview_log2json_eventsperhost_start();
+  }
+</script>
+
+
+<span id="span-log2json-eventsperhost-body">
+    <hr><br>
+    <div class="container">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th width=50%>Hostname / IP Address</th>
+                    <th>Pending</th>
+                    <th>Processed</th>
+                    <th>Dropped</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-log2json-eventsperhost"></tbody>
+        </table>
+    </div>
+</span>
+
+<script>
+    function drawEventsPerHostStats(inputStats) {
+
+        document.getElementById("tbody-log2json-eventsperhost").innerHTML = "";
+        let i = 0;
+
+        for (let input of inputStats) {
+            $("#tbody-log2json-eventsperhost-" + i).append(
+                `<tr><td id=log2json-eventsperhost-${i}-0></td><td id=log2json-eventsperhost-${i}-1></td><td id=log2json-eventsperhost-${i}-2></td><td id=log2json-eventsperhost-${i}-3></td></tr>`
+            );
+            $(`#log2json-eventsperhost-${i}-0`).text(client["hostname"] + "/" + client["ip"]);
+            $(`#log2json-eventsperhost-${i}-1`).text(client["events"]["pending"]);
+            $(`#log2json-eventsperhost-${i}-2`).text(client["events"]["processed"]);
+            $(`#log2json-eventsperhost-${i}-3`).text(client["events"]["dropped"]);
+            i++;
+        }
+    }
+
+    function mainview_log2json_eventsperhost_start() {
+        var method = "remote.stats";
+        var payloadData = { "target": "LOG2JSON", "remoteMethod": "stats.EventsPerHost" }
+        $.ajax({
+            url: '/api?mode=EXEC&method=' + method,
+            type: 'POST',
+            headers: { "CSRFToken": $("#csrfToken").val() },
+            data: { payload: JSON.stringify(payloadData) },
+            success: function (result) {
+                drawEventsPerHostStats(result["hosts"]);
+            },
+            error: function (result) {
+                console.log("ERR");
+            }
+        });
+    }
+    function mainview_log2json_eventsperhost_stop() {
+        //   alert('Stopping alert inputs');
+    }
+</script>
+
+<cinc_>/mods/log2json/z.inc.footer.html</cinc_>

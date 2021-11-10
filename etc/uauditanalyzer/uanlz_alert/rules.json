@@ -1,0 +1,20 @@
+[
+	{
+		"action" : "EXEC",
+		"actionId" : "SendMSG",
+		"filter" : "IS_EQUAL($.INFO.key,\"L5_EXEC_BIN\") && \n(\niCONTAINS($.PATH[0].name,\"gdb\") || iCONTAINS($.PATH[0].name,\"ltrace\") || iCONTAINS($.PATH[0].name,\"strace\") || iCONTAINS($.PATH[0].name,\"ltrace\")\n)",
+		"name" : "Suspicious Debugging Software Execution"
+	},
+	{
+		"action" : "EXEC",
+		"actionId" : "SendMSG",
+		"filter" : "IS_EQUAL($.INFO.key,\"L5_EXEC_BIN\") && \n(\niCONTAINS($.PATH[0].name,\"nmap\") || iCONTAINS($.PATH[0].name,\"tcpdump\") || ENDS_WITH($.PATH[0].name,\"/nc\") || iCONTAINS($.PATH[0].name,\"netcat\") || iCONTAINS($.PATH[0].name,\"wget\") || iCONTAINS($.PATH[0].name,\"ncat\")\n)",
+		"name" : "Suspicious Network Software Execution"
+	},
+	{
+		"action" : "EXEC",
+		"actionId" : "SendMSG",
+		"filter" : "IS_EQUAL($.INFO.key,\"L5_INTEL\")",
+		"name" : "Database Access"
+	}
+]

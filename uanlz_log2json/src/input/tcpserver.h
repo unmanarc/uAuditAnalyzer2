@@ -16,7 +16,7 @@ public:
     bool loadConfig( const std::string & file );
     void startThreaded();
 
-    Json::Value getStats();
+    json getStats();
 
     void addClient(TCPLineProcessor * clientProcessor);
     void remClient(TCPLineProcessor * clientProcessor);

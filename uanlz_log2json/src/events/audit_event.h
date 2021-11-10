@@ -46,7 +46,7 @@ public:
     std::list<Audit_ClassType *> getMultiLineClassVars(const std::string & groupName);
     Audit_ClassType * getClassVars(const std::string & groupName);
 
-    Json::Value getJSON();
+    json getJSON();
 
 private:
     // eventType -> ClassEvent

@@ -1,0 +1,189 @@
+<cinc_>/mods/alerts/z.inc.header.html</cinc_>
+
+<script>
+  document.getElementById("apptitle").innerHTML = "Alerts &#9658; JSON Alerts Actions";
+  document.getElementById('mainview-alerts-actions-link').style.color = "white";
+
+  // Default Main View:
+  function csrfReady() {
+    drawRunningActionsStart();
+    drawIfModified();
+  }
+</script>
+
+
+  <table width=80% align="center">
+    <tr>
+      <td>
+  
+        <div class="alert alert-warning fade show" role="alert" id="saveAlert" style="visibility: collapse; display: none;">
+          <strong>Alert!</strong> <br>
+          This running configuration has not been saved to disk.
+          <div class="d-flex flex-row-reverse">
+            <a href="javascript:saveToDisk();" class="btn btn-warning btn-sm" role="button">Save To Disk...</a>
+          </div>
+        </div>
+  
+        <br>
+  
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Name/Key</th>
+              <th>Description</th>
+              <th align="right"></th>
+            </tr>
+          </thead>
+  
+          <tbody id="actionsBody">
+  
+          </tbody>
+        </table>
+  
+        <hr>
+        <div class="d-flex flex-row-reverse">
+          <!--          <a href="./action-upload" class="btn btn-info btn-sm" role="button">Upload Actions...</a> &nbsp;-->
+          <a href="./action-add" class="btn btn-success btn-sm" role="button">Add New...</a>
+        </div>
+  
+      </td>
+    </tr>
+  
+  </table>
+
+<script>
+
+  function saveToDisk()
+  {
+    var method = "remote.control";
+    var payloadData = { "target": "ALERTS", 
+                        "remoteMethod": "control.SaveRunningActions",
+                      }
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+        if (result == true)
+        {
+          location.reload();
+        }
+        else
+        {
+          alert("Error Saving Running Configuration.");
+        }
+      },
+      error: function (result) {
+        alert("Error removing object (1).");
+      }
+    });
+  }
+
+  function drawActions(result)
+  {
+    if (result==null)
+      return;
+    document.getElementById("actionsBody").innerHTML = "";
+    let i = 0;
+
+    for (let action of result) {
+
+      let actionId = btoa(action["name"]);
+
+      $("#actionsBody").append(
+        ` <tr>
+              <td id="actionName${i}"></td>
+              <td id="actionDescription${i}"></td>
+              <td align="right"> 
+                <a href="./action-add?${actionId}" class="btn btn-info btn-sm" role="button">Edit...</a>
+                <a href="javascript:actionRemove('${actionId}')" class="btn btn-danger btn-sm" role="button">Remove</a>
+              </td>
+            </tr>`
+      );
+      $(`#actionName${i}`).text(action["name"]);
+      $(`#actionDescription${i}`).text(action["description"]);
+
+      i++;
+    }
+  }
+
+  function actionRemove(actionId)
+  {
+    let actionName = atob(actionId);
+    var method = "remote.control";
+    var payloadData = { "target": "ALERTS", 
+                        "remoteMethod": "control.RemoveAction",
+                        "payload" : {
+                          "name" : actionName
+                        } 
+                      }
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+        if (result == true)
+        {
+          location.reload();
+        }
+        else
+        {
+          alert("Error removing object (2).");
+        }
+      },
+      error: function (result) {
+        alert("Error removing object (1).");
+      }
+    });
+  }
+
+  function drawRunningActionsStart()
+  {
+    var method = "remote.stats";
+    var payloadData = { "target": "ALERTS", "remoteMethod": "stats.ReadRunningActions" }
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+        drawActions(result);
+      },
+      error: function (result) {
+        console.log("ERR");
+      }
+    });
+  }
+
+  function drawIfModified()
+  {
+    var method = "remote.stats";
+    var payloadData = { "target": "ALERTS", "remoteMethod": "stats.AreActionsModified" }
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+        if (result == true)
+        {
+          document.getElementById("saveAlert").style.visibility = "visible";
+          document.getElementById("saveAlert").style.display = "block";
+        }
+        else
+        {
+          document.getElementById("saveAlert").style.visibility = "collapse";
+          document.getElementById("saveAlert").style.display = "none";
+        }
+      },
+      error: function (result) {
+        console.log("ERR");
+      }
+    });
+  }
+
+</script>
+
+<cinc_>/mods/alerts/z.inc.footer.html</cinc_>

@@ -1,4 +1,4 @@
-#include <cx2_prg_service/service.h>
+#include <cx2_prg_service/application.h>
 #include <cx2_net_sockets/socket_tls.h>
 
 #include "rpcserverimpl.h"
@@ -35,6 +35,8 @@ public:
         Globals::getAppLog()->log(__func__, "","", Logs::LEVEL_INFO, 2048, "Starting... (Build date %s %s), PID: %u",__DATE__, __TIME__, getpid());
         Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Using config dir: %s", configDir.c_str());
 
+        Globals::getLoginRPCClient()->start();
+
         if (!UANLZ::WEB::RPCServerImpl::createRPCListener())
         {
             _exit(-2);
@@ -43,6 +45,26 @@ public:
         if (!UANLZ::WEB::WebServerImpl::createWebServer())
         {
             _exit(-1);
+        }
+
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  "Looking for static login resources...");
+
+        auto staticContent = Globals::getLoginRPCClient()->getRemoteAuthManager()->getStaticContent();
+
+        for ( unsigned int i=0; i<staticContent.size(); i++ )
+        {
+            auto jContent =  staticContent[i];
+
+            if (jContent.isMember("path") && jContent.isMember("content"))
+            {
+                std::string path = JSON_ASSTRING(jContent,"path","");
+                std::string content = JSON_ASSTRING(jContent,"content","");
+                Globals::getWebServer()->addInternalContentElement(path,content);
+                Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  "Adding web login static resource '%s'", path.c_str());
+            }
+            else {
+                Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,  "Warning: bad static resource (%d)", i);
+            }
         }
 
         Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  (globalArguments->getDaemonName() + " initialized with PID: %d").c_str(), getpid());
@@ -100,12 +122,11 @@ public:
 
         *(Globals::getConfig_main()) = config_main;
 
-        if ( config_main.get<bool>("Logs.ToSyslog",true) ) logMode|=Logs::MODE_SYSLOG;
+        if ( config_main.get<bool>("Logs.ToSyslog",false) ) logMode|=Logs::MODE_SYSLOG;
         Globals::setAppLog(new Logs::AppLog( logMode));
         Globals::getAppLog()->setPrintEmptyFields(true);
         Globals::getAppLog()->setUsingColors(config_main.get<bool>("Logs.ShowColors",true));
         Globals::getAppLog()->setUsingPrintDate(config_main.get<bool>("Logs.ShowDate",true));
-        //Globals::getAppLog()->setUserAlignSize(1);
         Globals::getAppLog()->setModuleAlignSize(26);
         Globals::getAppLog()->setUsingAttributeName(false);
         Globals::getAppLog()->setDebug(Globals::getConfig_main()->get<bool>("Logs.Debug",false));
@@ -114,13 +135,20 @@ public:
         Globals::getRPCLog()->setPrintEmptyFields(true);
         Globals::getRPCLog()->setUsingColors(config_main.get<bool>("Logs.ShowColors",true));
         Globals::getRPCLog()->setUsingPrintDate(config_main.get<bool>("Logs.ShowDate",true));
-        //Globals::getRPCLog()->setUserAlignSize(1);
         Globals::getRPCLog()->setDisableDomain(true);
         Globals::getRPCLog()->setDisableModule(true);
         Globals::getRPCLog()->setModuleAlignSize(26);
         Globals::getRPCLog()->setUsingAttributeName(false);
         Globals::getRPCLog()->setStandardLogSeparator(",");
         Globals::getRPCLog()->setDebug(config_main.get<bool>("Logs.Debug",false));
+
+        // Initialize app vars here:
+        Globals::getLoginRPCClient()->setApiKey(Globals::getConfig_main()->get<std::string>("LoginRPCClient.LoginApiKey","REPLACEME_XABCXAPIX_LOGIN"));
+        Globals::getLoginRPCClient()->setAppName(Globals::getConfig_main()->get<std::string>("LoginRPCClient.AppName","UAUDITANLZ"));
+        Globals::getLoginRPCClient()->setCaFile(Globals::getConfig_main()->get<std::string>("LoginRPCClient.CAFile","ca.crt"));
+        Globals::getLoginRPCClient()->setRemoteHost(Globals::getConfig_main()->get<std::string>("LoginRPCClient.RemoteHost","127.0.0.1"));
+        Globals::getLoginRPCClient()->setRemotePort(Globals::getConfig_main()->get<uint16_t>("LoginRPCClient.RemotePort",30301));
+        Globals::getLoginRPCClient()->setUseIPv6(Globals::getConfig_main()->get<bool>("LoginRPCClient.ipv6",false));
 
         return true;
     }

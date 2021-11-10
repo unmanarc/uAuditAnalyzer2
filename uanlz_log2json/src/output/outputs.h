@@ -14,10 +14,10 @@ class Outputs
 public:
     Outputs();
 
-    static Json::Value getStats();
+    static json getStats();
     static void loadConfig( const std::string & file );
     static void startThreads();
-    static void pushToOutputBases(const Json::Value & eventJSON, const std::tuple<time_t, uint32_t, uint64_t> &eventId);
+    static void pushToOutputBases(const json & eventJSON, const std::tuple<time_t, uint32_t, uint64_t> &eventId);
 
 private:
     static std::list<Output_Base *> outputBases;

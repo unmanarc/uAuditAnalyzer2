@@ -10,13 +10,25 @@ class Inputs
 {
 public:
     Inputs();
-    static Json::Value getStats();
-    static void loadConfig( const std::string & file );
+    static json getStats();
+    static json readInputs(bool * readOK = nullptr);
+    static bool writeInputs(const json & jConfig);
+
+    static bool addInput(json jConfig);
+    static bool remInput(const std::string &inputId);
+
+    static bool loadConfig();
     static void startThreads();
+
+    static void setConfigFilePath(const std::string &value);
+
+    static bool getModified();
 
 private:
     static std::list<TCPServer *> tcpServers;
     static std::mutex mt;
+    static std::string sConfigFilePath;
+    static bool modified;
 };
 
 }}}

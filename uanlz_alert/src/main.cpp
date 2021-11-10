@@ -1,4 +1,4 @@
-#include <cx2_prg_service/service.h>
+#include <cx2_prg_service/application.h>
 #include <cx2_xrpc_webserver/webserver.h>
 #include <cx2_net_sockets/socket_tcp.h>
 
@@ -33,21 +33,8 @@ public:
 
     int _start(int , char *[], Arguments::GlobalArguments *globalArguments)
     {
-        std::string configDir = globalArguments->getCommandLineOptionValue("config-dir")->toString();
-
-        // start program.
-        Globals::getAppLog()->log(__func__, "","", Logs::LEVEL_INFO, 2048, "Starting... (Build date %s %s), PID: %u",__DATE__, __TIME__, getpid());
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Using config dir: %s", configDir.c_str());
-
         // Start input threads...
         Input::Inputs::startThreads();
-
-        Filters::Rules::setEvaluationQueueMaxSize( Globals::getConfig_main()->get<size_t>("Filters.QueueSize",100000) );
-        Filters::Rules::setMaxQueuePushWaitTimeInMilliseconds( Globals::getConfig_main()->get<uint64_t>("Filters.QueueMaxPushWaitTimeInMS",0) );
-        Filters::Rules::setMaxQueuePopTimeInMilliseconds( Globals::getConfig_main()->get<uint64_t>("Filters.ThreadMaxPopTimeInMS",10000) );
-        Filters::Rules::reloadRules( Globals::getConfig_main()->get<std::string>("Filters.RulesPath","rules.d") );
-        Filters::Rules::reloadActions( Globals::getConfig_main()->get<std::string>("Filters.ActionsPath","actions.d") );
-        Filters::Rules::startEvaluationThreads( Globals::getConfig_main()->get<uint32_t>("Filters.Threads",16) );
 
         std::thread(RPCImpl::runRPClient).detach();
 
@@ -71,6 +58,8 @@ public:
 
     bool _config(int , char *argv[], Arguments::GlobalArguments * globalArguments)
     {
+        std::string configDir = globalArguments->getCommandLineOptionValue("config-dir")->toString();
+
         // process config:
         unsigned int logMode = Logs::MODE_STANDARD;
 
@@ -79,8 +68,9 @@ public:
         initLog.setUsingAttributeName(false);
         initLog.setUserAlignSize(1);
 
-        std::string configDir = globalArguments->getCommandLineOptionValue("config-dir")->toString();
-
+        // start program.
+        initLog.log(__func__, "","", Logs::LEVEL_INFO, 2048, "Starting... (Build date %s %s), PID: %u",__DATE__, __TIME__, getpid());
+        initLog.log0(__func__,Logs::LEVEL_INFO, "Using config dir: %s", configDir.c_str());
         initLog.log0(__func__,Logs::LEVEL_INFO, "Loading configuration: %s", (configDir + "/config.ini").c_str());
 
         boost::property_tree::ptree config_main;
@@ -113,35 +103,20 @@ public:
         Globals::getAppLog()->setDebug(Globals::getConfig_main()->get<bool>("Logs.Debug",false));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        std::string dirPath = configDir + "/receptors.d";
-        if (!access(dirPath.c_str(),R_OK))
-        {
-            DIR *dir;
-            struct dirent *ent;
-            if ((dir = opendir (dirPath.c_str())) != NULL)
-            {
-                std::set<std::string> files;
-                while ((ent = readdir (dir)) != NULL)
-                {
-                    if ((ent->d_type & DT_REG) != 0)
-                        files.insert(ent->d_name);
-                }
-                closedir (dir);
+        Input::Inputs::setConfigFilePath(Globals::getConfig_main()->get<std::string>("Input.InputsPath","inputs.json"));
+        Filters::Rules::setRulesFilePath(Globals::getConfig_main()->get<std::string>("Filters.RulesPath","rules.json"));
+        Filters::Rules::setActionsFilePath(Globals::getConfig_main()->get<std::string>("Filters.ActionsPath","actions.json"));
 
-                for (const std::string & file: files)
-                {
-                    boost::property_tree::ptree filters;
-                    std::string fullFilePath = dirPath + "/" + file;
-                    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Loading JSON TCP Receptor configuration from file: %s", fullFilePath.c_str());
-                    Input::Inputs::loadConfig(fullFilePath);
-                }
-            }
-            else
-                Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "Failed to list directory: %s, no receptors loaded.", dirPath.c_str());
-        }
-        else
+        Filters::Rules::setEvaluationQueueMaxSize( Globals::getConfig_main()->get<size_t>("Filters.QueueSize",100000) );
+        Filters::Rules::setMaxQueuePushWaitTimeInMilliseconds( Globals::getConfig_main()->get<uint64_t>("Filters.QueueMaxPushWaitTimeInMS",0) );
+        Filters::Rules::setMaxQueuePopTimeInMilliseconds( Globals::getConfig_main()->get<uint64_t>("Filters.ThreadMaxPopTimeInMS",10000) );
+        Filters::Rules::reloadActions(  );
+        Filters::Rules::reloadRules(  );
+        Filters::Rules::startEvaluationThreads( Globals::getConfig_main()->get<uint32_t>("Filters.Threads",16) );
+
+        if (!Input::Inputs::loadConfig())
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Missing/Unreadable receptors directory: %s", dirPath.c_str());
+            initLog.log0(__func__,Logs::LEVEL_CRITICAL, "Error loading inputs configuration.");
             return false;
         }
 

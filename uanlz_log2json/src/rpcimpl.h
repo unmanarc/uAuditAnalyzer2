@@ -1,7 +1,7 @@
 #ifndef RPCIMPL_H
 #define RPCIMPL_H
 
-#include <json/json.h>
+#include <cx2_hlp_functions/json.h>
 
 namespace UANLZ { namespace LOG2JSON {
 
@@ -12,11 +12,11 @@ public:
     static void runRPClient();
 
 private:
-    static Json::Value statEventsPerHost(void *, const Json::Value &);
-    static Json::Value statOutputsDistributionThreads(void *,  const Json::Value &);
-    static Json::Value statOutputs(void *, const Json::Value &);
-    static Json::Value statInputs(void *,  const Json::Value &);
-//    static Json::Value helloWorld(void *,  const Json::Value &);
+    static json statEventsPerHost(void *, const std::string &, const json &);
+    static json statOutputsDistributionThreads(void *,const std::string &,  const json &);
+    static json statOutputs(void *,const std::string &, const json &);
+    static json statInputs(void *,const std::string &,  const json &);
+//    static json helloWorld(void *,  const json &);
 };
 
 }}

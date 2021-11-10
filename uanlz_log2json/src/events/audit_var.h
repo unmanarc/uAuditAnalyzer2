@@ -24,7 +24,7 @@ public:
     char *getRawPure() const;
     std::string getFancy() const;
     size_t getRawPureSize() const;
-    uint32_t asUInt() const;
+    uint32_t asUInt32() const;
 
 private:
     void createFancyString();

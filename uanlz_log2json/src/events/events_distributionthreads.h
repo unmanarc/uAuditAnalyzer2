@@ -11,7 +11,7 @@ class Events_DistributionThreads
 public:
     Events_DistributionThreads();
 
-    static Json::Value stats();
+    static json stats();
 
     static void setQueueSize(const size_t & qSize);
     static void startDistributionThreads(const size_t & threads);

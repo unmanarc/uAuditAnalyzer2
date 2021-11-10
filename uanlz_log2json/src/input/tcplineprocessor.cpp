@@ -43,9 +43,9 @@ TCPLineProcessor::~TCPLineProcessor()
 {
 }
 
-Json::Value TCPLineProcessor::getStats()
+json TCPLineProcessor::getStats()
 {
-    Json::Value v;
+    json v;
     v["ip"] = remoteIP;
     v["processedLinesCount"] = (Json::UInt64)processedLinesCount;
     v["invalidLinesCount"] = (Json::UInt64)invalidLinesCount;

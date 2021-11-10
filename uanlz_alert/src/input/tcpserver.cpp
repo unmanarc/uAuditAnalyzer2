@@ -61,23 +61,17 @@ bool logServerThr(void * obj, StreamSocket * baseClientSocket, const char * remo
 
 TCPServer::TCPServer()
 {
-/*    invalidLinesCount = 0;
-    processedLinesCount = 0;*/
 }
 
-bool TCPServer::loadConfig(const string &file)
+bool TCPServer::loadConfig(const json & jConfig)
 {
-    if (!access(file.c_str(),R_OK))
-        boost::property_tree::ini_parser::read_ini( file.c_str(),config);
-    else
-    {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Failed to load receptor configuration file %s, insufficient permissions?", file.c_str());
-        return false;
-    }
 
-    listenAddr = config.get<string>("ListenAddr","127.0.0.1");
-    listenPort = config.get<uint16_t>("ListenPort",10710);
-    description = config.get<string>("Description", "JSON log receiver @" + listenAddr + ":" + to_string(listenPort));
+    listenAddr = JSON_ASSTRING(jConfig,"ListenAddr","");
+    listenPort = JSON_ASUINT(jConfig,"ListenPort",0);
+    description = JSON_ASSTRING(jConfig,"Description","");
+
+    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Configuring JSON input '%s' @%s:%d",description.c_str(),listenAddr.c_str(),listenPort );
+
 
     return true;
 }
@@ -101,9 +95,9 @@ void TCPServer::startThreaded()
     vstreamer_syslog->startThreaded();
 }
 
-Json::Value TCPServer::getStats()
+json TCPServer::getStats()
 {
-    Json::Value v;
+    json v;
 
     v["description"] = description;
 

@@ -102,7 +102,7 @@ size_t Audit_Var::getRawPureSize() const
     return rawPureSize;
 }
 
-uint32_t Audit_Var::asUInt() const
+uint32_t Audit_Var::asUInt32() const
 {
     return stoul(fancy);
 }

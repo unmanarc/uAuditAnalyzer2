@@ -5,7 +5,7 @@
 #include <cx2_net_sockets/socket_tcp.h>
 #include <cx2_thr_safecontainers/queue.h>
 
-#include <json/json.h>
+#include <cx2_hlp_functions/json.h>
 #include <boost/property_tree/ptree.hpp>
 
 namespace UANLZ { namespace LOG2JSON { namespace Output {
@@ -17,16 +17,16 @@ public:
     ~Output_JSONTCP();
 
     bool loadConfig(const std::string & file);
-    void logAuditEvent(const Json::Value & eventJSON, const std::tuple<time_t, uint32_t, uint64_t> & eventId);
+    void logAuditEvent(const json & eventJSON, const std::tuple<time_t, uint32_t, uint64_t> & eventId);
     void startThread();
     void process();
 
-    Json::Value getStats();
+    json getStats();
 
 private:
     bool reconnect();
 
-    CX2::Threads::Safe::Queue<Json::Value> queueValues;
+    CX2::Threads::Safe::Queue<json> queueValues;
 
     std::string server;
     uint16_t port;

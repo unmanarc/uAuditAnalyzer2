@@ -40,7 +40,7 @@ void outputDistributionThread(int threadid)
         if (event)
         {
             event->process();
-            Json::Value eventJSON = event->getJSON();
+            json eventJSON = event->getJSON();
             delete event;
 
             // push to outputs...
@@ -61,7 +61,7 @@ void outputDistributionThread(int threadid)
         else
         {
             Globals::getAppLog()->log0(__func__,CX2::Application::Logs::LEVEL_INFO, "No events so far for output thread #%d, triggering no event alert JSON...", threadid);
-            Json::Value noEventsAlertJSON;
+            json noEventsAlertJSON;
             noEventsAlertJSON["noEventsAlert"] = true;
             Output::Outputs::pushToOutputBases(noEventsAlertJSON, {0,0,0});
         }
@@ -84,9 +84,9 @@ Events_DistributionThreads::Events_DistributionThreads()
 {
 }
 
-Json::Value Events_DistributionThreads::stats()
+json Events_DistributionThreads::stats()
 {
-    Json::Value v;
+    json v;
     v["eventsQueue"]["maxItems"] = (Json::UInt64) eventsQueue.getMaxItems();
     v["eventsQueue"]["curSize"] = (Json::UInt64) eventsQueue.size();
     v["eventsQueue"]["dropped"] = (Json::UInt64) eventsDropped;

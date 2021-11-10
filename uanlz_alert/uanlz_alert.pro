@@ -12,7 +12,7 @@ isEmpty(OSSLIBS_PREFIX) {
 }
 
 # includes dir
-LIBS += -L$$PREFIX/lib -L$$OSSLIBS_PREFIX/lib
+LIBS += -L$$PREFIX/lib -L$$PREFIX/lib64 -L$$OSSLIBS_PREFIX/lib -L$$OSSLIBS_PREFIX/lib64
 
 QMAKE_INCDIR += ..
 INCLUDEPATH += ..

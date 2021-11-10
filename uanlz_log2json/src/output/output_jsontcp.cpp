@@ -43,7 +43,7 @@ bool Output_JSONTCP::loadConfig(const std::string &file)
     return true;
 }
 
-std::string toUnStyledString(const Json::Value& value)
+std::string toUnStyledString(const json& value)
 {
     Json::FastWriter writer;
     std::string str = writer.write( value );
@@ -51,9 +51,9 @@ std::string toUnStyledString(const Json::Value& value)
     return str;
 }
 
-void Output_JSONTCP::logAuditEvent(const Json::Value & eventJSON, const std::tuple<time_t, uint32_t, uint64_t> &eventId)
+void Output_JSONTCP::logAuditEvent(const json & eventJSON, const std::tuple<time_t, uint32_t, uint64_t> &eventId)
 {
-    Json::Value * value = new Json::Value;
+    json * value = new json;
     // make a copy:
     *value = eventJSON;
     // push, if not report and go.
@@ -83,7 +83,7 @@ void Output_JSONTCP::process()
     for (;;)
     {
         // Take one JSON value from the queue...
-        Json::Value * value = queueValues.pop();
+        json * value = queueValues.pop();
         if (value)
         {
             // Try to send it...
@@ -98,9 +98,9 @@ void Output_JSONTCP::process()
     }
 }
 
-Json::Value Output_JSONTCP::getStats()
+json Output_JSONTCP::getStats()
 {
-    Json::Value v;
+    json v;
 
     std::string server = config.get<std::string>("Host","127.0.0.1");
     uint16_t port = config.get<uint16_t>("Port",18200);

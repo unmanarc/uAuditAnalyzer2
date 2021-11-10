@@ -13,9 +13,9 @@ Outputs::Outputs()
 
 }
 
-Json::Value Outputs::getStats()
+json Outputs::getStats()
 {
-    Json::Value v;
+    json v;
     mt.lock();
     int x=0;
     for (Output_Base * ob : outputBases)
@@ -48,7 +48,7 @@ void Outputs::startThreads()
     mt.unlock();
 }
 
-void Outputs::pushToOutputBases(const Json::Value &eventJSON, const std::tuple<time_t, uint32_t, uint64_t> &eventId)
+void Outputs::pushToOutputBases(const json &eventJSON, const std::tuple<time_t, uint32_t, uint64_t> &eventId)
 {
     mt.lock();
     for (Output_Base * ob : outputBases)

@@ -14,10 +14,10 @@ class TCPServer
 public:
     TCPServer();
 
-    bool loadConfig( const std::string & file );
+    bool loadConfig(const json &jConfig );
     void startThreaded();
 
-    Json::Value getStats();
+    json getStats();
 
     void addClient(TCPLineProcessor * clientProcessor);
     void remClient(TCPLineProcessor * clientProcessor);

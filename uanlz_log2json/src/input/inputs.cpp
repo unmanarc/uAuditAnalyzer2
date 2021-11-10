@@ -10,9 +10,9 @@ Inputs::Inputs()
 
 }
 
-Json::Value Inputs::getStats()
+json Inputs::getStats()
 {
-    Json::Value v;
+    json v;
 
     int x=0;
     mt.lock();

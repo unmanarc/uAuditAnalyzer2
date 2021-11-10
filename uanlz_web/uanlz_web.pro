@@ -12,7 +12,7 @@ isEmpty(OSSLIBS_PREFIX) {
 }
 
 # includes dir
-LIBS += -L$$PREFIX/lib -L$$OSSLIBS_PREFIX/lib
+LIBS += -L$$PREFIX/lib -L$$PREFIX/lib64 -L$$OSSLIBS_PREFIX/lib -L$$OSSLIBS_PREFIX/lib64
 
 QMAKE_INCDIR += ..
 INCLUDEPATH += ..
@@ -42,7 +42,7 @@ LIBS += -lcx2_xrpc_fast
 LIBS += -lcx2_xrpc_webserver -lcx2_xrpc_common -lcx2_netp_http -lcx2_netp_mime
 LIBS += -lcx2_thr_mutex -lcx2_thr_safecontainers -lcx2_thr_threads
 LIBS += -lcx2_prg_service -lcx2_prg_logs
-LIBS += -lcx2_auth -lcx2_auth_db -lcx2_db_sqlite3 -lcx2_db -lsqlite3
+LIBS += -lcx2_auth -lcx2_auth_remote
 LIBS += -lcx2_hlp_functions
 LIBS += -lcx2_net_sockets
 LIBS += -lcx2_mem_vars
@@ -51,10 +51,12 @@ LIBS += -lboost_regex -lpthread -ljsoncpp  -lssl -lcrypto
 
 SOURCES +=  \
     src/globals.cpp \
+    src/loginrpcclientimpl.cpp \
     src/main.cpp \
     src/rpcserverimpl.cpp \
     src/webserverimpl.cpp
 HEADERS +=  \
     src/globals.h \
+    src/loginrpcclientimpl.h \
     src/rpcserverimpl.h \
     src/webserverimpl.h

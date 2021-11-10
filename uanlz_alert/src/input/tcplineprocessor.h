@@ -1,7 +1,7 @@
 #ifndef LINERECEPTOR_H
 #define LINERECEPTOR_H
 
-#include <json/json.h>
+#include <cx2_hlp_functions/json.h>
 #include <cx2_netp_linerecv/linerecv.h>
 #include <thread>
 #include <atomic>
@@ -14,7 +14,7 @@ public:
     TCPLineProcessor(CX2::Memory::Streams::Streamable *sock, void * server);
     virtual ~TCPLineProcessor();
 
-    Json::Value getStats();
+    json getStats();
 
     void setRemoteIP(const std::string &value);
 

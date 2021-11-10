@@ -55,41 +55,41 @@ void RPCImpl::runRPClient()
     }
 }
 
-Json::Value RPCImpl::statEventsPerHost(void *, const Json::Value &)
+json RPCImpl::statEventsPerHost(void *,const std::string &, const json &)
 {
-    Json::Value j;
+    json j;
     j["hosts"] = AuditdEvents::Events_Manager::getJSONStats();
     j["ok"] = true;
     return j;
 }
 
-Json::Value RPCImpl::statOutputsDistributionThreads(void *, const Json::Value &)
+json RPCImpl::statOutputsDistributionThreads(void *,const std::string &, const json &)
 {
-    Json::Value j;
+    json j;
     j["events"] = AuditdEvents::Events_DistributionThreads::stats();
     j["ok"] = true;
     return j;
 }
 
-Json::Value RPCImpl::statOutputs(void *, const Json::Value &)
+json RPCImpl::statOutputs(void *,const std::string &, const json &)
 {
-    Json::Value j;
+    json j;
     j["outputs"] = Output::Outputs::getStats();
     j["ok"] = true;
     return j;
 }
 
-Json::Value RPCImpl::statInputs(void *, const Json::Value &)
+json RPCImpl::statInputs(void *,const std::string &, const json &)
 {
-    Json::Value j;
+    json j;
     j["ok"] = true;
     j["inputs"] = Input::Inputs::getStats();
     return j;
 }
 /*
-Json::Value RPCImpl::helloWorld(void *, const Json::Value &)
+json RPCImpl::helloWorld(void *, const json &)
 {
-    Json::Value hw;
+    json hw;
     hw["MSG"] = "Hello World!";
     return hw;
 }

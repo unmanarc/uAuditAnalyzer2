@@ -118,9 +118,9 @@ Audit_ClassType *Audit_Event::getClassVars(const string &groupName)
     return nullptr;
 }
 
-Json::Value Audit_Event::getJSON()
+json Audit_Event::getJSON()
 {
-    Json::Value x;
+    json x;
 
     time_t unixTime = std::get<0>(eventId);
     std::string  sTime = std::asctime(std::localtime(&unixTime));
@@ -133,9 +133,9 @@ Json::Value Audit_Event::getJSON()
     x["INFO"]["source"] = "auditd";
     x["INFO"]["parserVersion"]  = 1;
 
-    x["INFO"]["unixTime"]  = (Json::Value::Int64)unixTime;
+    x["INFO"]["unixTime"]  = (json::Int64)unixTime;
     x["INFO"]["msecs"]     = std::get<1>(eventId);
-    x["INFO"]["id"]        = (Json::Value::UInt64)std::get<2>(eventId);
+    x["INFO"]["id"]        = (json::UInt64)std::get<2>(eventId);
 
     x["INFO"]["host"]      = hostId.hostname;
     x["INFO"]["ip"]        = hostId.ip;

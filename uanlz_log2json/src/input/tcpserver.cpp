@@ -103,9 +103,9 @@ void TCPServer::startThreaded()
     vstreamer_syslog->startThreaded();
 }
 
-Json::Value TCPServer::getStats()
+json TCPServer::getStats()
 {
-    Json::Value v;
+    json v;
 
     v["description"] = description;
     v["processedLinesCount"] = (Json::UInt64)processedLinesCount;

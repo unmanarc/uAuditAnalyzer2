@@ -1,0 +1,66 @@
+<cinc_>/mods/alerts/z.inc.header.html</cinc_>
+
+<script>
+  document.getElementById("apptitle").innerHTML = "Alerts &#9658; JSON Alerts - Add New Input";
+
+  // Default Main View:
+  function csrfReady() {
+    document.getElementById('mainview-alerts-inputsconfig-link').style.color = "white";
+  }
+
+  function addInput() {
+
+    var method = "remote.control";
+    var payloadData = { "target": "ALERTS", 
+                        "remoteMethod": "control.AddInputToFileConfig",
+                        "payload": {
+                          "Description" : $("#inputDescription").val(),
+                          "ListenAddr" : $("#inputAddress").val(),
+                          "ListenPort" : parseInt($("#inputPort").val())
+                        }
+                      }
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+        if (result == true)
+          document.location = "./inputsconfig";
+        else
+        {
+          alert("Internal Error Adding new Input");
+        }
+      },
+      error: function (result) {
+        console.log("ERR");
+      }
+    });
+
+
+    return true;
+
+  }
+
+</script>
+  <form>
+    <div class="form-group">
+      <label for="inputDescription">Description:</label>
+      <input type="text" class="form-control" value="Alert JSON TCP Input" id="inputDescription"
+        placeholder="Enter Input Description">
+    </div>
+    <div class="form-group">
+      <label for="inputAddress">Input Address:</label>
+      <input type="text" class="form-control" value="0.0.0.0" id="inputAddress"
+        placeholder="Enter TCP/IP Listenning address">
+    </div>
+    <div class="form-group">
+      <label for="inputPort">Listen TCP/IP Port (from 1 to 65535): </label>
+      <input type="number" class="form-control" id="inputPort" min="1" max="65535" value="9999">
+    </div>
+  </form>
+  <div class="d-flex flex-row-reverse">
+    <button class="btn btn-success btn-sm" role="button"  onclick="javascript:addInput()">Add...</a>
+  </div>
+
+<cinc_>/mods/alerts/z.inc.footer.html</cinc_>

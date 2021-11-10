@@ -18,6 +18,8 @@
 #include <string>
 #include <thread>
 
+#include <iostream>
+
 using namespace std;
 using namespace boost;
 
@@ -29,7 +31,7 @@ using namespace CX2::Scripts::Expressions;
 using namespace CX2::Helpers;
 using namespace CX2::Threads::Sync;
 
-list<sRule *> Rules::rules;
+vector<sRule *> Rules::rules;
 std::map<std::string,sAction *> Rules::actions;
 CX2::Threads::Sync::Mutex_Shared Rules::mtRules;
 CX2::Threads::Safe::Queue<std::string> Rules::evaluationQueue;
@@ -43,8 +45,11 @@ std::atomic<uint64_t> Rules::queueInLastSec_ct,Rules::queueOutLastSec_ct;
 
 std::atomic<double> Rules::evaluationTimeInMS;
 
-std::string Rules::lastRulesDirPath, Rules::lastActionsDirPath;
+std::string Rules::sRulesFilePath;
+std::string Rules::sActionsFilePath;
 
+bool Rules::bRulesModified = false;
+bool Rules::bActionsModified = false;
 
 void forkExec(const std::string & ruleName, const char *file, std::vector<string> vArguments )
 {
@@ -83,7 +88,7 @@ void forkExec(const std::string & ruleName, const char *file, std::vector<string
     free(argv);
 }
 
-std::string toUnStyledString(const Json::Value& value)
+std::string toUnStyledString(const json& value)
 {
     Json::FastWriter writer;
     std::string str = writer.write( value );
@@ -105,9 +110,9 @@ Rules::~Rules()
     }
 }
 
-Json::Value Rules::getStats()
+json Rules::getStats()
 {
-    Json::Value j;
+    json j;
     j["queue"]["count"] = (Json::UInt64)evaluationQueue.size();
     j["queue"]["max"] = (Json::UInt64)evaluationQueue.getMaxItems();
 
@@ -169,112 +174,42 @@ bool Rules::pushElementOnEvaluationQueue(const string &str)
     return true;
 }
 
-bool Rules::reloadRules(const string &dirPath)
+bool Rules::reloadRules()
 {
     Lock_RW lock(mtRules);
     resetRules();
+    json root = readRulesFileConfig();
+    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Loading filters from file: %s", sRulesFilePath.c_str());
 
-    lastRulesDirPath = dirPath;
-
-    if (!access(dirPath.c_str(),R_OK))
+    for (uint32_t i=0;i<root.size();i++)
     {
-        DIR *dir;
-        struct dirent *ent;
-        if ((dir = opendir (dirPath.c_str())) != NULL)
-        {
-            std::set<std::string> files;
-
-            while ((ent = readdir (dir)) != NULL)
-            {
-                if ((ent->d_type & DT_REG) != 0)
-                {
-                    files.insert(ent->d_name);
-
-                }
-            }
-            closedir (dir);
-
-            for (const std::string & file: files)
-            {
-                property_tree::ptree filters;
-                string filterFilePath = dirPath + "/" + file;
-
-                Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Loading filters from file: %s", filterFilePath.c_str());
-
-                property_tree::ini_parser::read_ini( filterFilePath, filters );
-
-                for ( auto & i : filters)
-                {
-                    addNewRule(i.first,filters.get_child(i.first));
-                }
-            }
-
-        }
-        else
-        {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Failed to list directory: %s, no rules loaded", dirPath.c_str());
-        }
-        return true;
+        _addRule(i,root[i]);
     }
-    else
-    {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL,"Missing/Unreadable filters directory: %s", dirPath.c_str());
-        return false;
-    }
+
+    bRulesModified = false;
+
+    return true;
 }
 
-bool Rules::reloadActions(const string &dirPath)
+bool Rules::reloadActions()
 {
     Lock_RW lock(mtRules);
     resetActions();
+    json root = readActionsFileConfig();
 
-    lastActionsDirPath = dirPath;
-
-    if (!access(dirPath.c_str(),R_OK))
+    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Loading actions from file: %s", sActionsFilePath.c_str());
+    for (uint32_t i=0;i<root.size();i++)
     {
-        DIR *dir;
-        struct dirent *ent;
-        if ((dir = opendir (dirPath.c_str())) != NULL)
-        {
-            std::set<std::string> files;
-
-            while ((ent = readdir (dir)) != NULL)
-            {
-                if ((ent->d_type & DT_REG) != 0)
-                {
-                    files.insert(ent->d_name);
-                }
-            }
-            closedir (dir);
-
-            for (const std::string & file: files)
-            {
-                property_tree::ptree filters;
-                string filterFilePath = dirPath + "/" + file;
-
-                Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Loading actions from file: %s", filterFilePath.c_str());
-
-                property_tree::ini_parser::read_ini( filterFilePath, filters );
-                for ( auto & i : filters)
-                {
-                    addNewAction(i.first,filters.get_child(i.first));
-                }
-            }
-        }
-        else
-        {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Failed to list directory: %s, no actions loaded.", dirPath.c_str());
-        }
-        return true;
+        _addAction(root[i]);
     }
-    else
-    {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL,"Missing/Unreadable filters directory: %s", dirPath.c_str());
-        return false;
-    }
+
+    bActionsModified = false;
+
+    return true;
 }
 
-bool Rules::evaluate(const Json::Value &values)
+
+bool Rules::evaluate(const json &values)
 {
     Lock_RD lock(mtRules);
 
@@ -309,12 +244,78 @@ bool Rules::evaluate(const Json::Value &values)
     return activated;
 }
 
+bool Rules::editRule(uint32_t pos, const json &jConfig)
+{
+    Lock_RW lock(mtRules);
+    return _addRule(pos,jConfig,true);
+}
+
+bool Rules::editAction(const json &jConfig)
+{
+    Lock_RW lock(mtRules);
+    return _addAction(jConfig,true);
+}
+
+bool Rules::ruleUp(uint32_t pos)
+{
+    Lock_RW lock(mtRules);
+
+    if (pos>=rules.size()) return false;
+    if (pos==0) return true;
+
+    auto * i = rules[pos-1];
+    rules[pos-1] = rules[pos];
+    rules[pos] = i;
+
+    bRulesModified = true;
+    return true;
+}
+
+bool Rules::ruleDown(uint32_t pos)
+{
+    Lock_RW lock(mtRules);
+
+    if (pos>=rules.size()) return false;
+    if (pos==(rules.size()-1)) return true;
+
+    auto * i = rules[pos+1];
+    rules[pos+1] = rules[pos];
+    rules[pos] = i;
+
+    bRulesModified = true;
+    return true;
+}
+
+bool Rules::addRule(uint32_t pos, const json &jConfig)
+{
+    Lock_RW lock(mtRules);
+    return _addRule(pos,jConfig);
+}
+
+bool Rules::addAction(const json &jConfig)
+{
+    Lock_RW lock(mtRules);
+    return _addAction(jConfig);
+}
+
+bool Rules::removeRule(const uint32_t &pos)
+{
+    Lock_RW lock(mtRules);
+    return _removeRule(pos);
+}
+
+bool Rules::removeAction(const string & actionName)
+{
+    Lock_RW lock(mtRules);
+    return _removeAction(actionName);
+}
+
 void Rules::threadEvaluation(const uint32_t &threadId)
 {
     std::string threadName = "JSONEVAL";
     pthread_setname_np(pthread_self(), threadName.c_str());
 
-    Json::Value v;
+    json v;
     std::string * s;
     for (;;)
     {
@@ -371,13 +372,13 @@ void Rules::threadPassCTStatsEverySecond()
     }
 }
 
-void Rules::exec(const std::string & ruleName, const char *file, std::vector<string> vArguments,const Json::Value &values )
+void Rules::exec(const std::string & ruleName, const char *file, std::vector<string> vArguments,const json &values )
 {
     replaceArgumentsVars(vArguments,ruleName,values);
     forkExec(ruleName,file,vArguments);
 }
 
-void Rules::replaceArgumentsVars(std::vector<string> &vArguments,const std::string &ruleName,const Json::Value &values)
+void Rules::replaceArgumentsVars(std::vector<string> &vArguments,const std::string &ruleName,const json &values)
 {
     size_t i=0;
     for ( std::string & vArgument : vArguments)
@@ -388,7 +389,7 @@ void Rules::replaceArgumentsVars(std::vector<string> &vArguments,const std::stri
     }
 }
 
-void Rules::replaceArgumentsVar(string &vArgument, const std::string &ruleName, const Json::Value &values)
+void Rules::replaceArgumentsVar(string &vArgument, const std::string &ruleName, const json &values)
 {
     boost::match_flag_type flags = boost::match_default;
     // PRECOMPILE _STATIC_TEXT
@@ -413,7 +414,7 @@ void Rules::replaceArgumentsVar(string &vArgument, const std::string &ruleName, 
     }
 }
 
-string Rules::getValueForVar(const string &var, const string &ruleName, const Json::Value &values)
+string Rules::getValueForVar(const string &var, const string &ruleName, const json &values)
 {
     if (var.empty()) return "%";
 
@@ -425,21 +426,21 @@ string Rules::getValueForVar(const string &var, const string &ruleName, const Js
     {
         // JSONPATH MULTI-LINE STYLED
         Json::Path path(var.substr(1));
-        Json::Value result = path.resolve(values);
+        json result = path.resolve(values);
         return result.toStyledString();
     }
     else if (var.at(0) == '-')
     {
         // JSONPATH ONE-LINE UNSTYLED
         Json::Path path(var.substr(1));
-        Json::Value result = path.resolve(values);
+        json result = path.resolve(values);
         return toUnStyledString(result);
     }
     else if (var.at(0) == '+')
     {
         // JSONPATH ONE-LINE UNSTYLED MAYUS
         Json::Path path(var.substr(1));
-        Json::Value result = path.resolve(values);
+        json result = path.resolve(values);
         return boost::to_upper_copy(toUnStyledString(result));
     }
     else if (var.at(0) == '#')
@@ -459,84 +460,153 @@ string Rules::getValueForVar(const string &var, const string &ruleName, const Js
 
 }
 
-void Rules::addNewRule(const string &ruleName, const property_tree::ptree &vars)
+bool Rules::_addRule(uint32_t pos, const json &jConfig, bool replace)
 {
-    if (vars.get<string>("Filter", "") == "")
+    std::string name =  JSON_ASSTRING(jConfig,"name","");
+    std::string action = JSON_ASSTRING(jConfig,"action","");
+
+    if (replace)
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Rule '%s': 'Filter' required variable is missing, aborting.",ruleName.c_str());
-        return;
-    }
-    if (vars.get<string>("Action", "") == "")
-    {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Rule '%s': 'Action' required variable is missing, aborting.",ruleName.c_str());
-        return;
-    }
-    if (vars.get<string>("Action", "") == "EXEC" && vars.get<string>("ActionID", "") == "")
-    {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Rule '%s': 'ActionID' required variable is missing, aborting.",ruleName.c_str());
-        return;
+        if (pos >= rules.size())
+        {
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Rule '%d': pos not found during replacement.",pos);
+            return false;
+        }
+        // TODO: match internal uniqid..
     }
 
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Creating Rule '%s'",ruleName.c_str());
+    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Creating Rule '%s'",name.c_str());
+
+    std::string filter = JSON_ASSTRING(jConfig,"filter","");
+
+    boost::replace_all(filter,"\n", " ");
 
     sRule * rule = new sRule;
-    rule->name = ruleName;
-    rule->expr = new JSONEval(vars.get<string>("Filter", ""));
+    rule->name = name;
+    rule->expr = new JSONEval( filter );
+    rule->jOriginalVal = jConfig;
 
     if (!rule->expr->getIsCompiled())
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Rule '%s': 'Filter' compilation failed with '%s'.",ruleName.c_str(), rule->expr->getLastCompilerError().c_str());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Rule '%s': 'Filter' compilation failed with '%s'.",name.c_str(), rule->expr->getLastCompilerError().c_str());
         delete rule;
-        return;
+        return false;
     }
 
-    if (vars.get<string>("Action", "") == "EXEC" || vars.get<string>("Action", "") == "EXECANDABORT")
+    if (action == "EXEC" || action == "EXECANDABORT")
     {
-        rule->ruleAction =  vars.get<string>("Action", "") == "EXEC"? RULE_ACTION_EXEC : RULE_ACTION_EXECANDABORT;
-        rule->actionId = vars.get<string>("ActionID", "");
+        rule->ruleAction =  action == "EXEC"? RULE_ACTION_EXEC : RULE_ACTION_EXECANDABORT;
+        rule->actionId = JSON_ASSTRING(jConfig,"actionId","");
+        // TODO: Check if actionId exist...
+
+        if (actions.find(rule->actionId) == actions.end())
+        {
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Rule '%s': 'Filter' referenced unexistent action '%s'.",name.c_str(), rule->actionId.c_str());
+            delete rule;
+            return false;
+        }
     }
-    else if (vars.get<string>("Action", "") == "ABORT")
+    else if (action == "ABORT")
     {
         rule->ruleAction = RULE_ACTION_ABORT;
     }
+    else
+    {
+
+    }
+
+    if (!replace)
+    {
+        if (pos >= rules.size())
+            rules.push_back(rule);
+        else
+            rules.insert( rules.begin()+pos, rule );
+    }
+    else
+    {
+        delete rules[pos];
+        rules[pos] = rule;
+    }
 
 
-    rules.push_back(rule);
+    bRulesModified = true;
+    return true;
 }
 
-void Rules::addNewAction(const string &actionName, const property_tree::ptree &vars)
+bool Rules::_addAction(const json &jConfig, bool replace)
 {
-    if (actions.find(actionName) != actions.end())
+    std::string actionName = JSON_ASSTRING(jConfig,"name","");
+    std::string actionDescription = JSON_ASSTRING(jConfig,"description","");
+
+    if (!replace)
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Action '%s': duplicated name.",actionName.c_str());
-        return;
+        if (actions.find(actionName) != actions.end())
+        {
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Action '%s': duplicated name.",actionName.c_str());
+            return false;
+        }
+    }
+    else
+    {
+        if (actions.find(actionName) == actions.end())
+        {
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Action '%s': name not found during replacement.",actionName.c_str());
+            return false;
+        }
     }
 
-    if ( vars.get<string>("PathName", "") == "")
-    {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Action '%s': 'PathName' required variable is missing, aborting.",actionName.c_str());
-        return;
-    }
-    if (vars.get<string>("Argv[0]", "") == "")
-    {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Action '%s': 'Argv[0]' required variable is missing, aborting.",actionName.c_str());
-        return;
-    }
-
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Creating Action '%s'",actionName.c_str());
+    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Creating Action '%s' - '%s'",actionName.c_str(), actionDescription.c_str());
 
     sAction * action = new sAction;
-    action->setFileName(vars.get<string>("PathName", ""));
+    action->jOriginalVal = jConfig;
+    action->setFileName(JSON_ASSTRING(jConfig,"path",""));
     vector<string> arguments;
-    for (size_t i=0;vars.get<string>(string("Argv[") + to_string(i) + "]", "") != "";i++)
+    for (uint32_t i =0; i<jConfig["args"].size();i++ )
     {
         //AppendNewLineToEarchArgument
-        std::string argument = vars.get<string>(string("Argv[") + to_string(i) + "]", "");
-        if (vars.get<bool>("AppendNewLineToEarchArgv", false)) argument+="%N%";
+        std::string argument = JSON_ASSTRING(jConfig["args"],i,"");
+        if (JSON_ASBOOL(jConfig,"appendNewLineToEachArgv",false)) argument+="%N%";
         arguments.push_back(argument);
     }
     action->setArguments(arguments);
-    actions[actionName] = action;
+
+    if (replace)
+    {
+        delete actions[actionName];
+        actions[actionName] = action;
+    }
+    else
+    {
+        actions[actionName] = action;
+    }
+
+    bActionsModified = true;
+    return true;
+}
+
+bool Rules::_removeRule(const uint32_t &pos)
+{
+    if (pos>=rules.size())
+        return false;
+
+    delete rules[pos];
+    rules.erase(rules.begin()+pos);
+
+    bRulesModified = true;
+
+    return true;
+}
+
+bool Rules::_removeAction(const string &actionName)
+{
+    if (actions.find(actionName) == actions.end())
+        return false;
+
+    delete actions[actionName];
+    actions.erase(actionName);
+    bActionsModified = true;
+
+    return true;
 }
 
 void Rules::resetRules()
@@ -556,22 +626,143 @@ string Rules::getRandomTag(const string &str, uint64_t t)
     return "__" + str + "[" + std::to_string(t) + "]";
 }
 
+json Rules::getCurrentRunningActions()
+{
+    Lock_RD lock(mtRules);
+    json r;
+
+    uint32_t i=0;
+    for (auto action: actions) r[i++] = action.second->jOriginalVal;
+
+    return r;
+}
+
+json Rules::getCurrentRunningAction(const string &sActionName)
+{
+    Lock_RD lock(mtRules);
+    json r;
+
+    if (actions.find(sActionName) == actions.end())
+        return r;
+
+    return actions[sActionName]->jOriginalVal;
+}
+
+json Rules::getCurrentRunningRule(const uint32_t &pos)
+{
+    Lock_RD lock(mtRules);
+    json r;
+
+    if (pos>=rules.size())
+        return r;
+
+    return rules[pos]->jOriginalVal;
+}
+
+json Rules::getCurrentRunningRules()
+{
+    Lock_RD lock(mtRules);
+
+    json r;
+
+    uint32_t i=0;
+    for (auto rule: rules) r[i++] = rule->jOriginalVal;
+
+    return r;
+}
+
+bool Rules::getActionsModified()
+{
+    Lock_RD lock(mtRules);
+    return bActionsModified;
+}
+
+bool Rules::getRulesModified()
+{
+    Lock_RD lock(mtRules);
+    return bRulesModified;
+}
+
+void Rules::setActionsFilePath(const std::string &value)
+{
+    Lock_RW lock(mtRules);
+    sActionsFilePath = value;
+}
+
+void Rules::setRulesFilePath(const std::string &value)
+{
+    Lock_RW lock(mtRules);
+    sRulesFilePath = value;
+}
+
 void Rules::setMaxQueuePopTimeInMilliseconds(const uint64_t &value)
 {
+    Lock_RW lock(mtRules);
     maxQueuePopTimeInMilliseconds = value;
 }
 
-bool Rules::reloadRules()
+bool Rules::writeRulesFileConfig(const json &jConfig)
 {
-    return reloadRules(lastRulesDirPath);
+    if (readRulesFileConfig() == jConfig)
+    {
+        bRulesModified = false;
+        return true;
+    }
+
+    std::ofstream config_doc(sRulesFilePath, std::ifstream::binary);
+    if (!config_doc.is_open()) return false;
+    config_doc << jConfig;
+    config_doc.close();
+
+    reloadRules();
+    bRulesModified = false;
+
+    return true;
 }
 
-bool Rules::reloadActions()
+bool Rules::writeActionsFileConfig(const json &jConfig)
 {
-    return reloadActions(lastActionsDirPath);
+    if (readActionsFileConfig() == jConfig)
+    {
+        bActionsModified = false;
+        return true;
+    }
+
+    std::ofstream config_doc(sActionsFilePath, std::ifstream::binary);
+    if (!config_doc.is_open()) return false;
+    config_doc << jConfig;
+    config_doc.close();
+
+    reloadActions();
+    bActionsModified = false;
+    return true;
 }
+
+json Rules::readRulesFileConfig()
+{
+    json root;
+    // Read JSON from file:
+    std::ifstream config_doc(sRulesFilePath, std::ifstream::binary);
+    if (!config_doc.is_open())
+        return root;
+    config_doc >> root;
+    return root;
+}
+
+json Rules::readActionsFileConfig()
+{
+    json root;
+    // Read JSON from file:
+    std::ifstream config_doc(sActionsFilePath, std::ifstream::binary);
+    if (!config_doc.is_open())
+        return root;
+    config_doc >> root;
+    return root;
+}
+
 
 void Rules::setMaxQueuePushWaitTimeInMilliseconds(const uint64_t &value)
 {
+    Lock_RW lock(mtRules);
     maxQueuePushWaitTimeInMilliseconds = value;
 }

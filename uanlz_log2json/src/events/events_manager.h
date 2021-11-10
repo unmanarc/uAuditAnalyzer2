@@ -16,7 +16,7 @@ public:
     ~Events_Manager();
 
 
-    static Json::Value getJSONStats();
+    static json getJSONStats();
 
     static void gc();
     static void startGC();

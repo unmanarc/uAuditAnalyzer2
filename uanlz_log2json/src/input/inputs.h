@@ -10,7 +10,7 @@ class Inputs
 {
 public:
     Inputs();
-    static Json::Value getStats();
+    static json getStats();
     static void loadConfig( const std::string & file );
     static void startThreads();
 

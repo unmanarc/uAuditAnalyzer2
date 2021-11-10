@@ -21,9 +21,9 @@ Events_Manager::Events_Manager()
 
 }
 
-Json::Value Events_Manager::getJSONStats()
+json Events_Manager::getJSONStats()
 {
-    Json::Value v;
+    json v;
     mutex_insert.lock();
     int x=0;
     for ( auto & i : eventsByHostName )

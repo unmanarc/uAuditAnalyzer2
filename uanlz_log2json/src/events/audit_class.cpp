@@ -71,9 +71,9 @@ void Audit_ClassType::setClassTypeName(const string &value)
     classTypeName = value;
 }
 
-Json::Value Audit_ClassType::getJSON()
+json Audit_ClassType::getJSON()
 {
-    Json::Value v;
+    json v;
 
     bool normal = true;
     if (classTypeName == "EXECVE")
@@ -83,7 +83,7 @@ Json::Value Audit_ClassType::getJSON()
             normal = false;
             v["argc"] = contentVars["argc"].getFancy();
             std::string cmdline;
-            for (uint32_t i=0; i<contentVars["argc"].asUInt() && i<65536; i++)
+            for (uint32_t i=0; i<contentVars["argc"].asUInt32() && i<65536; i++)
             {
                 std::string curVar = "a" + to_string(i);
                 if (contentVars.find(curVar)!=contentVars.end())
@@ -164,6 +164,7 @@ void Audit_ClassType::parseVar(const string &varName, const string &varValue)
         default:
             break;
         }
+
 
         contentVars["family"].parse( classTypeName, "family",  family );
         contentVars["ipaddr"].parse( classTypeName, "ipaddr",  laddr );

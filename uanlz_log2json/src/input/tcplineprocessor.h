@@ -22,7 +22,7 @@ public:
     TCPLineProcessor(CX2::Memory::Streams::Streamable *sock, void * server);
     virtual ~TCPLineProcessor();
 
-    Json::Value getStats();
+    json getStats();
 
 //    bool getActive();
 

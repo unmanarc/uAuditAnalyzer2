@@ -1,0 +1,269 @@
+<cinc_>/mods/alerts/z.inc.header.html</cinc_>
+
+<script>
+  document.getElementById("apptitle").innerHTML = "Alerts &#9658; JSON Alerts - Add New Rule";
+
+  // Default Main View:
+  function csrfReady() {
+    document.getElementById('mainview-alerts-rules-link').style.color = "white";
+    loadActions();
+  }
+
+
+
+  function displayRule(pos) {
+    var method = "remote.stats";
+
+    var payloadData = {
+      "target": "ALERTS",
+      "remoteMethod": "stats.ReadRunningRule",
+      "payload": {
+        "id": pos
+      }
+    }
+
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+        if (result == null)
+        {
+          alert("Error loading rule (2)...");
+          return;
+        }
+
+        document.getElementById("EditButton").style.visibility = "visible";
+        document.getElementById("EditButton").style.display = "block";
+
+        document.getElementById("AddButton").style.visibility = "collapse";
+        document.getElementById("AddButton").style.display = "none";
+
+        document.getElementById("ruleName").value = result['name'];
+
+        if (result['action'] == "EXECANDABORT")
+        {
+          document.getElementById("bEXECANDABORT").checked = true;
+          document.getElementById("bABORT").checked = false;
+          document.getElementById("bEXEC").checked = false;
+        }
+        else if (result['action'] == "ABORT")
+        {
+          document.getElementById("bABORT").checked = true;
+          document.getElementById("bEXEC").checked = false;
+          document.getElementById("bEXECANDABORT").checked = false;
+        }
+        else
+        {
+          document.getElementById("bEXECANDABORT").checked = false;
+          document.getElementById("bABORT").checked = false;
+          document.getElementById("bEXEC").checked = true;
+        }
+
+        $('#actions').val(result['actionId']);
+
+        document.getElementById("ruleEvaluationFilter").value = result['filter'];
+        document.getElementById("rulePos").value = pos;
+        document.getElementById("rulePos").disabled = true;
+        checkActions();
+      },
+      error: function (result) {
+        alert("Error loading rule...");
+      }
+    });
+
+    return true;
+  }
+
+  function loadActions() {
+
+    var method = "remote.stats";
+    var payloadData = {
+      "target": "ALERTS",
+      "remoteMethod": "stats.ReadRunningActions"
+    }
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+
+        if (result != null)
+        {
+
+        
+        document.getElementById("actions").innerHTML = "";
+        let i = 0;
+
+        for (let action of result) {
+
+          var sel = document.getElementById(`actions`);
+          var opt = document.createElement('option');
+          opt.appendChild(document.createTextNode(action["name"] + ': ' + action["description"]));
+          opt.value = action["name"];
+          sel.appendChild(opt);
+
+          i++;
+        }
+      }
+
+    if (window.location.search.substr(1)!="")
+    {
+      let ruleId = parseInt(window.location.search.substr(1));
+      if (ruleId != null)
+        displayRule(ruleId);
+    }
+
+      },
+      error: function (result) {
+        console.log("ERR");
+      }
+    });
+
+  }
+
+  function checkActions() {
+    if (document.getElementById("bEXECANDABORT").checked || document.getElementById("bEXEC").checked) {
+      document.getElementById("actionOptions").style.visibility = "visible";
+      document.getElementById("actionOptions").style.display = "block";
+    }
+    else {
+      document.getElementById("actionOptions").style.visibility = "collapse";
+      document.getElementById("actionOptions").style.display = "none";
+    }
+
+  }
+
+  function addRule(editMode) {
+
+    var action = "EXEC";
+
+    if (document.getElementById("bEXECANDABORT").checked) action = "EXECANDABORT";
+    else if (document.getElementById("bABORT").checked) action = "ABORT";
+    
+    if (editMode == "add")
+    {
+      remoteMethod = "control.AddRule";
+    }
+    else
+    {
+      remoteMethod = "control.EditRule";
+    }
+
+    var method = "remote.control";
+    var payloadData = {};
+
+    if (document.getElementById("bEXECANDABORT").checked || document.getElementById("bEXEC").checked) {
+      payloadData = {
+        "target": "ALERTS",
+        "remoteMethod": remoteMethod,
+        "payload": {
+          "pos": parseInt($("#rulePos").val()),
+          "rule": {
+            "name": $("#ruleName").val(),
+            "action": action,
+            "actionId": $("#actions").val(),
+            "filter": $("#ruleEvaluationFilter").val()
+          }
+        }
+      }
+    }
+    else {
+      payloadData = {
+        "target": "ALERTS",
+        "remoteMethod": remoteMethod,
+        "payload": {
+          "pos": parseInt($("#rulePos").val()),
+          "rule": {
+            "name": $("#ruleName").val(),
+            "action": action,
+            "filter": $("#ruleEvaluationFilter").val()
+          }
+        }
+      }
+    }
+
+    $.ajax({
+      url: '/api?mode=EXEC&method=' + method,
+      type: 'POST',
+      headers: { "CSRFToken": $("#csrfToken").val() },
+      data: { payload: JSON.stringify(payloadData) },
+      success: function (result) {
+        if (result == true)
+          document.location = "./rules";
+        else {
+          alert("Internal Error Adding new Rule");
+        }
+      },
+      error: function (result) {
+        console.log("ERR");
+      }
+    });
+
+    return true;
+  }
+
+</script>
+
+
+<form>
+  <div class="form-group">
+    <label for="ruleName"><b>Alert Description / Name:</b></label>
+    <input type="text" class="form-control" value="Alert Name" id="ruleName" placeholder="Enter Alert Name">
+  </div>
+  <div class="form-group">
+    <label><b>Action:</b></label>
+
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="flexRadioDefault" id="bEXEC" checked
+        onclick="javascript:checkActions();">
+      <label class="form-check-label" for="bEXEC">
+        Execute Action And Continue
+      </label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="flexRadioDefault" id="bEXECANDABORT"
+        onclick="javascript:checkActions();">
+      <label class="form-check-label" for="bEXECANDABORT">
+        Execute Action And Abort Next Rules Evaluation
+      </label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="flexRadioDefault" id="bABORT"
+        onclick="javascript:checkActions();">
+      <label class="form-check-label" for="bABORT">
+        Stop and Abort Next Rules
+      </label>
+    </div>
+  </div>
+
+  <span id="actionOptions">
+    <div class="form-group">
+      <label for="actions"><b>Action Name:</b></label>
+      <select class="form-select" aria-label="Default select example" id="actions" style="min-width: 300px;">
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="ruleEvaluationFilter"><b>Evaluation Rule:</b></label>
+      <textarea class="form-control" style="font-family:monospace;" id="ruleEvaluationFilter" rows="10"
+        cols="50">IS_EQUAL("Y","Y")</textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="rulePos"><b>Rule Position Index:</b> </label>
+      <input type="number" class="form-control" id="rulePos" min="0" value="0">
+    </div>
+  </span>
+</form>
+
+
+<div class="d-flex flex-row-reverse">
+  <button class="btn btn-success btn-sm" id="AddButton"  role="button" onclick="javascript:addRule('add')">Add...</a>
+    <button class="btn btn-success " id="EditButton" role="button" onclick="javascript:addRule('edit')" style="visibility: collapse; display: none;">Edit...</a>
+
+</div>
+
+<cinc_>/mods/alerts/z.inc.footer.html</cinc_>

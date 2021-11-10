@@ -1,0 +1,26 @@
+[
+	{
+		"appendNewLineToEachArgv" : true,
+		"args" : 
+		[
+			"sendmsg.sh",
+			"%%F0%%9F%%9A%%A8 %%E2%%9A%%A0 *%#rule.name%* %%E2%%9A%%A0 %%F0%%9F%%9A%%A8 %N%#TIME=*%-.INFO.time%*",
+			"#KEY=*%-.INFO.key%* / #ID=%-.INFO.unixTime%.%-.INFO.msecs%:%-.INFO.id%",
+			"#HOST=*%-.INFO.host%*",
+			"```",
+			"PATHS= {%-.PATH[0].name%, %-.PATH[1].name%, %-.PATH[2].name%,%-.PATH[3].mode%, %-.PATH[4].mode%, %-.PATH[5].mode%}",
+			"MODES= {%-.PATH[0].mode%, %-.PATH[1].mode%, %-.PATH[2].mode%,%-.PATH[3].mode%, %-.PATH[4].mode%, %-.PATH[5].mode%}",
+			"DIR(CWD)= %-.CWD[0].cwd%",
+			"UID/GID= %-.SYSCALL[0].uid% / %-.SYSCALL[0].gid%",
+			"PID/PPID= %-.SYSCALL[0].pid% / %-.SYSCALL[0].ppid%",
+			"SELINUX=%-.SYSCALL[0].subj%",
+			"SES/TTY=%-.SYSCALL[0].ses% / %-.SYSCALL[0].tty%",
+			"RET/SUC=%-.SYSCALL[0].exit% / %-.SYSCALL[0].success% ```",
+			"PROCESS NAME: ``` %-.PROCTITLE[0].proctitle% ```",
+			"EXECVE CMDLINE: ``` %-.EXECVE[0].cmdline% ```"
+		],
+		"description" : "Send Message via sendmsg.sh",
+		"name" : "SendMSG",
+		"path" : "/usr/bin/sendmsg.sh"
+	}
+]

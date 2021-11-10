@@ -1,4 +1,4 @@
-#include <cx2_prg_service/service.h>
+#include <cx2_prg_service/application.h>
 #include <cx2_xrpc_webserver/webserver.h>
 #include <cx2_net_sockets/socket_tcp.h>
 

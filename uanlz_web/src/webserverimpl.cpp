@@ -2,15 +2,14 @@
 #include "globals.h"
 #include "defs.h"
 
-#include <cx2_db_sqlite3/sqlconnector_sqlite3.h>
-#include <cx2_auth_db/manager_db.h>
-#include <cx2_xrpc_webserver/webserver.h>
 #include <cx2_net_sockets/socket_tls.h>
 
 #include  <boost/algorithm/string/predicate.hpp>
 
 #include <sstream>
 #include <ostream>
+
+#include <fstream>
 
 using namespace CX2::Application;
 using namespace CX2::Authentication;
@@ -19,32 +18,51 @@ using namespace CX2::RPC;
 using namespace CX2;
 using namespace UANLZ::WEB;
 
-#define UAUDITANLZ_APPNAME "UAUDITANLZ"
-
 WebServerImpl::WebServerImpl()
 {
 }
 
-Json::Value WebServerImpl::controlMethods(void *, Authentication::Manager *, Authentication::Session *, const Json::Value & jInput)
+json WebServerImpl::rmtCaller(const std::string &caller, Authentication::Manager * auth, Authentication::Session * sess, const json &jInput)
 {
-    std::string remoteMethod = jInput["remoteMethod"].asString();
-    Json::Value j;
-    if (!boost::starts_with(remoteMethod, "control.")) return j;
-    j = Globals::getFastRPC()->runRemoteRPCMethod(jInput["target"].asString(), remoteMethod,jInput["payload"]);
+    std::string remoteMethod = JSON_ASSTRING(jInput,"remoteMethod","");
+    json j,error;
+    if (!boost::starts_with(remoteMethod, caller)) return j;
+    j = Globals::getFastRPC()->runRemoteRPCMethod(JSON_ASSTRING(jInput,"target",""), remoteMethod,jInput["payload"],&error);
+
+    //std::cout << error;
+
+    if (JSON_ASBOOL(error,"succeed",false) == false)
+    {
+        Globals::getAppLog()->log2(__func__, sess->getUserID(),"", Logs::LEVEL_ERR, "Error (%d) Executing Method '%s' at '%s': '%s'",
+                                   JSON_ASINT(error,"errorId",-1),
+                                   remoteMethod.c_str(),
+                                   JSON_ASCSTRING(jInput,"target",""),
+                                   JSON_ASCSTRING(error,"errorMessage","")
+                                   );
+    }
+    else
+    {
+        Globals::getAppLog()->log2(__func__, sess->getUserID(),"", Logs::LEVEL_INFO, "Method '%s' Executed at '%s'.",
+                                   remoteMethod.c_str(),
+                                   JSON_ASCSTRING(jInput,"target","")
+                                   );
+    }
     return j;
 }
 
-Json::Value WebServerImpl::statMethods(void *, Authentication::Manager *, Authentication::Session *, const Json::Value &jInput)
+json WebServerImpl::controlMethods(void *, Authentication::Manager *auth, Authentication::Session * sess, const json & jInput)
 {
-    std::string remoteMethod = jInput["remoteMethod"].asString();
-    Json::Value j;
-    if (!boost::starts_with(remoteMethod, "stats.")) return j;
-    j = Globals::getFastRPC()->runRemoteRPCMethod(jInput["target"].asString(), remoteMethod,jInput["payload"]);
-    return j;
+    return rmtCaller( "control.", auth,sess,jInput );
+}
+
+json WebServerImpl::statMethods(void *, Authentication::Manager * auth, Authentication::Session * sess, const json &jInput)
+{
+  return rmtCaller( "stats.", auth,sess,jInput );
 }
 
 bool WebServerImpl::createWebServer()
 {
+    std::string sAppName = Globals::getConfig_main()->get<std::string>("LoginRPCClient.AppName","UAUDITANLZ");
     CX2::Network::TLS::Socket_TLS * sockWebListen = new CX2::Network::TLS::Socket_TLS;
 
     uint16_t listenPort = Globals::getConfig_main()->get<uint16_t>("WebServer.ListenPort",33000);
@@ -68,55 +86,42 @@ bool WebServerImpl::createWebServer()
         ////////////////////////////////////////////////////////////////
         /// Authentication DB
         ///
-        Database::SQLConnector_SQLite3 * authDb = new Database::SQLConnector_SQLite3();
-        //authDb->connect("/tmp/testdb.sqlite3");
-        authDb->connectInMemory();
-        Manager_DB * authManager = new Manager_DB(authDb);
+        auto * authManager = Globals::getLoginRPCClient()->getRemoteAuthManager();
         Secret passDataStats, passDataControl;
 
-        if (!authManager->initScheme())
+        // Create attribute to applications:]
+        if (!authManager->attribExist({sAppName,"control"}))
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error (Driver: SQLite3), Unknown error during database scheme initialization.");
-            return false;
+            if (!authManager->attribAdd({sAppName,"control"},"Control Access"))
+            {
+                Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Failed to create attribute in ther authentication server.");
+                return false;
+            }
+            else
+                Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Attrib 'control' initialized.");
+
         }
-
-        // Create api account (stats):
-        passDataStats.hash = Globals::getConfig_main()->get<std::string>("WebServer.StatsKey","stats");
-        authManager->accountAdd("stats",passDataStats);
-        // Create api account (control):
-        passDataControl.hash = Globals::getConfig_main()->get<std::string>("WebServer.ControlKey","control");
-        authManager->accountAdd("control",passDataControl);
-
-        // Add application:
-        if (!authManager->applicationAdd(UAUDITANLZ_APPNAME,"uAuditAnalyzer", "control"))
+        if (!authManager->attribExist({sAppName,"stats"}))
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Unexpected Error.");
-            return false;
+            if (!authManager->attribAdd({sAppName,"stats"},"Stats Access"))
+            {
+                Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Failed to create attribute in ther authentication server.");
+                return false;
+            }
+            else
+                Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Attrib 'stats' initialized.");
         }
-
-        // Add users control+stats to our application
-        authManager->applicationAccountAdd(UAUDITANLZ_APPNAME,"control");
-        authManager->applicationAccountAdd(UAUDITANLZ_APPNAME,"stats");
-
-        // Create attribute to applications:
-        authManager->attribAdd({UAUDITANLZ_APPNAME,"control"},"Control Access");
-        authManager->attribAdd({UAUDITANLZ_APPNAME,"stats"},"Stats Access");
-
-        // Assign attributes to accounts:
-        authManager->attribAccountAdd({UAUDITANLZ_APPNAME,"control"},"control"); // Add control attrib to control acct.
-        authManager->attribAccountAdd({UAUDITANLZ_APPNAME,"stats"},"control"); // Add stats attrib to control acct.
-        authManager->attribAccountAdd({UAUDITANLZ_APPNAME,"stats"},"stats");// Add stats attrib to stat acct.
-
         // Add the default domain / auth:
         authDomains->addDomain("",authManager);
         ////////////////////////////////////////////////////////////////
 
-        MethodsManager *methodsManagers = new MethodsManager(UAUDITANLZ_APPNAME);
+        MethodsManager *methodsManagers = new MethodsManager(sAppName);
         // Add functions
         methodsManagers->addRPCMethod( "remote.stats",     {"stats"},   {&WebServerImpl::statMethods,nullptr} );
         methodsManagers->addRPCMethod( "remote.control",   {"control"}, {&WebServerImpl::controlMethods,nullptr} );
 
         WebServer * webServer = new WebServer;
+        Globals::setWebServer(webServer);
         webServer->setRPCLog(Globals::getRPCLog());
 
         std::string resourcesPath = Globals::getConfig_main()->get<std::string>("WebServer.ResourcesPath","/var/www/uauditweb");
