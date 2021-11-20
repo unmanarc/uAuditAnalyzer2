@@ -1,6 +1,7 @@
 #include <cx2_prg_service/application.h>
 #include <cx2_xrpc_webserver/webserver.h>
 #include <cx2_net_sockets/socket_tcp.h>
+#include <cx2_net_sockets/socket_tls.h>
 
 #include "rpcimpl.h"
 #include "globals.h"
@@ -76,6 +77,8 @@ public:
 
     bool _config(int , char *argv[], Arguments::GlobalArguments * globalArguments)
     {
+        CX2::Network::TLS::Socket_TLS::prepareTLS();
+
         // process config:
         unsigned int logMode = Logs::MODE_STANDARD;
 

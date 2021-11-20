@@ -88,6 +88,8 @@ public:
 
     bool _config(int , char *argv[], Arguments::GlobalArguments * globalArguments)
     {
+        CX2::Network::TLS::Socket_TLS::prepareTLS();
+
         // process config:
         unsigned int logMode = Logs::MODE_STANDARD;
 
