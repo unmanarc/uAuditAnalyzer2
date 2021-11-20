@@ -632,7 +632,8 @@ json Rules::getCurrentRunningActions()
     json r;
 
     uint32_t i=0;
-    for (auto action: actions) r[i++] = action.second->jOriginalVal;
+    for (const auto &action: actions)
+        r[i++] = action.second->jOriginalVal;
 
     return r;
 }
