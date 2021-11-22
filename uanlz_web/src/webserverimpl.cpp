@@ -125,7 +125,7 @@ bool WebServerImpl::createWebServer()
         webServer->setRPCLog(Globals::getRPCLog());
 
         std::string resourcesPath = Globals::getConfig_main()->get<std::string>("WebServer.ResourcesPath","/var/www/uauditweb");
-        if (!webServer->setResourcesLocalPath( resourcesPath ))
+        if (!webServer->setDocumentRootPath( resourcesPath ))
         {
             Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error locating web server resources at %s",resourcesPath.c_str() );
             return false;
