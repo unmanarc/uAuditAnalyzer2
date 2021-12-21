@@ -28,7 +28,6 @@ uanlz_web was designed to manage and monitor the health of uAuditAnalyzer servic
 This should be built on top of:
 
 - cxFramework2 libraries (2.3.0) - https://github.com/unmanarc/cxFramework2
-- POCO Libraries
 - JSONCPP (AT LEAST v1.7.7, for RHEL7 you will have to build it by hand or install an external RPM)
 - C++11
 
