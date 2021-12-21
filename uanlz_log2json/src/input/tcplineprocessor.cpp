@@ -4,7 +4,7 @@
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "globals.h"
+#include "../globals.h"
 
 using namespace std;
 using namespace UANLZ::LOG2JSON::Input;

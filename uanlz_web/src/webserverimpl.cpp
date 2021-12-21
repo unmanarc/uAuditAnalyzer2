@@ -1,6 +1,6 @@
 #include "webserverimpl.h"
 #include "globals.h"
-#include "defs.h"
+#include "config.h"
 
 #include <cx2_net_sockets/socket_tls.h>
 
@@ -132,7 +132,7 @@ bool WebServerImpl::createWebServer()
         }
         webServer->setAuthenticator(authDomains);
         webServer->setMethodManagers(methodsManagers);
-        webServer->setSoftwareVersion(UANZL_VER_MAJOR, UANZL_VER_MINOR, UANZL_VER_SUBMINOR, UANZL_VER_CODENAME);
+        webServer->setSoftwareVersion(atoi(PROJECT_VER_MAJOR), atoi(PROJECT_VER_MINOR), atoi(PROJECT_VER_PATCH), "a");
         webServer->setExtCallBackOnInitFailed(WebServerImpl::protoInitFail);
 
         webServer->acceptPoolThreaded(sockWebListen);

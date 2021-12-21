@@ -2,7 +2,7 @@
 #define INPUTS_H
 
 #include <mutex>
-#include "input/tcpserver.h"
+#include "../input/tcpserver.h"
 
 namespace UANLZ { namespace LOG2JSON { namespace Input {
 

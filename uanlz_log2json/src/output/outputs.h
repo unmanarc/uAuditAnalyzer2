@@ -5,7 +5,7 @@
 #include <list>
 #include <mutex>
 
-#include "output/output_base.h"
+#include "../output/output_base.h"
 
 namespace UANLZ { namespace LOG2JSON { namespace Output {
 

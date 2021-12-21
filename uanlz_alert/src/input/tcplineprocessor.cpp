@@ -4,9 +4,9 @@
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "rules/rules.h"
+#include "../rules/rules.h"
 
-#include "globals.h"
+#include "../globals.h"
 
 using namespace std;
 using namespace UANLZ::JSONALERT::Input;

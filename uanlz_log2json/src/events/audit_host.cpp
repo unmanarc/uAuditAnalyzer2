@@ -1,7 +1,7 @@
 #include "audit_host.h"
-#include "globals.h"
+#include "../globals.h"
 
-#include "events/events_distributionthreads.h"
+#include "../events/events_distributionthreads.h"
 
 #include <set>
 

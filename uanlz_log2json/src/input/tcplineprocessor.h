@@ -1,7 +1,7 @@
 #ifndef LINERECEPTOR_H
 #define LINERECEPTOR_H
 
-#include "events/events_manager.h"
+#include "../events/events_manager.h"
 
 #include <cx2_netp_linerecv/linerecv.h>
 #include <thread>

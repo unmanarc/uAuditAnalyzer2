@@ -1,5 +1,5 @@
 #include "output_jsontcp.h"
-#include "globals.h"
+#include "../globals.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <thread>
 

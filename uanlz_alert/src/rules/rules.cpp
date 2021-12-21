@@ -7,7 +7,7 @@
 #include <boost/optional.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 
-#include "globals.h"
+#include "../globals.h"
 
 #include <dirent.h>
 #include <unistd.h>

@@ -1,7 +1,7 @@
 #include "tcpserver.h"
 
-#include "globals.h"
-#include "input/tcplineprocessor.h"
+#include "../globals.h"
+#include "../input/tcplineprocessor.h"
 
 #include <cx2_net_sockets/socket_tcp.h>
 #include <cx2_net_sockets/socket_acceptor_multithreaded.h>

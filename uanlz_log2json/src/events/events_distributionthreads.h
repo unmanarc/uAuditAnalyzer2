@@ -3,7 +3,7 @@
 
 #include <cx2_thr_safecontainers/queue.h>
 
-#include "events/audit_event.h"
+#include "../events/audit_event.h"
 
 namespace UANLZ { namespace LOG2JSON { namespace AuditdEvents {
 class Events_DistributionThreads

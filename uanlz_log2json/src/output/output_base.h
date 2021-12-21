@@ -1,7 +1,7 @@
 #ifndef OUTPUT_BASE_H
 #define OUTPUT_BASE_H
 
-#include "events/audit_event.h"
+#include "../events/audit_event.h"
 #include <cx2_hlp_functions/json.h>
 
 namespace UANLZ { namespace LOG2JSON { namespace Output {

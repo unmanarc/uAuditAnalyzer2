@@ -1,7 +1,7 @@
 #include "outputs.h"
-#include "output/output_base.h"
+#include "../output/output_base.h"
 
-#include "output/output_jsontcp.h"
+#include "../output/output_jsontcp.h"
 
 using namespace UANLZ::LOG2JSON::Output;
 

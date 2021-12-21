@@ -2,7 +2,7 @@
 #define INPUTS_H
 
 #include <mutex>
-#include "input/tcpserver.h"
+#include "tcpserver.h"
 
 namespace UANLZ { namespace JSONALERT { namespace Input {
 

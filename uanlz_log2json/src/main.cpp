@@ -5,7 +5,7 @@
 
 #include "rpcimpl.h"
 #include "globals.h"
-#include "defs.h"
+#include "config.h"
 
 #include "vars/namedefs.h"
 
@@ -69,8 +69,9 @@ public:
         globalArguments->setLicense("GPLv3 (https://www.gnu.org/licenses/gpl-3.0.en.html)");
         globalArguments->setAuthor("Aarón Mizrachi");
         globalArguments->setEmail("aaron@unmanarc.com");
-        globalArguments->setVersion(UANZL_VER_MAJOR, UANZL_VER_MINOR, UANZL_VER_SUBMINOR, UANZL_VER_CODENAME);
-        globalArguments->setDescription(std::string("Unmanarc's Auditd Analyzer Framework - Log to JSON Translator"));
+
+        globalArguments->setVersion(atoi(PROJECT_VER_MAJOR), atoi(PROJECT_VER_MINOR), atoi(PROJECT_VER_PATCH), "a");
+        globalArguments->setDescription(PROJECT_DESCRIPTION);
 
         globalArguments->addCommandLineOption("Service Options", 'c', "config-dir" , "Configuration directory"  , "/etc/uauditanalyzer/" + globalArguments->getDaemonName(), CX2::Memory::Abstract::TYPE_STRING );
     }

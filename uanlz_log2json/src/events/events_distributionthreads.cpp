@@ -3,8 +3,8 @@
 #include <thread>
 #include <chrono>
 
-#include "output/outputs.h"
-#include "globals.h"
+#include "../output/outputs.h"
+#include "../globals.h"
 
 using namespace std;
 using namespace UANLZ::LOG2JSON::AuditdEvents;

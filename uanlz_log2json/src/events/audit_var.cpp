@@ -1,5 +1,5 @@
 #include "audit_var.h"
-#include "vars/namedefs.h"
+#include "../vars/namedefs.h"
 #include <boost/algorithm/string.hpp>
 
 using namespace boost::algorithm;

@@ -2,7 +2,7 @@
 #include <fstream>
 #include <cx2_hlp_functions/random.h>
 
-#include "globals.h"
+#include "../globals.h"
 
 using namespace UANLZ::JSONALERT::Input;
 using namespace CX2::Application;

@@ -1,5 +1,5 @@
 #include "events_manager.h"
-#include "globals.h"
+#include "../globals.h"
 
 #include <mutex>
 #include <thread>

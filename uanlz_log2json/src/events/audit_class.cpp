@@ -1,6 +1,6 @@
 #include "audit_class.h"
 
-#include "globals.h"
+#include "../globals.h"
 
 #include <sys/un.h>
 #include <sys/socket.h>
