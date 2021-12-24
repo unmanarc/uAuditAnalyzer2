@@ -19,7 +19,7 @@ RPCServerImpl::RPCServerImpl()
 
 bool RPCServerImpl::callbackOnRPCConnect(void *, CX2::Network::Streams::StreamSocket *sock, const char * remoteAddr, bool secure)
 {
-    std::string rpcApiKey = sock->readString(nullptr,16);
+    std::string rpcApiKey = sock->readStringEx<uint16_t>();
 
     Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Incomming %sRPC connection from %s", secure?"secure ":"", remoteAddr);
 

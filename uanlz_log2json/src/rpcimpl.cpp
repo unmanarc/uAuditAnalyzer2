@@ -44,7 +44,7 @@ void RPCImpl::runRPClient()
         if ( sockRPCClient.connectTo( remoteAddr.c_str(), remotePort ) )
         {
             Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  "Connected to @%s:%d", remoteAddr.c_str(), remotePort);
-            sockRPCClient.writeString16(rpcApiKey);
+            sockRPCClient.writeStringEx<uint16_t>(rpcApiKey);
             fastRPC.processConnection(&sockRPCClient,"SERVER");
         }
         else
