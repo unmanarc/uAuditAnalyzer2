@@ -1,11 +1,11 @@
 #include "inputs.h"
 #include <fstream>
-#include <cx2_hlp_functions/random.h>
+#include <mdz_hlp_functions/random.h>
 
 #include "../globals.h"
 
 using namespace UANLZ::JSONALERT::Input;
-using namespace CX2::Application;
+using namespace Mantids::Application;
 
 std::list<TCPServer *> Inputs::tcpServers;
 std::mutex Inputs::mt;
@@ -85,7 +85,7 @@ bool Inputs::addInput(json jConfig)
     if (!readOK)
         return false;
 
-    jConfig["id"] = CX2::Helpers::Random::createRandomString(8).c_str();
+    jConfig["id"] = Mantids::Helpers::Random::createRandomString(8).c_str();
 
     std::string listenAddr, description;
     uint16_t listenPort;

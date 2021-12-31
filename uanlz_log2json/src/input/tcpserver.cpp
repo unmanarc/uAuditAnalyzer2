@@ -3,8 +3,8 @@
 #include "../globals.h"
 #include "../input/tcplineprocessor.h"
 
-#include <cx2_net_sockets/socket_tcp.h>
-#include <cx2_net_sockets/socket_acceptor_multithreaded.h>
+#include <mdz_net_sockets/socket_tcp.h>
+#include <mdz_net_sockets/socket_acceptor_multithreaded.h>
 
 #include <boost/property_tree/ini_parser.hpp>
 
@@ -12,10 +12,10 @@ using namespace std;
 using namespace UANLZ::LOG2JSON::Input;
 using namespace UANLZ::LOG2JSON;
 
-using namespace CX2::Memory::Streams;
-using namespace CX2::Network::Streams;
-using namespace CX2::Network::Sockets;
-using namespace CX2::Application;
+using namespace Mantids::Memory::Streams;
+using namespace Mantids::Network::Streams;
+using namespace Mantids::Network::Sockets;
+using namespace Mantids::Application;
 
 bool logServerThr(void * obj, StreamSocket * baseClientSocket, const char * remotePair, bool secure)
 {

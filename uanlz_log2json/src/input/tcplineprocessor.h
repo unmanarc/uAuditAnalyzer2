@@ -3,7 +3,7 @@
 
 #include "../events/events_manager.h"
 
-#include <cx2_netp_linerecv/linerecv.h>
+#include <mdz_proto_linerecv/linerecv.h>
 #include <thread>
 #include <atomic>
 
@@ -16,10 +16,10 @@ enum eDecoders
     DECODER_AUDITD_SYSLOGWITHIP
 };
 
-class TCPLineProcessor : public CX2::Network::Line2Line::LineRecv
+class TCPLineProcessor : public Mantids::Network::Line2Line::LineRecv
 {
 public:
-    TCPLineProcessor(CX2::Memory::Streams::Streamable *sock, void * server);
+    TCPLineProcessor(Mantids::Memory::Streams::Streamable *sock, void * server);
     virtual ~TCPLineProcessor();
 
     json getStats();

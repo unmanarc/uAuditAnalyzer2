@@ -1,5 +1,5 @@
-#include <cx2_prg_service/application.h>
-#include <cx2_net_sockets/socket_tls.h>
+#include <mdz_prg_service/application.h>
+#include <mdz_net_sockets/socket_tls.h>
 
 #include "rpcserverimpl.h"
 #include "webserverimpl.h"
@@ -17,7 +17,7 @@
 
 using namespace UANLZ::WEB;
 
-using namespace CX2::Application;
+using namespace Mantids::Application;
 
 class Main : public Application
 {
@@ -84,17 +84,17 @@ public:
         globalArguments->setVersion(atoi(PROJECT_VER_MAJOR), atoi(PROJECT_VER_MINOR), atoi(PROJECT_VER_PATCH), "a");
         globalArguments->setDescription(PROJECT_DESCRIPTION);
 
-        globalArguments->addCommandLineOption("Service Options", 'c', "config-dir" , "Configuration directory"  , "/etc/uauditanalyzer/" + globalArguments->getDaemonName(), CX2::Memory::Abstract::TYPE_STRING );
+        globalArguments->addCommandLineOption("Service Options", 'c', "config-dir" , "Configuration directory"  , "/etc/uauditanalyzer/" + globalArguments->getDaemonName(), Mantids::Memory::Abstract::TYPE_STRING );
     }
 
     bool _config(int , char *argv[], Arguments::GlobalArguments * globalArguments)
     {
-        CX2::Network::TLS::Socket_TLS::prepareTLS();
+        Mantids::Network::TLS::Socket_TLS::prepareTLS();
 
         // process config:
         unsigned int logMode = Logs::MODE_STANDARD;
 
-        CX2::Network::TLS::Socket_TLS::prepareTLS();
+        Mantids::Network::TLS::Socket_TLS::prepareTLS();
 
         Logs::AppLog initLog( Logs::MODE_STANDARD);
         initLog.setPrintEmptyFields(true);

@@ -12,7 +12,7 @@ using namespace std;
 using namespace UANLZ::JSONALERT::Input;
 using namespace UANLZ::JSONALERT;
 
-TCPLineProcessor::TCPLineProcessor(CX2::Memory::Streams::Streamable *sock, void *server) : LineRecv(sock)
+TCPLineProcessor::TCPLineProcessor(Mantids::Memory::Streams::Streamable *sock, void *server) : LineRecv(sock)
 {
     processedLinesCount=0;
     this->server = server;

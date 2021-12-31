@@ -2,7 +2,7 @@
 
 using namespace UANLZ::LOG2JSON;
 
-CX2::Application::Logs::AppLog * Globals::applog = nullptr;
+Mantids::Application::Logs::AppLog * Globals::applog = nullptr;
 std::mutex Globals::mDatabase, Globals::mDirs;
 boost::property_tree::ptree Globals::config_main;
 
@@ -10,12 +10,12 @@ Globals::Globals()
 {
 }
 
-CX2::Application::Logs::AppLog *Globals::getAppLog()
+Mantids::Application::Logs::AppLog *Globals::getAppLog()
 {
     return applog;
 }
 
-void Globals::setAppLog(CX2::Application::Logs::AppLog *value)
+void Globals::setAppLog(Mantids::Application::Logs::AppLog *value)
 {
     applog = value;
 }

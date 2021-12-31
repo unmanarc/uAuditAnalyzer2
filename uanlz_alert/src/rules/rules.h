@@ -5,12 +5,12 @@
 #include <string>
 #include <mutex>
 
-#include <cx2_scripts_jsonexpreval/jsoneval.h>
-#include <cx2_thr_mutex/mutex_shared.h>
-#include <cx2_thr_safecontainers/queue.h>
+#include <mdz_scripts_jsonexpreval/jsoneval.h>
+#include <mdz_thr_mutex/mutex_shared.h>
+#include <mdz_thr_safecontainers/queue.h>
 
 #include <boost/property_tree/ptree.hpp>
-#include <cx2_hlp_functions/json.h>
+#include <mdz_hlp_functions/json.h>
 
 namespace UANLZ { namespace JSONALERT { namespace Filters {
 
@@ -39,7 +39,7 @@ struct sRule
     std::string actionId;
 
     std::string filter;
-    CX2::Scripts::Expressions::JSONEval *expr;
+    Mantids::Scripts::Expressions::JSONEval *expr;
 
     json jOriginalVal;
 };
@@ -154,8 +154,8 @@ private:
     static std::string getRandomTag(const std::string & str, uint64_t t);
 
     static uint64_t maxQueuePushWaitTimeInMilliseconds, maxQueuePopTimeInMilliseconds;
-    static CX2::Threads::Safe::Queue<std::string> evaluationQueue;
-    static CX2::Threads::Sync::Mutex_Shared mtRules;
+    static Mantids::Threads::Safe::Queue<std::string> evaluationQueue;
+    static Mantids::Threads::Sync::Mutex_Shared mtRules;
     static std::vector<sRule *> rules;
     static std::map<std::string,sAction *> actions;
 

@@ -2,7 +2,7 @@
 #define GLOBALS_H
 
 #include <boost/property_tree/ini_parser.hpp>
-#include <cx2_prg_logs/applog.h>
+#include <mdz_prg_logs/applog.h>
 #include <mutex>
 #include <list>
 
@@ -15,8 +15,8 @@ class Globals
 public:
     Globals();
 
-    static CX2::Application::Logs::AppLog *getAppLog();
-    static void setAppLog(CX2::Application::Logs::AppLog *value);
+    static Mantids::Application::Logs::AppLog *getAppLog();
+    static void setAppLog(Mantids::Application::Logs::AppLog *value);
 
     static boost::property_tree::ptree * getConfig_main();
 
@@ -24,7 +24,7 @@ public:
 private:
     static std::mutex mDatabase,mDirs;
     static boost::property_tree::ptree config_main;
-    static CX2::Application::Logs::AppLog * applog;
+    static Mantids::Application::Logs::AppLog * applog;
 
 };
 }}

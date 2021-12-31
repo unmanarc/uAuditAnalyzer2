@@ -1,10 +1,10 @@
 #ifndef WEBSERVERIMPL_H
 #define WEBSERVERIMPL_H
 
-#include <cx2_hlp_functions/json.h>
-#include <cx2_auth/manager.h>
-#include <cx2_auth/session.h>
-#include <cx2_net_sockets/streamsocket.h>
+#include <mdz_hlp_functions/json.h>
+#include <mdz_auth/manager.h>
+#include <mdz_auth/session.h>
+#include <mdz_net_sockets/streamsocket.h>
 
 namespace UANLZ { namespace WEB {
 
@@ -15,13 +15,13 @@ public:
     static bool createWebServer();
 
 private:
-    static bool protoInitFail(void *webServer, CX2::Network::Streams::StreamSocket *sock, const char *remoteIP, bool isSecure);
+    static bool protoInitFail(void *webServer, Mantids::Network::Streams::StreamSocket *sock, const char *remoteIP, bool isSecure);
 
-    static json statMethods(void *, CX2::Authentication::Manager *, CX2::Authentication::Session *, const json &);
-    static json controlMethods(void *, CX2::Authentication::Manager *, CX2::Authentication::Session *, const json &);
+    static json statMethods(void *, Mantids::Authentication::Manager *, Mantids::Authentication::Session *, const json &);
+    static json controlMethods(void *, Mantids::Authentication::Manager *, Mantids::Authentication::Session *, const json &);
 
 
-    static json rmtCaller(const std::string & caller, CX2::Authentication::Manager *auth, CX2::Authentication::Session *sess, const json &jInput);
+    static json rmtCaller(const std::string & caller, Mantids::Authentication::Manager *auth, Mantids::Authentication::Session *sess, const json &jInput);
 
 };
 

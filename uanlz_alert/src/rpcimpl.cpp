@@ -5,10 +5,10 @@
 #include "input/inputs.h"
 #include "rules/rules.h"
 
-#include <cx2_net_sockets/socket_tls.h>
-#include <cx2_xrpc_fast/fastrpc.h>
+#include <mdz_net_sockets/socket_tls.h>
+#include <mdz_xrpc_fast/fastrpc.h>
 
-using namespace CX2::Application;
+using namespace Mantids::Application;
 using namespace UANLZ::JSONALERT;
 
 RPCImpl::RPCImpl()
@@ -21,7 +21,7 @@ void RPCImpl::runRPClient()
     std::string remoteAddr = Globals::getConfig_main()->get<std::string>("RPCConnector.RemoteAddr","127.0.0.1");
     std::string rpcApiKey = Globals::getConfig_main()->get<std::string>("RPCConnector.AlertsApiKey","REPLACEME_XABCXAPIX_ALERT");
 
-    CX2::RPC::Fast::FastRPC fastRPC;
+    Mantids::RPC::Fast::FastRPC fastRPC;
 
     // RULES:
     fastRPC.addMethod( "control.RulesReload",            {&controlRulesReload,nullptr} );
@@ -61,7 +61,7 @@ void RPCImpl::runRPClient()
 
     for (;;)
     {
-        CX2::Network::TLS::Socket_TLS sockRPCClient;
+        Mantids::Network::TLS::Socket_TLS sockRPCClient;
 
         if (!sockRPCClient.setTLSCertificateAuthorityPath( "rpcca.crt" ))
         {

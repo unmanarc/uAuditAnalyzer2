@@ -1,17 +1,17 @@
 #ifndef LINERECEPTOR_H
 #define LINERECEPTOR_H
 
-#include <cx2_hlp_functions/json.h>
-#include <cx2_netp_linerecv/linerecv.h>
+#include <mdz_hlp_functions/json.h>
+#include <mdz_proto_linerecv/linerecv.h>
 #include <thread>
 #include <atomic>
 
 namespace UANLZ { namespace JSONALERT { namespace Input {
 
-class TCPLineProcessor : public CX2::Network::Line2Line::LineRecv
+class TCPLineProcessor : public Mantids::Network::Line2Line::LineRecv
 {
 public:
-    TCPLineProcessor(CX2::Memory::Streams::Streamable *sock, void * server);
+    TCPLineProcessor(Mantids::Memory::Streams::Streamable *sock, void * server);
     virtual ~TCPLineProcessor();
 
     json getStats();

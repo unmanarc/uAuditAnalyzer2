@@ -1,7 +1,7 @@
 #ifndef RPC_H
 #define RPC_H
 
-#include <cx2_net_sockets/streamsocket.h>
+#include <mdz_net_sockets/streamsocket.h>
 
 namespace UANLZ { namespace WEB {
 
@@ -12,7 +12,7 @@ public:
     static bool createRPCListener();
 
 private:
-    static bool callbackOnRPCConnect(void *, CX2::Network::Streams::StreamSocket *sock, const char *remoteAddr, bool secure);
+    static bool callbackOnRPCConnect(void *, Mantids::Network::Streams::StreamSocket *sock, const char *remoteAddr, bool secure);
 };
 
 }}

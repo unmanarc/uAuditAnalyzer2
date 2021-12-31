@@ -1,7 +1,7 @@
-#include <cx2_prg_service/application.h>
-#include <cx2_xrpc_webserver/webserver.h>
-#include <cx2_net_sockets/socket_tcp.h>
-#include <cx2_net_sockets/socket_tls.h>
+#include <mdz_prg_service/application.h>
+#include <mdz_xrpc_webserver/webserver.h>
+#include <mdz_net_sockets/socket_tcp.h>
+#include <mdz_net_sockets/socket_tls.h>
 
 #include "rpcimpl.h"
 #include "globals.h"
@@ -20,10 +20,10 @@
 
 using namespace UANLZ::JSONALERT;
 
-using namespace CX2::Application;
-using namespace CX2::Authentication;
-using namespace CX2::RPC::Web;
-using namespace CX2::RPC;
+using namespace Mantids::Application;
+using namespace Mantids::Authentication;
+using namespace Mantids::RPC::Web;
+using namespace Mantids::RPC;
 
 class Main : public Application
 {
@@ -54,12 +54,12 @@ public:
         globalArguments->setVersion(atoi(PROJECT_VER_MAJOR), atoi(PROJECT_VER_MINOR), atoi(PROJECT_VER_PATCH), "a");
         globalArguments->setDescription(PROJECT_DESCRIPTION);
 
-        globalArguments->addCommandLineOption("Service Options", 'c', "config-dir" , "Configuration directory"  , "/etc/uauditanalyzer/" + globalArguments->getDaemonName(), CX2::Memory::Abstract::TYPE_STRING );
+        globalArguments->addCommandLineOption("Service Options", 'c', "config-dir" , "Configuration directory"  , "/etc/uauditanalyzer/" + globalArguments->getDaemonName(), Mantids::Memory::Abstract::TYPE_STRING );
     }
 
     bool _config(int , char *argv[], Arguments::GlobalArguments * globalArguments)
     {
-        CX2::Network::TLS::Socket_TLS::prepareTLS();
+        Mantids::Network::TLS::Socket_TLS::prepareTLS();
 
         std::string configDir = globalArguments->getCommandLineOptionValue("config-dir")->toString();
 

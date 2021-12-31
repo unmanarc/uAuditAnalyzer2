@@ -1,23 +1,23 @@
 #include "rpcserverimpl.h"
 #include "globals.h"
 
-#include <cx2_net_sockets/socket_tls.h>
-#include <cx2_net_sockets/socket_acceptor_multithreaded.h>
-#include <cx2_xrpc_fast/fastrpc.h>
-#include <cx2_prg_logs/applog.h>
+#include <mdz_net_sockets/socket_tls.h>
+#include <mdz_net_sockets/socket_acceptor_multithreaded.h>
+#include <mdz_xrpc_fast/fastrpc.h>
+#include <mdz_prg_logs/applog.h>
 #include <string>
 
 using namespace UANLZ::WEB;
 
-using namespace CX2::Application;
-using namespace CX2::RPC;
-using namespace CX2;
+using namespace Mantids::Application;
+using namespace Mantids::RPC;
+using namespace Mantids;
 
 RPCServerImpl::RPCServerImpl()
 {
 }
 
-bool RPCServerImpl::callbackOnRPCConnect(void *, CX2::Network::Streams::StreamSocket *sock, const char * remoteAddr, bool secure)
+bool RPCServerImpl::callbackOnRPCConnect(void *, Mantids::Network::Streams::StreamSocket *sock, const char * remoteAddr, bool secure)
 {
     std::string rpcApiKey = sock->readStringEx<uint16_t>();
 
@@ -43,7 +43,7 @@ bool RPCServerImpl::callbackOnRPCConnect(void *, CX2::Network::Streams::StreamSo
 
 bool RPCServerImpl::createRPCListener()
 {
-    CX2::Network::TLS::Socket_TLS * sockRPCListen = new CX2::Network::TLS::Socket_TLS;
+    Mantids::Network::TLS::Socket_TLS * sockRPCListen = new Mantids::Network::TLS::Socket_TLS;
 
     uint16_t listenPort = Globals::getConfig_main()->get<uint16_t>("RPCServer.ListenPort",33001);
     std::string listenAddr = Globals::getConfig_main()->get<std::string>("RPCServer.ListenAddr","0.0.0.0");
@@ -59,7 +59,7 @@ bool RPCServerImpl::createRPCListener()
         return false;
     }
 
-    Globals::setFastRPC(new CX2::RPC::Fast::FastRPC);
+    Globals::setFastRPC(new Mantids::RPC::Fast::FastRPC);
 
     Network::Sockets::Acceptors::Socket_Acceptor_MultiThreaded * multiThreadedAcceptor = new Network::Sockets::Acceptors::Socket_Acceptor_MultiThreaded;
     multiThreadedAcceptor->setMaxConcurrentClients( Globals::getConfig_main()->get<uint16_t>("RPCServer.MaxClients",512) );

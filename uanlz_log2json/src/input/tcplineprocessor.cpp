@@ -25,7 +25,7 @@ static boost::regex exSyslogIPAuditd(REGEX_SYSLOGIP_HEADER REGEX_AUDITD_HEADER R
 static boost::regex exSyslogAuditd(REGEX_SYSLOG_HEADER REGEX_AUDITD_HEADER REGEX_AUDTID_CONTENT);
 static boost::regex exNoHeaderAuditd(REGEX_AUDITD_HEADER REGEX_AUDTID_CONTENT);
 
-TCPLineProcessor::TCPLineProcessor(CX2::Memory::Streams::Streamable *sock, void *server) : LineRecv(sock)
+TCPLineProcessor::TCPLineProcessor(Mantids::Memory::Streams::Streamable *sock, void *server) : LineRecv(sock)
 {
     if      (((TCPServer *)server)->getDecoder() == "AUDITD")           this->decoder = DECODER_AUDITD_NOHEADER;
     else if (((TCPServer *)server)->getDecoder() == "SYSLOG+IP+AUDITD") this->decoder = DECODER_AUDITD_SYSLOGWITHIP;
@@ -91,7 +91,7 @@ bool TCPLineProcessor::processParsedLine(const string &line)
     {
         ((TCPServer *)server)->incInvalidLines();
         invalidLinesCount++;
-        Globals::getAppLog()->log1(__func__,remoteIP,CX2::Application::Logs::LEVEL_WARN,"Incomming invalid line: %s", line.c_str());
+        Globals::getAppLog()->log1(__func__,remoteIP,Mantids::Application::Logs::LEVEL_WARN,"Incomming invalid line: %s", line.c_str());
     }
 
     return true;

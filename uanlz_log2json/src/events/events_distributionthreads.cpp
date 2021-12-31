@@ -11,7 +11,7 @@ using namespace UANLZ::LOG2JSON::AuditdEvents;
 using namespace UANLZ::LOG2JSON;
 
 
-CX2::Threads::Safe::Queue<Audit_Event> Events_DistributionThreads::eventsQueue;
+Mantids::Threads::Safe::Queue<Audit_Event> Events_DistributionThreads::eventsQueue;
 uint32_t Events_DistributionThreads::pushTimeoutInMS = 0;
 
 //std::atomic<double> ProcessorThreads_Output::lastRulesEvaluationTime;
@@ -60,7 +60,7 @@ void outputDistributionThread(int threadid)
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,CX2::Application::Logs::LEVEL_INFO, "No events so far for output thread #%d, triggering no event alert JSON...", threadid);
+            Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_INFO, "No events so far for output thread #%d, triggering no event alert JSON...", threadid);
             json noEventsAlertJSON;
             noEventsAlertJSON["noEventsAlert"] = true;
             Output::Outputs::pushToOutputBases(noEventsAlertJSON, {0,0,0});

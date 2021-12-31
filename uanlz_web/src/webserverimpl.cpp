@@ -2,7 +2,7 @@
 #include "globals.h"
 #include "config.h"
 
-#include <cx2_net_sockets/socket_tls.h>
+#include <mdz_net_sockets/socket_tls.h>
 
 #include  <boost/algorithm/string/predicate.hpp>
 
@@ -11,11 +11,11 @@
 
 #include <fstream>
 
-using namespace CX2::Application;
-using namespace CX2::Authentication;
-using namespace CX2::RPC::Web;
-using namespace CX2::RPC;
-using namespace CX2;
+using namespace Mantids::Application;
+using namespace Mantids::Authentication;
+using namespace Mantids::RPC::Web;
+using namespace Mantids::RPC;
+using namespace Mantids;
 using namespace UANLZ::WEB;
 
 WebServerImpl::WebServerImpl()
@@ -63,7 +63,7 @@ json WebServerImpl::statMethods(void *, Authentication::Manager * auth, Authenti
 bool WebServerImpl::createWebServer()
 {
     std::string sAppName = Globals::getConfig_main()->get<std::string>("LoginRPCClient.AppName","UAUDITANLZ");
-    CX2::Network::TLS::Socket_TLS * sockWebListen = new CX2::Network::TLS::Socket_TLS;
+    Mantids::Network::TLS::Socket_TLS * sockWebListen = new Mantids::Network::TLS::Socket_TLS;
 
     uint16_t listenPort = Globals::getConfig_main()->get<uint16_t>("WebServer.ListenPort",33000);
     std::string listenAddr = Globals::getConfig_main()->get<std::string>("WebServer.ListenAddr","0.0.0.0");
@@ -149,7 +149,7 @@ bool WebServerImpl::createWebServer()
 
 bool WebServerImpl::protoInitFail(void * , Network::Streams::StreamSocket * sock, const char * remoteIP, bool )
 {
-    CX2::Network::TLS::Socket_TLS * secSocket = (CX2::Network::TLS::Socket_TLS *)sock;
+    Mantids::Network::TLS::Socket_TLS * secSocket = (Mantids::Network::TLS::Socket_TLS *)sock;
 
     for (const auto & i :secSocket->getTLSErrorsAndClear())
     {

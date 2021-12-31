@@ -1,6 +1,6 @@
 #include "rules.h"
-#include <cx2_thr_mutex/lock_shared.h>
-#include <cx2_hlp_functions/random.h>
+#include <mdz_thr_mutex/lock_shared.h>
+#include <mdz_hlp_functions/random.h>
 
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/algorithm/string.hpp>
@@ -26,15 +26,15 @@ using namespace boost;
 using namespace UANLZ::JSONALERT;
 using namespace UANLZ::JSONALERT::Filters;
 
-using namespace CX2::Application;
-using namespace CX2::Scripts::Expressions;
-using namespace CX2::Helpers;
-using namespace CX2::Threads::Sync;
+using namespace Mantids::Application;
+using namespace Mantids::Scripts::Expressions;
+using namespace Mantids::Helpers;
+using namespace Mantids::Threads::Sync;
 
 vector<sRule *> Rules::rules;
 std::map<std::string,sAction *> Rules::actions;
-CX2::Threads::Sync::Mutex_Shared Rules::mtRules;
-CX2::Threads::Safe::Queue<std::string> Rules::evaluationQueue;
+Mantids::Threads::Sync::Mutex_Shared Rules::mtRules;
+Mantids::Threads::Safe::Queue<std::string> Rules::evaluationQueue;
 uint64_t Rules::maxQueuePushWaitTimeInMilliseconds=0, Rules::maxQueuePopTimeInMilliseconds=10000;
 
 std::atomic<uint64_t> Rules::queuedLinesCount, Rules::droppedInQueue;
