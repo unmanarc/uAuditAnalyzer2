@@ -17,17 +17,17 @@ This application is in charge of receiving the auditd logs through a centralized
 
 uanlz_alert receives a TCP stream with 1 JSON per line in order to filter and execute actions (usually alerting).
 
-uanlz_alert uses a filter system based on a JSONPath mechanism integrated with an expression evaluation mechanism provided by the cxFramework2 library, which allows comparison with advanced regular expressions, among other things.
+uanlz_alert uses a filter system based on a JSONPath mechanism integrated with an expression evaluation mechanism provided by the libMantids library, which allows comparison with advanced regular expressions, among other things.
 
 ### uanlz_web
 
-uanlz_web was designed to manage and monitor the health of uAuditAnalyzer services. It is designed in HTML5 + JQUERY + BOOTSTRAP, using a webservices backend made in C ++ provided by the cxFramework2 library.
+uanlz_web was designed to manage and monitor the health of uAuditAnalyzer services. It is designed in HTML5 + JQUERY + BOOTSTRAP, using a webservices backend made in C ++ provided by the libMantids library.
 
 ## Build Requirements 
 
 This should be built on top of:
 
-- cxFramework2 libraries (2.3.0) - https://github.com/unmanarc/cxFramework2
+- libMantids libraries (2.3.0) - https://github.com/unmanarc/libMantids
 - JSONCPP (AT LEAST v1.7.7, for RHEL7 you will have to build it by hand or install an external RPM)
 - C++11
 
