@@ -94,7 +94,7 @@ bool WebServerImpl::createWebServer()
         {
             if (!authManager->attribAdd({sAppName,"control"},"Control Access"))
             {
-                Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Failed to create attribute in ther authentication server.");
+                Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Failed to create attribute in the authentication server.");
                 return false;
             }
             else
@@ -105,7 +105,7 @@ bool WebServerImpl::createWebServer()
         {
             if (!authManager->attribAdd({sAppName,"stats"},"Stats Access"))
             {
-                Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Failed to create attribute in ther authentication server.");
+                Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Failed to create attribute in the authentication server.");
                 return false;
             }
             else

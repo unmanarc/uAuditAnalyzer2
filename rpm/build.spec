@@ -1,5 +1,5 @@
 %define name uAuditAnalyzer2
-%define version 2.1.1
+%define version 2.1.2
 %define build_timestamp %{lua: print(os.date("%Y%m%d"))}
 
 Name:           %{name}
@@ -33,8 +33,10 @@ Group:          Applications/Internet
 %define debug_package %{nil}
 %endif
 
-BuildRequires: %{cmake} systemd libMantids-devel libMantids-sqlite openssl-devel zlib-devel boost-devel gcc-c++ jsoncpp-devel sqlite-devel
-Requires: libMantids libMantids-sqlite zlib openssl boost-regex boost-system jsoncpp sqlite
+BuildRequires: libMantids-devel >= 2.5.3
+BuildRequires: %{cmake} systemd libMantids-sqlite openssl-devel zlib-devel boost-devel gcc-c++ jsoncpp-devel sqlite-devel
+Requires: libMantids >= 2.5.3
+Requires: libMantids-sqlite zlib openssl boost-regex boost-system jsoncpp sqlite
 
 %description
 This package contains uAuditAnalyzer2 is intended to be a highly-efficient application for processing auditd logs received via rsyslog. It is being actively used in many enterprise-level environments for detecting potential threats and providing instant alerts using messaging applications, bots or other means.
