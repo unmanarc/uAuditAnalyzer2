@@ -4,7 +4,7 @@ Description=Unmanarc's Auditd Analyzer Framework - WebServer
 [Service]
 Type=simple
 WorkingDirectory=/etc/uauditanalyzer/uanlz_web
-ExecStart=/usr/sbin/uanlz_web
+ExecStart=/usr/bin/uanlz_web
 Restart=always
 
 [Install]
