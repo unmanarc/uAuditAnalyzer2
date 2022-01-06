@@ -94,9 +94,9 @@ chmod 600 $RPM_BUILD_ROOT/etc/uauditanalyzer/*/*.ini
 
 mkdir -vp $RPM_BUILD_ROOT/usr/lib/systemd/system
 
-cp etc/systemd/system/uanlz_web.service $RPM_BUILD_ROOT/usr/lib/systemd/system/
-cp etc/systemd/system/uanlz_log2json.service $RPM_BUILD_ROOT/usr/lib/systemd/system/
-cp etc/systemd/system/uanlz_alert.service $RPM_BUILD_ROOT/usr/lib/systemd/system/
+cp uanlz_web/etc/systemd/system/uanlz_web.service $RPM_BUILD_ROOT/usr/lib/systemd/system/
+cp uanlz_log2json/etc/systemd/system/uanlz_log2json.service $RPM_BUILD_ROOT/usr/lib/systemd/system/
+cp uanlz_alert/etc/systemd/system/uanlz_alert.service $RPM_BUILD_ROOT/usr/lib/systemd/system/
 
 chmod 644 $RPM_BUILD_ROOT/usr/lib/systemd/system/*.service
 
