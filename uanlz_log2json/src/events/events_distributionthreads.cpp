@@ -63,7 +63,7 @@ void outputDistributionThread(int threadid)
             Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_INFO, "No events so far for output thread #%d, triggering no event alert JSON...", threadid);
             json noEventsAlertJSON;
             noEventsAlertJSON["noEventsAlert"] = true;
-            Output::Outputs::pushToOutputBases(noEventsAlertJSON, {0,0,0});
+            Output::Outputs::pushToOutputBases(noEventsAlertJSON, std::make_tuple<time_t, uint32_t, uint64_t>(0,0,0));
         }
     }
 }
