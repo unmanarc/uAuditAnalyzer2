@@ -15,7 +15,7 @@ using namespace UANLZ::LOG2JSON::AuditdEvents;
 Audit_Event::Audit_Event()
 {
     creationTime = time(nullptr);
-    eventId = { 0,0,0 };
+    eventId = std::make_tuple<time_t, uint32_t, uint64_t>(0,0,0);
 }
 
 Audit_Event::~Audit_Event()
