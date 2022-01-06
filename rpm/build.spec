@@ -8,7 +8,7 @@ Release:        %{build_timestamp}.git%{?dist}
 Summary:        Unmanarc's Auditd Analyzer
 License:        GPLv3
 URL:            https://github.com/unmanarc/uAuditAnalyzer2
-Source0:        https://github.com/unmanarc/uAuditAnalyzer2/archive/main.tar.gz#/%{name}-%{version}-%{build_timestamp}.tar.gz
+Source0:        https://github.com/unmanarc/uAuditAnalyzer2/archive/master.tar.gz#/%{name}-%{version}-%{build_timestamp}.tar.gz
 Group:          Applications/Internet
 
 %define cmake cmake
@@ -40,7 +40,7 @@ Requires: libMantids libMantids-sqlite zlib openssl boost-regex boost-system jso
 This package contains uAuditAnalyzer2 is intended to be a highly-efficient application for processing auditd logs received via rsyslog. It is being actively used in many enterprise-level environments for detecting potential threats and providing instant alerts using messaging applications, bots or other means.
 
 %prep
-%autosetup -n %{name}-main
+%autosetup -n %{name}-master
 
 %build
 %{cmake} -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=MinSizeRel
