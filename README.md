@@ -23,11 +23,68 @@ uanlz_alert uses a filter system based on a JSONPath mechanism integrated with a
 
 uanlz_web was designed to manage and monitor the health of uAuditAnalyzer services. It is designed in HTML5 + JQUERY + BOOTSTRAP, using a webservices backend made in C ++ provided by the libMantids library.
 
+
+
+***
+## Installing packages (HOWTO)
+
+
+- [Manual build guide](BUILD.md)
+- COPR Packages (Fedora/CentOS/RHEL/etc):  
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/amizrachi/uAuditAnalyzer2/package/uAuditAnalyzer2/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amizrachi/uAuditAnalyzer2/package/uAuditAnalyzer2/)
+
+### Simple installation guide for Fedora/RHEL:
+
+- First, proceed to install EPEL in your distribution (https://docs.fedoraproject.org/en-US/epel/), sometimes this is required for jsoncpp.
+
+- Then, proceed to activate our repo's and download/install uAuditAnalyzer2:
+```bash
+# NOTE: for RHEL7 replace dnf by yum
+dnf copr enable amizrachi/libMantids
+dnf copr enable amizrachi/uAuditAnalyzer2
+
+dnf -y install uAuditAnalyzer2
+```
+
+- Don't forget to open the firewall:
+
+```bash
+# EG. Log listener @10514... 
+firewall-cmd --zone=public --permanent --add-port 10514/tcp
+# if you require another port, please repeat the last line modifiying the port
+firewall-cmd --reload
+```
+
+- You must create an application called **UAUDITANALYZER** in your uFastAuthD daemon (using the `uFastAuthD` web logged as `admin`)
+
+- Go to file `/etc/uauditanalyzer/uanlz_web/config.ini` and fill the following fields:
+
+    - `LoginRPCClient/LoginApiKey`: you obtain this random value from when you create the  **UAUDITANALYZER** app.
+    - `LoginRPCClient/RemoteHost`: fill with the remote host address from the uFastAuthD application
+
+- Don't forget to replace **/etc/uauditanalyzer/uanlz_web/ca.crt** file with the certificate authority public cert which signed uFastAuthD
+
+- Don't forget to replace **/etc/uauditanalyzer/uanlz_web/snakeoil.{key,crt}** with new certificates from your certificate authority. This will provide your encryption security for the administrative website.
+
+- Once completed the steps before, you can continue by activating/enabling the service:
+```bash
+systemctl enable --now uanlz_web
+systemctl enable --now uanlz_alert
+systemctl enable --now uanlz_log2json
+```
+
+- Now log into `uFastAuthD` as `admin` to give your user (even admin) enough privileges to access **UAUDITANALYZER** 
+
+- Then, you can log with your `uFastAuthD` user into your uAuditAnalyzer2 Website: https://YOURHOSTIP:33000/login
+
+- Now you are ready to operate this service
+
+
 ## Build Requirements 
 
 This should be built on top of:
 
-- libMantids libraries (2.3.0) - https://github.com/unmanarc/libMantids
+- libMantids libraries (2.5.2) - https://github.com/unmanarc/libMantids
 - JSONCPP (AT LEAST v1.7.7, for RHEL7 you will have to build it by hand or install an external RPM)
 - C++11
 
@@ -40,6 +97,8 @@ This should be built on top of:
 So... would it run in my Raspberry PI 4? 
 
 YES. But in our experience, RPI4 only delivers enough power to analyze some thousands of simultaneous servers with an average usage.
+
+***
 
 ## Commercial Support
    

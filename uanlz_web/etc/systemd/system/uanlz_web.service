@@ -3,8 +3,8 @@ Description=Unmanarc's Auditd Analyzer Framework - WebServer
 
 [Service]
 Type=simple
-#Environment="LD_LIBRARY_PATH=/opt/analyzer/lib"
-ExecStart=/sbin/uanlz_web
+WorkingDirectory=/etc/uauditanalyzer/uanlz_web
+ExecStart=/usr/sbin/uanlz_web
 Restart=always
 
 [Install]

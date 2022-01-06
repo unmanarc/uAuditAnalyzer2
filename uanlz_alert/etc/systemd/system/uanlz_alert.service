@@ -3,8 +3,8 @@ Description=Unmanarc's Auditd Analyzer Framework - Alert
 
 [Service]
 Type=simple
-#Environment="LD_LIBRARY_PATH=/opt/analyzer/lib"
-ExecStart=/sbin/uanlz_alert
+WorkingDirectory=/etc/uauditanalyzer/uanlz_alert
+ExecStart=/usr/sbin/uanlz_alert
 Restart=always
 
 [Install]

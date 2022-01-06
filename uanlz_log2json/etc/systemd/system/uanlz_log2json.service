@@ -3,8 +3,8 @@ Description=Unmanarc's Auditd Analyzer Framework - RSYSLOG 2 JSON
 
 [Service]
 Type=simple
-#Environment="LD_LIBRARY_PATH=/opt/analyzer/lib"
-ExecStart=/sbin/uanlz_log2json
+WorkingDirectory=/etc/uauditanalyzer/uanlz_log2json
+ExecStart=/usr/sbin/uanlz_log2json
 Restart=always
 
 [Install]
