@@ -105,6 +105,7 @@ chmod 644 $RPM_BUILD_ROOT/usr/lib/systemd/system/*.service
 %{_bindir}/uanlz_alert
 %{_bindir}/uanlz_log2json
 %{_bindir}/uanlz_web
+%dir /etc/uauditanalyzer
 %config(noreplace) /etc/uauditanalyzer/*
 /var/www/uauditweb/*
 /usr/lib/systemd/system/uanlz_alert.service
