@@ -1,5 +1,5 @@
 %define name uAuditAnalyzer2
-%define version 2.1.3
+%define version 2.1.4
 %define build_timestamp %{lua: print(os.date("%Y%m%d"))}
 
 Name:           %{name}
@@ -33,9 +33,9 @@ Group:          Applications/Internet
 %define debug_package %{nil}
 %endif
 
-BuildRequires: libMantids-devel >= 2.5.3
+BuildRequires: libMantids-devel >= 2.5.4
 BuildRequires: %{cmake} systemd libMantids-sqlite openssl-devel zlib-devel boost-devel gcc-c++ jsoncpp-devel sqlite-devel
-Requires: libMantids >= 2.5.3
+Requires: libMantids >= 2.5.4
 Requires: libMantids-sqlite zlib openssl boost-regex boost-system jsoncpp sqlite
 
 %description
