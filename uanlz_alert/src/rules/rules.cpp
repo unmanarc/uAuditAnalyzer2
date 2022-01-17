@@ -74,7 +74,9 @@ void forkExec(const std::string & ruleName, const char *file, std::vector<string
         waitpid(pid, &status, 0);
         if (status!=0)
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Rule '%s': execution of '%s' failed with %d (%s).", ruleName.c_str(), string(file).c_str(), status, strerror(errno));
+            char cError[1024]="Unknown Error";
+
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Rule '%s': execution of '%s' failed with %d (%s).", ruleName.c_str(), string(file).c_str(), status, strerror_r(errno,cError,sizeof(cError)));
         }
     }
     else
