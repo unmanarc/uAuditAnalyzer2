@@ -31,7 +31,7 @@ uanlz_web was designed to manage and monitor the health of uAuditAnalyzer servic
 
 - [Manual build guide](BUILD.md)
 - COPR Packages (Fedora/CentOS/RHEL/etc):  
-[![Copr build status](https://copr.fedorainfracloud.org/coprs/amizrachi/uAuditAnalyzer2/package/uAuditAnalyzer2/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amizrachi/uAuditAnalyzer2/package/uAuditAnalyzer2/)
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/amizrachi/unmanarc/package/uAuditAnalyzer2/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amizrachi/unmanarc/package/uAuditAnalyzer2/)
 
 ### Simple installation guide for Fedora/RHEL:
 
