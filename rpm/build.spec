@@ -61,6 +61,7 @@ ln -s . %{_host}
 
 %if 0%{?rhel} >= 9
 ln -s . %{_host}
+ln -s . redhat-linux-build
 %endif
 
 %if 0%{?fedora} == 35
