@@ -40,8 +40,7 @@ uanlz_web was designed to manage and monitor the health of uAuditAnalyzer servic
 - Then, proceed to activate our repo's and download/install uAuditAnalyzer2:
 ```bash
 # NOTE: for RHEL7 replace dnf by yum
-dnf copr enable amizrachi/libMantids
-dnf copr enable amizrachi/uAuditAnalyzer2
+dnf copr enable amizrachi/unmanarc
 
 dnf -y install uAuditAnalyzer2
 ```
