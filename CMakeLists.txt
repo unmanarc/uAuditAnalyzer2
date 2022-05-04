@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(SVERSION 2.1.5)
+set(SVERSION 2.1.6)
 project(uAuditAnalyzer2)
 project(${PROJECT_NAME} VERSION ${SVERSION} DESCRIPTION "Unmanarc's Audit Analyzer")
 
