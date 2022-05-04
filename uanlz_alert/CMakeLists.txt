@@ -25,6 +25,13 @@ if (EXTRAPREFIX)
     target_link_libraries(${APP_NAME} "-L${EXTRAPREFIX}/lib64")
 endif()
 
+if (CMAKE_INSTALL_PREFIX)
+    target_include_directories(${APP_NAME} PUBLIC ${CMAKE_INSTALL_PREFIX}/include)
+    target_include_directories(${APP_NAME} PUBLIC ${CMAKE_INSTALL_PREFIX}/usr/include)
+    target_link_libraries(${APP_NAME} "-L${CMAKE_INSTALL_PREFIX}/lib")
+    target_link_libraries(${APP_NAME} "-L${CMAKE_INSTALL_PREFIX}/lib64")
+endif()
+
 target_link_libraries(${APP_NAME} "-lmdz_xrpc_fast")
 target_link_libraries(${APP_NAME} "-lmdz_thr_threads")
 target_link_libraries(${APP_NAME} "-lmdz_thr_safecontainers")
