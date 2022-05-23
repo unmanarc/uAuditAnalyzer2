@@ -73,9 +73,9 @@ bool TCPLineProcessor::processParsedLine(const string &line)
         string hostname         = string(whatSyslogAuditdDecomposed[2].first, whatSyslogAuditdDecomposed[2].second);
         string eventType        = string(whatSyslogAuditdDecomposed[3].first, whatSyslogAuditdDecomposed[3].second);
 
-        time_t auditdEventTime  = stol(  string(whatSyslogAuditdDecomposed[4].first, whatSyslogAuditdDecomposed[4].second));
-        uint32_t msecs          = stoul( string(whatSyslogAuditdDecomposed[5].first, whatSyslogAuditdDecomposed[5].second));
-        uint64_t eventId        = stoull(string(whatSyslogAuditdDecomposed[6].first, whatSyslogAuditdDecomposed[6].second));
+        time_t auditdEventTime  = strtol(  string(whatSyslogAuditdDecomposed[4].first, whatSyslogAuditdDecomposed[4].second).c_str(),0,10 );
+        uint32_t msecs          = strtoul( string(whatSyslogAuditdDecomposed[5].first, whatSyslogAuditdDecomposed[5].second).c_str(), 0, 10);
+        uint64_t eventId        = strtoull(string(whatSyslogAuditdDecomposed[6].first, whatSyslogAuditdDecomposed[6].second).c_str(), 0, 10);
 
         ((TCPServer *)server)->incProcessedLines();
         processedLinesCount++;
