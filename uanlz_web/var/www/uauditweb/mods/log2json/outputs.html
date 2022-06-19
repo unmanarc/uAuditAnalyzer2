@@ -1,4 +1,4 @@
-<cinc_>/mods/log2json/z.inc.header.html</cinc_>
+<%include:/mods/log2json/z.inc.header.html%>
 
 <script>
   document.getElementById("apptitle").innerHTML = "Log Dissector &#9658; JSON Outputs";
@@ -102,7 +102,7 @@
         var method = "remote.stats";
         var payloadData = { "target": "LOG2JSON", "remoteMethod": "stats.Outputs" }
         $.ajax({
-            url: '/api?mode=EXEC&method=' + method,
+            url: '/japi_exec?method=' + method,
             type: 'POST',
             headers: { "CSRFToken": $("#csrfToken").val() },
             data: { payload: JSON.stringify(payloadData) },
@@ -119,4 +119,4 @@
     }
 </script>
 
-<cinc_>/mods/log2json/z.inc.footer.html</cinc_>
+<%include:/mods/log2json/z.inc.footer.html%>

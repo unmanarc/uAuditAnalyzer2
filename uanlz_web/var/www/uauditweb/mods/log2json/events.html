@@ -1,4 +1,4 @@
-<cinc_>/mods/log2json/z.inc.header.html</cinc_>
+<%include:/mods/log2json/z.inc.header.html%>
 
 <script>
   document.getElementById("apptitle").innerHTML = "Log Dissector &#9658; Syslog Incomming Auditd Events";
@@ -10,11 +10,8 @@
   }
 </script>
 
-
 <table width="100%">
-
     <tr valign=top>
-  
       <td>
         <h2 class="h6 font-weight-bold text-center mb-4">Auditd Event Queue</h2>
         <div class="progress mx-auto" data-value='x' id=log2json-eventsQueuePercentage0>
@@ -97,7 +94,7 @@ $(`#log2json-eventsQueueSize`).text( filterStats["eventsQueue"]["curSize"] + "/"
     var method = "remote.stats";
     var payloadData = { "target": "LOG2JSON", "remoteMethod": "stats.OutputsDistributionThreads" }
     $.ajax({
-      url: '/api?mode=EXEC&method=' + method,
+      url: '/japi_exec?method=' + method,
       type: 'POST',
       headers: { "CSRFToken": $("#csrfToken").val() },
       data: { payload: JSON.stringify(payloadData) },
@@ -114,4 +111,4 @@ $(`#log2json-eventsQueueSize`).text( filterStats["eventsQueue"]["curSize"] + "/"
   }
 </script>
 
-<cinc_>/mods/log2json/z.inc.footer.html</cinc_>
+<%include:/mods/log2json/z.inc.footer.html%>
