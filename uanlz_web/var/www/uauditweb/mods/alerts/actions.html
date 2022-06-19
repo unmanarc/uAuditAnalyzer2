@@ -1,4 +1,4 @@
-<cinc_>/mods/alerts/z.inc.header.html</cinc_>
+<%include:/mods/alerts/z.inc.header.html%>
 
 <script>
   document.getElementById("apptitle").innerHTML = "Alerts &#9658; JSON Alerts Actions";
@@ -60,7 +60,7 @@
                         "remoteMethod": "control.SaveRunningActions",
                       }
     $.ajax({
-      url: '/api?mode=EXEC&method=' + method,
+      url: '/japi_exec?method=' + method,
       type: 'POST',
       headers: { "CSRFToken": $("#csrfToken").val() },
       data: { payload: JSON.stringify(payloadData) },
@@ -119,7 +119,7 @@
                         } 
                       }
     $.ajax({
-      url: '/api?mode=EXEC&method=' + method,
+      url: '/japi_exec?method=' + method,
       type: 'POST',
       headers: { "CSRFToken": $("#csrfToken").val() },
       data: { payload: JSON.stringify(payloadData) },
@@ -144,7 +144,7 @@
     var method = "remote.stats";
     var payloadData = { "target": "ALERTS", "remoteMethod": "stats.ReadRunningActions" }
     $.ajax({
-      url: '/api?mode=EXEC&method=' + method,
+      url: '/japi_exec?method=' + method,
       type: 'POST',
       headers: { "CSRFToken": $("#csrfToken").val() },
       data: { payload: JSON.stringify(payloadData) },
@@ -162,7 +162,7 @@
     var method = "remote.stats";
     var payloadData = { "target": "ALERTS", "remoteMethod": "stats.AreActionsModified" }
     $.ajax({
-      url: '/api?mode=EXEC&method=' + method,
+      url: '/japi_exec?method=' + method,
       type: 'POST',
       headers: { "CSRFToken": $("#csrfToken").val() },
       data: { payload: JSON.stringify(payloadData) },
@@ -186,4 +186,4 @@
 
 </script>
 
-<cinc_>/mods/alerts/z.inc.footer.html</cinc_>
+<%include:/mods/alerts/z.inc.footer.html%>

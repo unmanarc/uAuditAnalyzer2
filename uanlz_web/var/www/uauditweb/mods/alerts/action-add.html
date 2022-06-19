@@ -1,4 +1,4 @@
-<cinc_>/mods/alerts/z.inc.header.html</cinc_>
+<%include:/mods/alerts/z.inc.header.html%>
 
 <script>
   document.getElementById("apptitle").innerHTML = "Alerts &#9658; JSON Alerts - Add New Action";
@@ -26,7 +26,7 @@
     }
 
     $.ajax({
-      url: '/api?mode=EXEC&method=' + method,
+      url: '/japi_exec?method=' + method,
       type: 'POST',
       headers: { "CSRFToken": $("#csrfToken").val() },
       data: { payload: JSON.stringify(payloadData) },
@@ -92,7 +92,7 @@
     }
 
     $.ajax({
-      url: '/api?mode=EXEC&method=' + method,
+      url: '/japi_exec?method=' + method,
       type: 'POST',
       headers: { "CSRFToken": $("#csrfToken").val() },
       data: { payload: JSON.stringify(payloadData) },
@@ -184,4 +184,4 @@
   <button class="btn btn-success " id="EditButton" role="button" onclick="javascript:addAction('edit')" style="visibility: collapse; display: none;">Edit...</a>
 </div>
 
-<cinc_>/mods/alerts/z.inc.footer.html</cinc_>
+<%include:/mods/alerts/z.inc.footer.html%>
