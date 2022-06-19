@@ -19,7 +19,7 @@
     $.ajax({
       url: '/japi_exec?method=' + method,
       type: 'POST',
-      headers: { "CSRFToken": $("#csrfToken").val() },
+      headers: { "CSRFToken": csrfToken },
       data: { payload: JSON.stringify(payloadData) },
       success: function (result) {
         if (result == true)
@@ -86,7 +86,7 @@
     $.ajax({
       url: '/japi_exec?method=' + method,
       type: 'POST',
-      headers: { "CSRFToken": $("#csrfToken").val() },
+      headers: { "CSRFToken": csrfToken },
       data: { payload: JSON.stringify(payloadData) },
       success: function (result) {
         if (result == true)
@@ -136,7 +136,7 @@
     $.ajax({
       url: '/japi_exec?method=' + method,
       type: 'POST',
-      headers: { "CSRFToken": $("#csrfToken").val() },
+      headers: { "CSRFToken": csrfToken },
       data: { payload: JSON.stringify(payloadData) },
       success: function (result) {
         if (result["modified"] == true)

@@ -12,12 +12,13 @@
     <script src="/assets/js/mantids_login.js" type="text/javascript"></script>
 </head>
 
+<%jvar/csrfToken:csrfToken%>
+<%jvar/softwareVersion:softwareVersion%>
+<%jvar/user:user%>
+<%jvar/domain:domain%>
+<%jvar/maxAge:maxAge%>
+
 <body onload="javascript:ajaxLoginStart()">
-    <cInputVar>csrfToken</cInputVar>
-    <cInputVar>softwareVersion</cInputVar>
-    <cInputVar>user</cInputVar>
-    <cInputVar>domain</cInputVar>
-    <cInputVar>maxAge</cInputVar>
     <main class="d-flex align-items-center min-vh-100 py-3 py-md-0">
         <div class="container">
             <div class="card login-card">

@@ -18,12 +18,13 @@
     <script src="/assets/js/mantids_main.js" type="text/javascript"></script>
 </head>
 
+<%jvar/csrfToken:csrfToken%>
+<%jvar/softwareVersion:softwareVersion%>
+<%jvar/user:user%>
+<%jvar/domain:domain%>
+<%jvar/maxAge:maxAge%>
+
 <body onload="javascript:ajaxLoadInfo();">
-    <cInputVar>csrfToken</cInputVar>
-    <cInputVar>softwareVersion</cInputVar>
-    <cInputVar>user</cInputVar>
-    <cInputVar>domain</cInputVar>
-    <cInputVar>maxAge</cInputVar>
     <header>
 
         <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
