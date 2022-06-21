@@ -1,6 +1,7 @@
 #include "inputs.h"
 #include <fstream>
 #include <mdz_hlp_functions/random.h>
+#include <inttypes.h>
 
 #include "../globals.h"
 
@@ -94,7 +95,7 @@ bool Inputs::addInput(json jConfig)
     listenPort = JSON_ASUINT(jConfig,"ListenPort",0);
     description = JSON_ASSTRING(jConfig,"Description","");
 
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Adding JSON input '%s' to config file: Description: '%s' / @%s:%d", JSON_ASCSTRING(jConfig,"id",""),description.c_str(),listenAddr.c_str(),listenPort );
+    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Adding JSON input '%s' to config file: Description: '%s' / @%s:%" PRIu16, JSON_ASCSTRING(jConfig,"id",""),description.c_str(),listenAddr.c_str(),listenPort );
 
     rt[0]=jConfig;
     // Read array:
@@ -127,7 +128,7 @@ bool Inputs::remInput(const std::string &inputId)
             listenPort = JSON_ASUINT(root[i],"ListenPort",0);
             description = JSON_ASSTRING(root[i],"Description","");
 
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Removing JSON input '%s' from config file: Description: '%s' / @%s:%d", JSON_ASCSTRING(root[i],"id",""),description.c_str(),listenAddr.c_str(),listenPort );
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Removing JSON input '%s' from config file: Description: '%s' / @%s:%" PRIu16, JSON_ASCSTRING(root[i],"id",""),description.c_str(),listenAddr.c_str(),listenPort );
 
         }
     }

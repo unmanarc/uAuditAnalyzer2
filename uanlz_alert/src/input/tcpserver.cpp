@@ -7,6 +7,7 @@
 #include <mdz_net_sockets/socket_acceptor_multithreaded.h>
 
 #include <boost/property_tree/ini_parser.hpp>
+#include <inttypes.h>
 
 using namespace std;
 using namespace UANLZ::JSONALERT;
@@ -70,7 +71,7 @@ bool TCPServer::loadConfig(const json & jConfig)
     listenPort = JSON_ASUINT(jConfig,"ListenPort",0);
     description = JSON_ASSTRING(jConfig,"Description","");
 
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Configuring JSON input '%s' @%s:%d",description.c_str(),listenAddr.c_str(),listenPort );
+    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Configuring JSON input '%s' @%s:%" PRIu16,description.c_str(),listenAddr.c_str(),listenPort );
 
 
     return true;
@@ -83,11 +84,13 @@ void TCPServer::startThreaded()
     Socket_TCP * tcpServer = new Socket_TCP;
     if (!tcpServer->listenOn(listenPort,listenAddr.c_str(),true))
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Error creating JSON TCP listener @%s:%lu",listenAddr.c_str(),listenPort);
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Error creating JSON TCP listener @%s:%" PRIu16,listenAddr.c_str(),listenPort);
+        delete tcpServer;
+        delete vstreamer_syslog;
         return;
     }
 
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"JSON TCP Listener listener running @%s:%lu...",  listenAddr.c_str(),tcpServer->getPort());
+    Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"JSON TCP Listener listener running @%s:%" PRIu16 "...",  listenAddr.c_str(),tcpServer->getPort());
 
     // STREAM MANAGER:
     vstreamer_syslog->setAcceptorSocket(tcpServer);

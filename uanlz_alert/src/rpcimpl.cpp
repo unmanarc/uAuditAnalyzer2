@@ -1,4 +1,5 @@
 #include "rpcimpl.h"
+#include <inttypes.h>
 
 #include "globals.h"
 
@@ -65,19 +66,19 @@ void RPCImpl::runRPClient()
 
         if (!sockRPCClient.setTLSCertificateAuthorityPath( "rpcca.crt" ))
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "Error starting RPC Connector to %s:%d: %s", remoteAddr.c_str(), remotePort, "Bad TLS Certificate Authority (rpcca.crt)");
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "Error starting RPC Connector to %s:%" PRIu16 ": %s", remoteAddr.c_str(), remotePort, "Bad TLS Certificate Authority (rpcca.crt)");
             _exit(-3);
         }
 
         if ( sockRPCClient.connectTo( remoteAddr.c_str(), remotePort ) )
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  "Connected to %s:%d", remoteAddr.c_str(), remotePort);
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  "Connected to %s:%" PRIu16, remoteAddr.c_str(), remotePort);
             sockRPCClient.writeStringEx<uint16_t>(rpcApiKey);
             fastRPC.processConnection(&sockRPCClient,"SERVER");
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "Error connecting to remote API Server @%s:%d: %s", remoteAddr.c_str(), remotePort, sockRPCClient.getLastError().c_str());
+            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "Error connecting to remote API Server @%s:%" PRIu16 ": %s", remoteAddr.c_str(), remotePort, sockRPCClient.getLastError().c_str());
             sleep(3);
         }
     }
