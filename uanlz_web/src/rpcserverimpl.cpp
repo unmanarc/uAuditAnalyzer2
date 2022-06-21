@@ -6,6 +6,7 @@
 #include <mdz_xrpc_fast/fastrpc.h>
 #include <mdz_prg_logs/applog.h>
 #include <string>
+#include <inttypes.h>
 
 using namespace UANLZ::WEB;
 
@@ -50,12 +51,12 @@ bool RPCServerImpl::createRPCListener()
 
     if (!sockRPCListen->setTLSPublicKeyPath( Globals::getConfig_main()->get<std::string>("RPCServer.CertFile","snakeoil.crt").c_str() ))
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error starting RPC Server @%s:%d: %s", listenAddr.c_str(), listenPort, "Bad TLS RPC Server Public Key");
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error starting RPC Server @%s:%" PRIu16 ": %s", listenAddr.c_str(), listenPort, "Bad TLS RPC Server Public Key");
         return false;
     }
     if (!sockRPCListen->setTLSPrivateKeyPath( Globals::getConfig_main()->get<std::string>("RPCServer.KeyFile","snakeoil.key").c_str() ))
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error starting RPC Server @%s:%d: %s", listenAddr.c_str(), listenPort, "Bad TLS RPC Server Private Key");
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error starting RPC Server @%s:%" PRIu16 ": %s", listenAddr.c_str(), listenPort, "Bad TLS RPC Server Private Key");
         return false;
     }
 
@@ -69,12 +70,12 @@ bool RPCServerImpl::createRPCListener()
     {
         multiThreadedAcceptor->setAcceptorSocket(sockRPCListen);
         multiThreadedAcceptor->startThreaded();
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  "Accepting RPC clients @%s:%d via TLS", listenAddr.c_str(), listenPort);
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  "Accepting RPC clients @%s:%" PRIu16 " via TLS", listenAddr.c_str(), listenPort);
         return true;
     }
     else
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error starting RPC Server @%s:%d: %s", listenAddr.c_str(), listenPort, sockRPCListen->getLastError().c_str());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Error starting RPC Server @%s:%" PRIu16 ": %s", listenAddr.c_str(), listenPort, sockRPCListen->getLastError().c_str());
         return false;
     }
 }

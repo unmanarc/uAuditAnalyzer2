@@ -2,6 +2,7 @@
 #include "../globals.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <thread>
+#include <inttypes.h>
 
 using namespace UANLZ::LOG2JSON::Output;
 using namespace std;
@@ -59,7 +60,7 @@ void Output_JSONTCP::logAuditEvent(const json & eventJSON, const std::tuple<time
     // push, if not report and go.
     if (!queueValues.push(value,push_tmout_msecs))
     {
-        Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_WARN, "Output_JSONTCP Queue full, Event %ld.%d:%lu Dropped...", get<0>(eventId),get<1>(eventId),get<2>(eventId));
+        Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_WARN, "Output_JSONTCP Queue full, Event %" PRIu64 ".%" PRIu32 ":%" PRIu64 " Dropped...", get<0>(eventId),get<1>(eventId),get<2>(eventId));
         dropped++;
         delete value;
     }
@@ -132,14 +133,14 @@ bool Output_JSONTCP::reconnect()
     {
         std::string msg = connection->getLastError();
         boost::replace_all(msg,"\n",",");
-        Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_ERR, "JSONTCP connection error to %s:%d: %s",  server.c_str(), port  ,msg.c_str());
+        Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_ERR, "JSONTCP connection error to %s:%" PRIu16 ": %s",  server.c_str(), port  ,msg.c_str());
         connected = false;
         sleep(config.get<uint32_t>("ReconnectSleepTimeInSecs",3));
         return false;
     }
     else
     {
-        Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_INFO, "JSONTCP connected to %s:%u",  server.c_str(), port);
+        Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_INFO, "JSONTCP connected to %s:%" PRIu16,  server.c_str(), port);
         connected = true;
         return true;
     }

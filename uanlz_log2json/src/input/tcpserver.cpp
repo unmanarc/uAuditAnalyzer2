@@ -7,6 +7,7 @@
 #include <mdz_net_sockets/socket_acceptor_multithreaded.h>
 
 #include <boost/property_tree/ini_parser.hpp>
+#include <inttypes.h>
 
 using namespace std;
 using namespace UANLZ::LOG2JSON::Input;
@@ -91,11 +92,13 @@ void TCPServer::startThreaded()
     Socket_TCP * tcpServer = new Socket_TCP;
     if (!tcpServer->listenOn(listenPort,listenAddr.c_str(),true))
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Error creating TCP LOG listener @%s:%lu",listenAddr.c_str(),listenPort);
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Error creating TCP LOG listener @%s:%" PRIu16,listenAddr.c_str(),listenPort);
+        delete vstreamer_syslog;
+        delete tcpServer;
         return;
     }
 
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"LOG Listener (with decoder:%s) listener running on TCP @%s:%lu...", decoder.c_str(), listenAddr.c_str(),tcpServer->getPort());
+    Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"LOG Listener (with decoder:%s) listener running on TCP @%s:%" PRIu16 "...", decoder.c_str(), listenAddr.c_str(),tcpServer->getPort());
 
     // STREAM MANAGER:
     vstreamer_syslog->setAcceptorSocket(tcpServer);

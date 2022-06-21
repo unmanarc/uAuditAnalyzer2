@@ -18,6 +18,8 @@
 #include <dirent.h>
 #include <unistd.h>
 
+#include <inttypes.h>
+
 using namespace UANLZ::JSONALERT;
 
 using namespace Mantids::Application;
@@ -72,7 +74,7 @@ public:
         initLog.setUserAlignSize(1);
 
         // start program.
-        initLog.log(__func__, "","", Logs::LEVEL_INFO, 2048, "Starting... (Build date %s %s), PID: %u",__DATE__, __TIME__, getpid());
+        initLog.log(__func__, "","", Logs::LEVEL_INFO, 2048, "Starting... (Build date %s %s), PID: %" PRIi32,__DATE__, __TIME__, getpid());
         initLog.log0(__func__,Logs::LEVEL_INFO, "Using config dir: %s", configDir.c_str());
         initLog.log0(__func__,Logs::LEVEL_INFO, "Loading configuration: %s", (configDir + "/config.ini").c_str());
 
