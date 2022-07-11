@@ -16,10 +16,10 @@ enum eDecoders
     DECODER_AUDITD_SYSLOGWITHIP
 };
 
-class TCPLineProcessor : public Mantids::Network::Line2Line::LineRecv
+class TCPLineProcessor : public Mantids::Protocols::Line2Line::LineRecv
 {
 public:
-    TCPLineProcessor(Mantids::Memory::Streams::Streamable *sock, void * server);
+    TCPLineProcessor(Mantids::Memory::Streams::StreamableObject *sock, void * server);
     virtual ~TCPLineProcessor();
 
     json getStats();

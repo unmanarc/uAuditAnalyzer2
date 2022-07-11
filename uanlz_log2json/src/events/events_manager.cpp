@@ -12,7 +12,9 @@ std::mutex Events_Manager::mutex_insert;
 void garbageCollector()
 {
     std::string threadName = "EVENTS_GC";
+#ifndef WIN32
     pthread_setname_np(pthread_self(), threadName.c_str());
+#endif
     Events_Manager::gc();
 }
 

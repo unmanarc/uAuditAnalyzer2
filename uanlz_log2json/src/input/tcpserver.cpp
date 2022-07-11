@@ -4,7 +4,7 @@
 #include "../input/tcplineprocessor.h"
 
 #include <mdz_net_sockets/socket_tcp.h>
-#include <mdz_net_sockets/socket_acceptor_multithreaded.h>
+#include <mdz_net_sockets/acceptor_multithreaded.h>
 
 #include <boost/property_tree/ini_parser.hpp>
 #include <inttypes.h>
@@ -14,11 +14,11 @@ using namespace UANLZ::LOG2JSON::Input;
 using namespace UANLZ::LOG2JSON;
 
 using namespace Mantids::Memory::Streams;
-using namespace Mantids::Network::Streams;
+using namespace Mantids::Network::Sockets;
 using namespace Mantids::Network::Sockets;
 using namespace Mantids::Application;
 
-bool logServerThr(void * obj, StreamSocket * baseClientSocket, const char * remotePair, bool secure)
+bool logServerThr(void * obj, Socket_StreamBase * baseClientSocket, const char * remotePair, bool secure)
 {
     TCPServer * server = (TCPServer *)obj;
     TCPLineProcessor *  lineServer = new TCPLineProcessor(baseClientSocket,server);
@@ -27,30 +27,32 @@ bool logServerThr(void * obj, StreamSocket * baseClientSocket, const char * remo
     lineServer->setRemoteIP(sRemotePair);
 
     string threadName = "IN_" + sRemotePair;
+#ifndef WIN32
     pthread_setname_np(pthread_self(), threadName.c_str());
+#endif
 
-    Globals::getAppLog()->log1(__func__,sRemotePair,Logs::LEVEL_INFO,"Receiving %srsyslog+auditd incomming connection...", secure? "secure ":"");
+    LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_INFO,"Receiving %srsyslog+auditd incomming connection...", secure? "secure ":"");
 
     server->addClient(lineServer);
 
     // Process the line.
-    Parsing::ParseErrorMSG err;
+    Parser::ErrorMSG err;
 
     lineServer->parseObject(&err);
     //
     switch (err)
     {
-    case Parsing::PROT_PARSER_SUCCEED:
-        Globals::getAppLog()->log1(__func__,sRemotePair,Logs::LEVEL_INFO,"Incomming connection finished.");
+    case Parser::PARSING_SUCCEED:
+        LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_INFO,"Incomming connection finished.");
         break;
-    case Parsing::PROT_PARSER_ERR_INIT:
-        Globals::getAppLog()->log1(__func__,sRemotePair,Logs::LEVEL_WARN,"Connection finished with PROT_PARSER_ERR_INIT");
+    case Parser::PARSING_ERR_INIT:
+        LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_WARN,"Connection finished with PARSING_ERR_INIT");
         break;
-    case Parsing::PROT_PARSER_ERR_READ:
-        Globals::getAppLog()->log1(__func__,sRemotePair,Logs::LEVEL_WARN,"Connection finished with PROT_PARSER_ERR_READ");
+    case Parser::PARSING_ERR_READ:
+        LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_WARN,"Connection finished with PARSING_ERR_READ");
         break;
-    case Parsing::PROT_PARSER_ERR_PARSE:
-        Globals::getAppLog()->log1(__func__,sRemotePair,Logs::LEVEL_WARN,"Connection finished with PROT_PARSER_ERR_PARSE");
+    case Parser::PARSING_ERR_PARSE:
+        LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_WARN,"Connection finished with PARSING_ERR_PARSE");
         break;
     }
 
@@ -73,7 +75,7 @@ bool TCPServer::loadConfig(const string &file)
         boost::property_tree::ini_parser::read_ini( file.c_str(),config);
     else
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Failed to load receptor configuration file %s, insufficient permissions?", file.c_str());
+        LOG_APP->log0(__func__,Logs::LEVEL_WARN,"Failed to load receptor configuration file %s, insufficient permissions?", file.c_str());
         return false;
     }
 
@@ -87,18 +89,18 @@ bool TCPServer::loadConfig(const string &file)
 
 void TCPServer::startThreaded()
 {
-    Acceptors::Socket_Acceptor_MultiThreaded * vstreamer_syslog = new Acceptors::Socket_Acceptor_MultiThreaded();
+    Acceptors::MultiThreaded * vstreamer_syslog = new Acceptors::MultiThreaded();
 
     Socket_TCP * tcpServer = new Socket_TCP;
     if (!tcpServer->listenOn(listenPort,listenAddr.c_str(),true))
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Error creating TCP LOG listener @%s:%" PRIu16,listenAddr.c_str(),listenPort);
+        LOG_APP->log0(__func__,Logs::LEVEL_ERR,"Error creating TCP LOG listener @%s:%" PRIu16,listenAddr.c_str(),listenPort);
         delete vstreamer_syslog;
         delete tcpServer;
         return;
     }
 
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"LOG Listener (with decoder:%s) listener running on TCP @%s:%" PRIu16 "...", decoder.c_str(), listenAddr.c_str(),tcpServer->getPort());
+    LOG_APP->log0(__func__,Logs::LEVEL_WARN,"LOG Listener (with decoder:%s) listener running on TCP @%s:%" PRIu16 "...", decoder.c_str(), listenAddr.c_str(),tcpServer->getPort());
 
     // STREAM MANAGER:
     vstreamer_syslog->setAcceptorSocket(tcpServer);

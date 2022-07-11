@@ -6,7 +6,9 @@
 #include <mutex>
 #include <list>
 
-#define APPLOGS UANLZ::JSONALERT::Globals::getAppLog()
+//#define APPLOGS UANLZ::JSONALERT::Globals::getAppLog()
+
+#define LOG_APP Globals::getAppLog()
 
 namespace UANLZ { namespace JSONALERT {
 

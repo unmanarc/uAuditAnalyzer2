@@ -33,8 +33,8 @@ public:
         std::string configDir = globalArguments->getCommandLineOptionValue("config-dir")->toString();
 
         // start program.
-        Globals::getAppLog()->log(__func__, "","", Logs::LEVEL_INFO, 2048, "Starting... (Build date %s %s), PID: %" PRIi32,__DATE__, __TIME__, getpid());
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Using config dir: %s", configDir.c_str());
+        LOG_APP->log(__func__, "","", Logs::LEVEL_INFO, 2048, "Starting... (Build date %s %s), PID: %" PRIi32,__DATE__, __TIME__, getpid());
+        LOG_APP->log0(__func__,Logs::LEVEL_INFO, "Using config dir: %s", configDir.c_str());
 
         Globals::getLoginRPCClient()->start();
 
@@ -48,7 +48,7 @@ public:
             _exit(-1);
         }
 
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  "Looking for static login resources...");
+        LOG_APP->log0(__func__,Logs::LEVEL_INFO,  "Looking for static login resources...");
 
         auto staticContent = Globals::getLoginRPCClient()->getRemoteAuthManager()->getStaticContent();
 
@@ -61,14 +61,14 @@ public:
                 std::string path = JSON_ASSTRING(jContent,"path","");
                 std::string content = JSON_ASSTRING(jContent,"content","");
                 Globals::getWebServer()->addInternalContentElement(path,content);
-                Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  "Adding web login static resource '%s'", path.c_str());
+                LOG_APP->log0(__func__,Logs::LEVEL_INFO,  "Adding web login static resource '%s'", path.c_str());
             }
             else {
-                Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,  "Warning: bad static resource (%d)", i);
+                LOG_APP->log0(__func__,Logs::LEVEL_WARN,  "Warning: bad static resource (%d)", i);
             }
         }
 
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  (globalArguments->getDaemonName() + " initialized with PID: %d").c_str(), getpid());
+        LOG_APP->log0(__func__,Logs::LEVEL_INFO,  (globalArguments->getDaemonName() + " initialized with PID: %d").c_str(), getpid());
 
         return 0;
     }
@@ -85,17 +85,17 @@ public:
         globalArguments->setVersion(atoi(PROJECT_VER_MAJOR), atoi(PROJECT_VER_MINOR), atoi(PROJECT_VER_PATCH), "a");
         globalArguments->setDescription(PROJECT_DESCRIPTION);
 
-        globalArguments->addCommandLineOption("Service Options", 'c', "config-dir" , "Configuration directory"  , "/etc/uauditanalyzer/" + globalArguments->getDaemonName(), Mantids::Memory::Abstract::TYPE_STRING );
+        globalArguments->addCommandLineOption("Service Options", 'c', "config-dir" , "Configuration directory"  , "/etc/uauditanalyzer/" + globalArguments->getDaemonName(), Mantids::Memory::Abstract::Var::TYPE_STRING );
     }
 
     bool _config(int , char *argv[], Arguments::GlobalArguments * globalArguments)
     {
-        Mantids::Network::TLS::Socket_TLS::prepareTLS();
+        Mantids::Network::Sockets::Socket_TLS::prepareTLS();
 
         // process config:
         unsigned int logMode = Logs::MODE_STANDARD;
 
-        Mantids::Network::TLS::Socket_TLS::prepareTLS();
+        Mantids::Network::Sockets::Socket_TLS::prepareTLS();
 
         Logs::AppLog initLog( Logs::MODE_STANDARD);
         initLog.setPrintEmptyFields(true);
@@ -128,23 +128,23 @@ public:
 
         if ( config_main.get<bool>("Logs.ToSyslog",false) ) logMode|=Logs::MODE_SYSLOG;
         Globals::setAppLog(new Logs::AppLog( logMode));
-        Globals::getAppLog()->setPrintEmptyFields(true);
-        Globals::getAppLog()->setUsingColors(config_main.get<bool>("Logs.ShowColors",true));
-        Globals::getAppLog()->setUsingPrintDate(config_main.get<bool>("Logs.ShowDate",true));
-        Globals::getAppLog()->setModuleAlignSize(26);
-        Globals::getAppLog()->setUsingAttributeName(false);
-        Globals::getAppLog()->setDebug(Globals::getConfig_main()->get<bool>("Logs.Debug",false));
+        LOG_APP->setPrintEmptyFields(true);
+        LOG_APP->setUsingColors(config_main.get<bool>("Logs.ShowColors",true));
+        LOG_APP->setUsingPrintDate(config_main.get<bool>("Logs.ShowDate",true));
+        LOG_APP->setModuleAlignSize(26);
+        LOG_APP->setUsingAttributeName(false);
+        LOG_APP->setDebug(Globals::getConfig_main()->get<bool>("Logs.Debug",false));
 
         Globals::setRPCLog(new Logs::RPCLog(logMode));
-        Globals::getRPCLog()->setPrintEmptyFields(true);
-        Globals::getRPCLog()->setUsingColors(config_main.get<bool>("Logs.ShowColors",true));
-        Globals::getRPCLog()->setUsingPrintDate(config_main.get<bool>("Logs.ShowDate",true));
-        Globals::getRPCLog()->setDisableDomain(true);
-        Globals::getRPCLog()->setDisableModule(true);
-        Globals::getRPCLog()->setModuleAlignSize(26);
-        Globals::getRPCLog()->setUsingAttributeName(false);
-        Globals::getRPCLog()->setStandardLogSeparator(",");
-        Globals::getRPCLog()->setDebug(config_main.get<bool>("Logs.Debug",false));
+        LOG_RPC->setPrintEmptyFields(true);
+        LOG_RPC->setUsingColors(config_main.get<bool>("Logs.ShowColors",true));
+        LOG_RPC->setUsingPrintDate(config_main.get<bool>("Logs.ShowDate",true));
+        LOG_RPC->setDisableDomain(true);
+        LOG_RPC->setDisableModule(true);
+        LOG_RPC->setModuleAlignSize(26);
+        LOG_RPC->setUsingAttributeName(false);
+        LOG_RPC->setStandardLogSeparator(",");
+        LOG_RPC->setDebug(config_main.get<bool>("Logs.Debug",false));
 
         // Initialize app vars here:
         Globals::getLoginRPCClient()->setApiKey(Globals::getConfig_main()->get<std::string>("LoginRPCClient.LoginApiKey","REPLACEME_XABCXAPIX_LOGIN"));

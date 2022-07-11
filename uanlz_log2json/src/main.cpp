@@ -42,8 +42,8 @@ public:
         std::string configDir = globalArguments->getCommandLineOptionValue("config-dir")->toString();
 
         // start program.
-        Globals::getAppLog()->log(__func__, "","", Logs::LEVEL_INFO, 2048, "Starting... (Build date %s %s), PID: %" PRIi32,__DATE__, __TIME__, getpid());
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Using config dir: %s", configDir.c_str());
+        LOG_APP->log(__func__, "","", Logs::LEVEL_INFO, 2048, "Starting... (Build date %s %s), PID: %" PRIi32,__DATE__, __TIME__, getpid());
+        LOG_APP->log0(__func__,Logs::LEVEL_INFO, "Using config dir: %s", configDir.c_str());
 
         // Start modules here...
         AuditdEvents::Events_Manager::startGC();
@@ -59,7 +59,7 @@ public:
 
         std::thread(RPCImpl::runRPClient).detach();
 
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  (globalArguments->getDaemonName() + " initialized with PID: %d").c_str(), getpid());
+        LOG_APP->log0(__func__,Logs::LEVEL_INFO,  (globalArguments->getDaemonName() + " initialized with PID: %d").c_str(), getpid());
         return 0;
     }
 
@@ -75,12 +75,12 @@ public:
         globalArguments->setVersion(atoi(PROJECT_VER_MAJOR), atoi(PROJECT_VER_MINOR), atoi(PROJECT_VER_PATCH), "a");
         globalArguments->setDescription(PROJECT_DESCRIPTION);
 
-        globalArguments->addCommandLineOption("Service Options", 'c', "config-dir" , "Configuration directory"  , "/etc/uauditanalyzer/" + globalArguments->getDaemonName(), Mantids::Memory::Abstract::TYPE_STRING );
+        globalArguments->addCommandLineOption("Service Options", 'c', "config-dir" , "Configuration directory"  , "/etc/uauditanalyzer/" + globalArguments->getDaemonName(), Mantids::Memory::Abstract::Var::TYPE_STRING );
     }
 
     bool _config(int , char *argv[], Arguments::GlobalArguments * globalArguments)
     {
-        Mantids::Network::TLS::Socket_TLS::prepareTLS();
+        Mantids::Network::Sockets::Socket_TLS::prepareTLS();
 
         // process config:
         unsigned int logMode = Logs::MODE_STANDARD;
@@ -118,12 +118,12 @@ public:
 
         if ( config_main.get<bool>("Logs.ToSyslog",true) ) logMode|=Logs::MODE_SYSLOG;
         Globals::setAppLog(new Logs::AppLog(logMode));
-        Globals::getAppLog()->setPrintEmptyFields(true);
-        Globals::getAppLog()->setUsingColors(config_main.get<bool>("Logs.ShowColors",true));
-        Globals::getAppLog()->setUsingPrintDate(config_main.get<bool>("Logs.ShowDate",true));
-        Globals::getAppLog()->setUserAlignSize(1);
-        Globals::getAppLog()->setUsingAttributeName(false);
-        Globals::getAppLog()->setDebug(Globals::getConfig_main()->get<bool>("Logs.Debug",false));
+        LOG_APP->setPrintEmptyFields(true);
+        LOG_APP->setUsingColors(config_main.get<bool>("Logs.ShowColors",true));
+        LOG_APP->setUsingPrintDate(config_main.get<bool>("Logs.ShowDate",true));
+        LOG_APP->setUserAlignSize(1);
+        LOG_APP->setUsingAttributeName(false);
+        LOG_APP->setDebug(Globals::getConfig_main()->get<bool>("Logs.Debug",false));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         std::string dirPath = configDir + "/receptors.d";
@@ -145,16 +145,16 @@ public:
                 {
                     boost::property_tree::ptree filters;
                     std::string fullFilePath = dirPath + "/" + file;
-                    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Loading Log Receptor configuration from file: %s", fullFilePath.c_str());
+                    LOG_APP->log0(__func__,Logs::LEVEL_INFO, "Loading Log Receptor configuration from file: %s", fullFilePath.c_str());
                     Input::Inputs::loadConfig(fullFilePath);
                 }
             }
             else
-                Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "Failed to list directory: %s, no receptors loaded.", dirPath.c_str());
+                LOG_APP->log0(__func__,Logs::LEVEL_ERR, "Failed to list directory: %s, no receptors loaded.", dirPath.c_str());
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Missing/Unreadable receptors directory: %s", dirPath.c_str());
+            LOG_APP->log0(__func__,Logs::LEVEL_CRITICAL, "Missing/Unreadable receptors directory: %s", dirPath.c_str());
             return false;
         }
 
@@ -179,16 +179,16 @@ public:
                 {
                     boost::property_tree::ptree filters;
                     std::string fullFilePath = dirPath + "/" + file;
-                    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Loading TCP JSON Dispatcher configuration from file: %s", fullFilePath.c_str());
+                    LOG_APP->log0(__func__,Logs::LEVEL_INFO, "Loading TCP JSON Dispatcher configuration from file: %s", fullFilePath.c_str());
                     Output::Outputs::loadConfig(fullFilePath);
                 }
             }
             else
-                Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "Failed to list directory: %s, no TCP JSON dispatchers loaded.", dirPath.c_str());
+                LOG_APP->log0(__func__,Logs::LEVEL_ERR, "Failed to list directory: %s, no TCP JSON dispatchers loaded.", dirPath.c_str());
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_CRITICAL, "Missing/Unreadable TCP JSON dispatchers directory: %s", dirPath.c_str());
+            LOG_APP->log0(__func__,Logs::LEVEL_CRITICAL, "Missing/Unreadable TCP JSON dispatchers directory: %s", dirPath.c_str());
             return false;
         }
 

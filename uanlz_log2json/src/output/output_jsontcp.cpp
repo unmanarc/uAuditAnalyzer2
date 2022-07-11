@@ -10,8 +10,9 @@ using namespace std;
 void tcpOutputProcessorThread( Output_JSONTCP * output )
 {
     std::string threadName = "TCP_OUTPUT";
+#ifndef WIN32
     pthread_setname_np(pthread_self(), threadName.c_str());
-
+#endif
     output->process();
 }
 
@@ -31,7 +32,7 @@ bool Output_JSONTCP::loadConfig(const std::string &file)
         boost::property_tree::ini_parser::read_ini( file.c_str(),config);
     else
     {
-        Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_ERR, "Unable to load Output JSON TCP Configuration: %s... Invalid Permissions", file.c_str());
+        LOG_APP->log0(__func__,Mantids::Application::Logs::LEVEL_ERR, "Unable to load Output JSON TCP Configuration: %s... Invalid Permissions", file.c_str());
         return false;
     }
 
@@ -60,7 +61,7 @@ void Output_JSONTCP::logAuditEvent(const json & eventJSON, const std::tuple<time
     // push, if not report and go.
     if (!queueValues.push(value,push_tmout_msecs))
     {
-        Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_WARN, "Output_JSONTCP Queue full, Event %" PRIu64 ".%" PRIu32 ":%" PRIu64 " Dropped...", get<0>(eventId),get<1>(eventId),get<2>(eventId));
+        LOG_APP->log0(__func__,Mantids::Application::Logs::LEVEL_WARN, "Output_JSONTCP Queue full, Event %" PRIu64 ".%" PRIu32 ":%" PRIu64 " Dropped...", get<0>(eventId),get<1>(eventId),get<2>(eventId));
         dropped++;
         delete value;
     }
@@ -133,14 +134,14 @@ bool Output_JSONTCP::reconnect()
     {
         std::string msg = connection->getLastError();
         boost::replace_all(msg,"\n",",");
-        Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_ERR, "JSONTCP connection error to %s:%" PRIu16 ": %s",  server.c_str(), port  ,msg.c_str());
+        LOG_APP->log0(__func__,Mantids::Application::Logs::LEVEL_ERR, "JSONTCP connection error to %s:%" PRIu16 ": %s",  server.c_str(), port  ,msg.c_str());
         connected = false;
         sleep(config.get<uint32_t>("ReconnectSleepTimeInSecs",3));
         return false;
     }
     else
     {
-        Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_INFO, "JSONTCP connected to %s:%" PRIu16,  server.c_str(), port);
+        LOG_APP->log0(__func__,Mantids::Application::Logs::LEVEL_INFO, "JSONTCP connected to %s:%" PRIu16,  server.c_str(), port);
         connected = true;
         return true;
     }

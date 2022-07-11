@@ -6,6 +6,8 @@
 #include <mutex>
 #include <list>
 
+#define LOG_APP Globals::getAppLog()
+
 namespace UANLZ { namespace LOG2JSON {
 
 class Globals
