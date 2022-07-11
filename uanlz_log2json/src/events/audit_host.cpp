@@ -49,7 +49,7 @@ void Audit_Host::insertClassContents(const std::tuple<time_t, uint32_t, uint64_t
         if (!Events_DistributionThreads::pushAuditEvent(aevent))
         {
             std::tuple<time_t, uint32_t, uint64_t> eventId = aevent->getEventId();
-            Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_ERR, "Queue full, Event %" PRIu16 ".%" PRIu32 ":%" PRIu64 " Dropped...", get<0>(eventId),get<1>(eventId),get<2>(eventId) );
+            LOG_APP->log0(__func__,Mantids::Application::Logs::LEVEL_ERR, "Queue full, Event %" PRIu16 ".%" PRIu32 ":%" PRIu64 " Dropped...", get<0>(eventId),get<1>(eventId),get<2>(eventId) );
             delete aevent;
             countEventsDropped++;
         }
@@ -104,7 +104,7 @@ void Audit_Host::dropOldUncompletedEvents(const uint64_t &maxEventTimeInSeconds)
     if (!uncompletedEventIDs.empty())
     {
         uncompletedEventIDs.pop_back();
-        Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_ERR, "Queueing uncompleted events for host='%s' (%s)...", this->hostid.hostname.c_str(), uncompletedEventIDs.c_str() );
+        LOG_APP->log0(__func__,Mantids::Application::Logs::LEVEL_ERR, "Queueing uncompleted events for host='%s' (%s)...", this->hostid.hostname.c_str(), uncompletedEventIDs.c_str() );
     }
 
     for (Audit_Event * aevent : uncompleted_phase2)
@@ -114,7 +114,7 @@ void Audit_Host::dropOldUncompletedEvents(const uint64_t &maxEventTimeInSeconds)
             char cEventID[512];
             std::tuple<time_t, uint32_t, uint64_t> eventId = aevent->getEventId();
             snprintf(cEventID,500,"%" PRIu64 ".%" PRIu32 ":%" PRIu64, get<0>(eventId),get<1>(eventId),get<2>(eventId));
-            Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_ERR, "Queue full, Event %s Dropped...", cEventID );
+            LOG_APP->log0(__func__,Mantids::Application::Logs::LEVEL_ERR, "Queue full, Event %s Dropped...", cEventID );
             delete aevent;
             countEventsDropped++;
         }

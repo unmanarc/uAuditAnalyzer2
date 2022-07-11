@@ -20,6 +20,10 @@
 
 #include <iostream>
 
+#ifdef WIN32
+#include <mdz_mem_vars/w32compat.h>
+#endif
+
 using namespace std;
 using namespace boost;
 
@@ -76,7 +80,7 @@ void forkExec(const std::string & ruleName, const char *file, std::vector<string
         {
             char cError[1024]="Unknown Error";
 
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Rule '%s': execution of '%s' failed with %d (%s).", ruleName.c_str(), string(file).c_str(), status, strerror_r(errno,cError,sizeof(cError)));
+            LOG_APP->log0(__func__,Logs::LEVEL_WARN,"Rule '%s': execution of '%s' failed with %d (%s).", ruleName.c_str(), string(file).c_str(), status, strerror_r(errno,cError,sizeof(cError)));
         }
     }
     else
@@ -181,7 +185,7 @@ bool Rules::reloadRules()
     Lock_RW lock(mtRules);
     resetRules();
     json root = readRulesFileConfig();
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Loading filters from file: %s", sRulesFilePath.c_str());
+    LOG_APP->log0(__func__,Logs::LEVEL_INFO,"Loading filters from file: %s", sRulesFilePath.c_str());
 
     for (uint32_t i=0;i<root.size();i++)
     {
@@ -199,7 +203,7 @@ bool Rules::reloadActions()
     resetActions();
     json root = readActionsFileConfig();
 
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Loading actions from file: %s", sActionsFilePath.c_str());
+    LOG_APP->log0(__func__,Logs::LEVEL_INFO,"Loading actions from file: %s", sActionsFilePath.c_str());
     for (uint32_t i=0;i<root.size();i++)
     {
         _addAction(root[i]);
@@ -227,18 +231,18 @@ bool Rules::evaluate(const json &values)
             {
                 if (actions.find(rule->actionId) == actions.end())
                 {
-                    Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Rule '%s' activated, but action '%s' not found", rule->name.c_str(), rule->actionId.c_str());
+                    LOG_APP->log0(__func__,Logs::LEVEL_ERR,"Rule '%s' activated, but action '%s' not found", rule->name.c_str(), rule->actionId.c_str());
                 }
                 else
                 {
-                    Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG,"Rule '%s' activated, executing action '%s'", rule->name.c_str(), rule->actionId.c_str());
+                    LOG_APP->log0(__func__,Logs::LEVEL_DEBUG,"Rule '%s' activated, executing action '%s'", rule->name.c_str(), rule->actionId.c_str());
                     exec(rule->name, actions[rule->actionId]->file,  actions[rule->actionId]->vArguments,values);
                     if (rule->ruleAction == RULE_ACTION_EXECANDABORT) break;
                 }
             }
             else if (rule->ruleAction == RULE_ACTION_ABORT)
             {
-                Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG,"Rule '%s' activated, aborting next rules...", rule->name.c_str());
+                LOG_APP->log0(__func__,Logs::LEVEL_DEBUG,"Rule '%s' activated, aborting next rules...", rule->name.c_str());
                 break;
             }
         }
@@ -315,7 +319,9 @@ bool Rules::removeAction(const string & actionName)
 void Rules::threadEvaluation(const uint32_t &threadId)
 {
     std::string threadName = "JSONEVAL";
+#ifndef WIN32
     pthread_setname_np(pthread_self(), threadName.c_str());
+#endif
 
     json v;
     std::string * s;
@@ -340,7 +346,7 @@ void Rules::threadEvaluation(const uint32_t &threadId)
             }
             else
             {
-                Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Evaluation Thread #%d received invalid JSON...", threadId);
+                LOG_APP->log0(__func__,Logs::LEVEL_ERR,"Evaluation Thread #%d received invalid JSON...", threadId);
                 badFormatLines++;
             }
             delete s;
@@ -352,7 +358,7 @@ void Rules::threadEvaluation(const uint32_t &threadId)
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG,"Evaluation Thread #%d timed out (no elements)...", threadId);
+            LOG_APP->log0(__func__,Logs::LEVEL_DEBUG,"Evaluation Thread #%d timed out (no elements)...", threadId);
         }
     }
 }
@@ -360,7 +366,9 @@ void Rules::threadEvaluation(const uint32_t &threadId)
 void Rules::threadPassCTStatsEverySecond()
 {
     std::string threadName = "COUNTERS";
+#ifndef WIN32
     pthread_setname_np(pthread_self(), threadName.c_str());
+#endif
 
     for (;;)
     {
@@ -451,12 +459,12 @@ string Rules::getValueForVar(const string &var, const string &ruleName, const js
         {
             return ruleName;
         }
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG,"Invalid Argument Variable '%s' on rule '%s'", var.c_str(),ruleName.c_str());
+        LOG_APP->log0(__func__,Logs::LEVEL_DEBUG,"Invalid Argument Variable '%s' on rule '%s'", var.c_str(),ruleName.c_str());
         return "INVALID_VARGUMENT_VARIABLE";
     }
     else
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG,"Invalid Argument Variable '%s' on rule '%s'", var.c_str(),ruleName.c_str());
+        LOG_APP->log0(__func__,Logs::LEVEL_DEBUG,"Invalid Argument Variable '%s' on rule '%s'", var.c_str(),ruleName.c_str());
         return "INVALID_VARGUMENT_VARIABLE";
     }
 
@@ -471,13 +479,13 @@ bool Rules::_addRule(uint32_t pos, const json &jConfig, bool replace)
     {
         if (pos >= rules.size())
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Rule '%d': pos not found during replacement.",pos);
+            LOG_APP->log0(__func__,Logs::LEVEL_WARN,"Rule '%d': pos not found during replacement.",pos);
             return false;
         }
         // TODO: match internal uniqid..
     }
 
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Creating Rule '%s'",name.c_str());
+    LOG_APP->log0(__func__,Logs::LEVEL_INFO,"Creating Rule '%s'",name.c_str());
 
     std::string filter = JSON_ASSTRING(jConfig,"filter","");
 
@@ -490,7 +498,7 @@ bool Rules::_addRule(uint32_t pos, const json &jConfig, bool replace)
 
     if (!rule->expr->getIsCompiled())
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Rule '%s': 'Filter' compilation failed with '%s'.",name.c_str(), rule->expr->getLastCompilerError().c_str());
+        LOG_APP->log0(__func__,Logs::LEVEL_ERR,"Rule '%s': 'Filter' compilation failed with '%s'.",name.c_str(), rule->expr->getLastCompilerError().c_str());
         delete rule;
         return false;
     }
@@ -503,7 +511,7 @@ bool Rules::_addRule(uint32_t pos, const json &jConfig, bool replace)
 
         if (actions.find(rule->actionId) == actions.end())
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Rule '%s': 'Filter' referenced unexistent action '%s'.",name.c_str(), rule->actionId.c_str());
+            LOG_APP->log0(__func__,Logs::LEVEL_ERR,"Rule '%s': 'Filter' referenced unexistent action '%s'.",name.c_str(), rule->actionId.c_str());
             delete rule;
             return false;
         }
@@ -544,7 +552,7 @@ bool Rules::_addAction(const json &jConfig, bool replace)
     {
         if (actions.find(actionName) != actions.end())
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Action '%s': duplicated name.",actionName.c_str());
+            LOG_APP->log0(__func__,Logs::LEVEL_WARN,"Action '%s': duplicated name.",actionName.c_str());
             return false;
         }
     }
@@ -552,12 +560,12 @@ bool Rules::_addAction(const json &jConfig, bool replace)
     {
         if (actions.find(actionName) == actions.end())
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"Action '%s': name not found during replacement.",actionName.c_str());
+            LOG_APP->log0(__func__,Logs::LEVEL_WARN,"Action '%s': name not found during replacement.",actionName.c_str());
             return false;
         }
     }
 
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Creating Action '%s' - '%s'",actionName.c_str(), actionDescription.c_str());
+    LOG_APP->log0(__func__,Logs::LEVEL_INFO,"Creating Action '%s' - '%s'",actionName.c_str(), actionDescription.c_str());
 
     sAction * action = new sAction;
     action->jOriginalVal = jConfig;

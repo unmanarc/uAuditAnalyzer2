@@ -62,23 +62,23 @@ void RPCImpl::runRPClient()
 
     for (;;)
     {
-        Mantids::Network::TLS::Socket_TLS sockRPCClient;
+        Mantids::Network::Sockets::Socket_TLS sockRPCClient;
 
         if (!sockRPCClient.setTLSCertificateAuthorityPath( "rpcca.crt" ))
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "Error starting RPC Connector to %s:%" PRIu16 ": %s", remoteAddr.c_str(), remotePort, "Bad TLS Certificate Authority (rpcca.crt)");
+            LOG_APP->log0(__func__,Logs::LEVEL_ERR, "Error starting RPC Connector to %s:%" PRIu16 ": %s", remoteAddr.c_str(), remotePort, "Bad TLS Certificate Authority (rpcca.crt)");
             _exit(-3);
         }
 
         if ( sockRPCClient.connectTo( remoteAddr.c_str(), remotePort ) )
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,  "Connected to %s:%" PRIu16, remoteAddr.c_str(), remotePort);
+            LOG_APP->log0(__func__,Logs::LEVEL_INFO,  "Connected to %s:%" PRIu16, remoteAddr.c_str(), remotePort);
             sockRPCClient.writeStringEx<uint16_t>(rpcApiKey);
             fastRPC.processConnection(&sockRPCClient,"SERVER");
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR, "Error connecting to remote API Server @%s:%" PRIu16 ": %s", remoteAddr.c_str(), remotePort, sockRPCClient.getLastError().c_str());
+            LOG_APP->log0(__func__,Logs::LEVEL_ERR, "Error connecting to remote API Server @%s:%" PRIu16 ": %s", remoteAddr.c_str(), remotePort, sockRPCClient.getLastError().c_str());
             sleep(3);
         }
     }
@@ -216,7 +216,7 @@ void sleepAndExit()
 json RPCImpl::controlReloadApp(void *, const std::string &, const json &)
 {
     json j = true;
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,  "Reload requested via RPC");
+    LOG_APP->log0(__func__,Logs::LEVEL_WARN,  "Reload requested via RPC");
 
     std::thread(sleepAndExit).detach();
     return j;

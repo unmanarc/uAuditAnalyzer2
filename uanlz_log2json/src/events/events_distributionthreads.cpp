@@ -25,7 +25,9 @@ std::atomic<uint64_t> Events_DistributionThreads::eventsDropped;
 void outputDistributionThread(int threadid)
 {   
     std::string threadName = "EVENTS_DEQUEUE";
+#ifndef WIN32
     pthread_setname_np(pthread_self(), threadName.c_str());
+#endif
 
 //    auto start = chrono::high_resolution_clock::now();
 //    auto finish = chrono::high_resolution_clock::now();
@@ -60,7 +62,7 @@ void outputDistributionThread(int threadid)
         }
         else
         {
-            Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_INFO, "No events so far for output thread #%d, triggering no event alert JSON...", threadid);
+            LOG_APP->log0(__func__,Mantids::Application::Logs::LEVEL_INFO, "No events so far for output thread #%d, triggering no event alert JSON...", threadid);
             json noEventsAlertJSON;
             noEventsAlertJSON["noEventsAlert"] = true;
             Output::Outputs::pushToOutputBases(noEventsAlertJSON, std::make_tuple<time_t, uint32_t, uint64_t>(0,0,0));
@@ -71,7 +73,9 @@ void outputDistributionThread(int threadid)
 void refreshEventsParsedPerSecond()
 {
     std::string threadName = "EVENTS_COUNTER";
+#ifndef WIN32
     pthread_setname_np(pthread_self(), threadName.c_str());
+#endif
 
     for (;;)
     {
