@@ -35,13 +35,30 @@ uanlz_web was designed to manage and monitor the health of uAuditAnalyzer servic
 
 ### Simple installation guide for Fedora/RHEL:
 
-- First, proceed to install EPEL in your distribution (https://docs.fedoraproject.org/en-US/epel/), sometimes this is required for jsoncpp.
 
-- Then, proceed to activate our repo's and download/install uAuditAnalyzer2:
+
+To activate our repo's and download/install the software:
+
+In RHEL7:
 ```bash
-# NOTE: for RHEL7 replace dnf by yum
-dnf copr enable amizrachi/unmanarc
+# Install EPEL Repo + COPR
+yum -y install epel-release
+yum -y install yum-plugin-copr
 
+# Install unmanarc's copr
+yum copr enable amizrachi/unmanarc -y
+yum -y install uAuditAnalyzer2
+```
+
+In RHEL8:
+```bash
+# Install EPEL Repo
+dnf -y install 'dnf-command(config-manager)'
+dnf config-manager --set-enabled powertools
+dnf -y install epel-release
+
+# Install unmanarc's copr
+dnf copr enable amizrachi/unmanarc -y
 dnf -y install uAuditAnalyzer2
 ```
 
