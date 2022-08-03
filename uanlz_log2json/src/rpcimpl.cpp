@@ -36,7 +36,7 @@ void RPCImpl::runRPClient()
     {
         Mantids::Network::Sockets::Socket_TLS sockRPCClient;
 
-        if (!sockRPCClient.setTLSCertificateAuthorityPath( "rpcca.crt" ))
+        if (!sockRPCClient.keys.loadCAFromPEMFile( "rpcca.crt" ))
         {
             LOG_APP->log0(__func__,Logs::LEVEL_ERR, "Error starting RPC Connector to %s:%" PRIu16 ": %s", remoteAddr.c_str(), remotePort, "Bad TLS Certificate Authority (rpcca.crt)");
             _exit(-3);
