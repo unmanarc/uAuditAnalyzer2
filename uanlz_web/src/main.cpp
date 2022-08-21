@@ -151,7 +151,8 @@ public:
         Globals::getLoginRPCClient()->setAppName(Globals::getConfig_main()->get<std::string>("LoginRPCClient.AppName","UAUDITANLZ"));
         Globals::getLoginRPCClient()->setCaFile(Globals::getConfig_main()->get<std::string>("LoginRPCClient.CAFile","ca.crt"));
         Globals::getLoginRPCClient()->setRemoteHost(Globals::getConfig_main()->get<std::string>("LoginRPCClient.RemoteHost","127.0.0.1"));
-        Globals::getLoginRPCClient()->setRemotePort(Globals::getConfig_main()->get<uint16_t>("LoginRPCClient.RemotePort",30301));
+        Globals::getLoginRPCClient()->setRemotePort(Globals::getConfig_main()->get<uint16_t>("LoginRPCClient.RemotePort",30302));
+        Globals::getLoginRPCClient()->setUsingTLSPSK(Globals::getConfig_main()->get<bool>("LoginRPCClient.UsePSK",true));
         Globals::getLoginRPCClient()->setUseIPv6(Globals::getConfig_main()->get<bool>("LoginRPCClient.ipv6",false));
 
         return true;
