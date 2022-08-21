@@ -22,6 +22,7 @@
 #include <unistd.h>
 
 #include <inttypes.h>
+#include <sys/stat.h>
 
 using namespace UANLZ::LOG2JSON;
 
@@ -107,7 +108,27 @@ public:
         chdir(configDir.c_str());
 
         if (!access((configDir + "/config.ini").c_str(),R_OK))
+        {
+            struct stat stats;
+            // Check file properties...
+            stat((configDir + "/config.ini").c_str(), &stats);
+
+            int smode = stats.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO);
+
+            if ( smode != 0600 )
+            {
+                initLog.log0(__func__,Logs::LEVEL_WARN, "config.ini file permissions are not 0600 and API key may be exposed, changing...");
+
+                if (chmod((configDir + "/config.ini").c_str(),0600))
+                {
+                    initLog.log0(__func__,Logs::LEVEL_CRITICAL, "Configuration file permissions can't be changed to 0600");
+                    return false;
+                }
+                initLog.log0(__func__,Logs::LEVEL_INFO, "config.ini file permissions changed to 0600");
+            }
+
             boost::property_tree::ini_parser::read_ini( (configDir + "/config.ini").c_str(),config_main);
+        }
         else
         {
             initLog.log0(__func__,Logs::LEVEL_CRITICAL, "Missing configuration: %s", (configDir + "/config.ini").c_str());
