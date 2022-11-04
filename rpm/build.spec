@@ -1,5 +1,5 @@
 %define name uAuditAnalyzer2
-%define version 2.2.4
+%define version 2.3.0
 %define build_timestamp %{lua: print(os.date("%Y%m%d"))}
 
 Name:           %{name}
@@ -33,10 +33,22 @@ Group:          Applications/Internet
 %define debug_package %{nil}
 %endif
 
-BuildRequires: libMantids-devel >= 2.7.5
-BuildRequires: %{cmake} systemd libMantids-sqlite openssl-devel zlib-devel boost-devel gcc-c++ jsoncpp-devel sqlite-devel
-Requires: libMantids >= 2.7.5
-Requires: libMantids-sqlite zlib openssl boost-regex boost-system jsoncpp sqlite
+BuildRequires: libMantids-devel >= 2.8.0
+BuildRequires: %{cmake} systemd libMantids-sqlite zlib-devel boost-devel gcc-c++ jsoncpp-devel sqlite-devel
+%if 0%{?rhel} == 7
+BuildRequires:  openssl11-devel
+%else
+BuildRequires:  openssl-devel
+%endif
+
+Requires: libMantids >= 2.8.0
+Requires: libMantids-sqlite zlib boost-regex boost-system jsoncpp sqlite
+%if 0%{?rhel} == 7
+Requires:       openssl11
+%else
+Requires:       openssl
+%endif
+
 
 %description
 This package contains uAuditAnalyzer2 is intended to be a highly-efficient application for processing auditd logs received via rsyslog. It is being actively used in many enterprise-level environments for detecting potential threats and providing instant alerts using messaging applications, bots or other means.
@@ -45,8 +57,15 @@ This package contains uAuditAnalyzer2 is intended to be a highly-efficient appli
 %autosetup -n %{name}-master
 
 %build
-%{cmake} -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=MinSizeRel
-%{cmake} -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=MinSizeRel
+
+
+%if 0%{?rhel} == 7
+%{cmake} -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=MinSizeRel -DSSLRHEL7=ON
+%else
+%{cmake} -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=MinSizeRel
+%endif
+
+
 make %{?_smp_mflags}
 
 %clean

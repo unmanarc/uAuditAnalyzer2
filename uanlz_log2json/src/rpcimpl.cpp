@@ -59,7 +59,7 @@ void RPCImpl::runRPClient()
     }
 }
 
-json RPCImpl::statEventsPerHost(void *,const std::string &, const json &)
+json RPCImpl::statEventsPerHost(void *,const std::string &, const json &, void*, const std::string &)
 {
     json j;
     j["hosts"] = AuditdEvents::Events_Manager::getJSONStats();
@@ -67,7 +67,7 @@ json RPCImpl::statEventsPerHost(void *,const std::string &, const json &)
     return j;
 }
 
-json RPCImpl::statOutputsDistributionThreads(void *,const std::string &, const json &)
+json RPCImpl::statOutputsDistributionThreads(void *,const std::string &, const json &, void*, const std::string &)
 {
     json j;
     j["events"] = AuditdEvents::Events_DistributionThreads::stats();
@@ -75,7 +75,7 @@ json RPCImpl::statOutputsDistributionThreads(void *,const std::string &, const j
     return j;
 }
 
-json RPCImpl::statOutputs(void *,const std::string &, const json &)
+json RPCImpl::statOutputs(void *,const std::string &, const json &, void*, const std::string &)
 {
     json j;
     j["outputs"] = Output::Outputs::getStats();
@@ -83,7 +83,7 @@ json RPCImpl::statOutputs(void *,const std::string &, const json &)
     return j;
 }
 
-json RPCImpl::statInputs(void *,const std::string &, const json &)
+json RPCImpl::statInputs(void *,const std::string &, const json &, void*, const std::string &)
 {
     json j;
     j["ok"] = true;

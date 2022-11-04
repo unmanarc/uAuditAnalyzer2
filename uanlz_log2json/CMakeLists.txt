@@ -44,8 +44,18 @@ target_link_libraries(${APP_NAME} "-lmdz_mem_vars")
 target_link_libraries(${APP_NAME} "-lmdz_hlp_functions")
 
 target_link_libraries(${APP_NAME} "-lpthread")
-target_link_libraries(${APP_NAME} "-lssl")
-target_link_libraries(${APP_NAME} "-lcrypto")
+
+option(SSLRHEL7 "OpenSSL 1.1 For Red Hat 7.x provided by EPEL" OFF)
+find_package(PkgConfig REQUIRED)
+if (SSLRHEL7)
+    pkg_check_modules(OPENSSL REQUIRED libssl11)
+else()
+    pkg_check_modules(OPENSSL REQUIRED libssl)
+endif()
+target_include_directories(${APP_NAME} PUBLIC ${OPENSSL_INCLUDE_DIRS})
+target_compile_options(${APP_NAME} PUBLIC ${OPENSSL_CFLAGS_OTHER})
+target_link_libraries(${APP_NAME} ${OPENSSL_STATIC_LDFLAGS})
+
 
 if (WIN32)
     target_link_libraries(${APP_NAME} "-lws2_32 -liphlpapi")

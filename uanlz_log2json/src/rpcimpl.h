@@ -12,10 +12,10 @@ public:
     static void runRPClient();
 
 private:
-    static json statEventsPerHost(void *, const std::string &, const json &);
-    static json statOutputsDistributionThreads(void *,const std::string &,  const json &);
-    static json statOutputs(void *,const std::string &, const json &);
-    static json statInputs(void *,const std::string &,  const json &);
+    static json statEventsPerHost(void *, const std::string &, const json &, void*, const std::string &);
+    static json statOutputsDistributionThreads(void *,const std::string &,  const json &, void*, const std::string &);
+    static json statOutputs(void *,const std::string &, const json &, void*, const std::string &);
+    static json statInputs(void *,const std::string &,  const json &, void*, const std::string &);
 //    static json helloWorld(void *,  const json &);
 };
 
