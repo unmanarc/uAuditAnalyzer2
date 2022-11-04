@@ -89,117 +89,117 @@ void RPCImpl::runRPClient()
     }
 }
 
-json RPCImpl::controlWriteRulesFileConfig(void *, const std::string &, const json &jConfig)
+json RPCImpl::controlWriteRulesFileConfig(void *, const std::string &, const json &jConfig, void*, const std::string &)
 {
     return Filters::Rules::writeRulesFileConfig(jConfig);
 }
 
-json RPCImpl::statReadRulesFileConfig(void *, const std::string &, const json &)
+json RPCImpl::statReadRulesFileConfig(void *, const std::string &, const json &, void*, const std::string &)
 {
     return Filters::Rules::readRulesFileConfig();
 }
 
-json RPCImpl::statReadRunningRules(void *, const std::string &, const json &)
+json RPCImpl::statReadRunningRules(void *, const std::string &, const json &, void*, const std::string &)
 {
     return Filters::Rules::getCurrentRunningRules();
 }
 
-json RPCImpl::statReadRunningRule(void *, const std::string &, const json &jConfig)
+json RPCImpl::statReadRunningRule(void *, const std::string &, const json &jConfig, void*, const std::string &)
 {
     return Filters::Rules::getCurrentRunningRule(JSON_ASUINT(jConfig,"id",0xFFFFFFFF));
 }
 
-json RPCImpl::statAreRulesModified(void *, const std::string &, const json &)
+json RPCImpl::statAreRulesModified(void *, const std::string &, const json &, void*, const std::string &)
 {
     return Filters::Rules::getRulesModified();
 }
 
-json RPCImpl::controlRemoveRule(void *, const std::string &, const json &jConfig)
+json RPCImpl::controlRemoveRule(void *, const std::string &, const json &jConfig, void*, const std::string &)
 {
     return Filters::Rules::removeRule(JSON_ASUINT(jConfig,"pos",0xFFFFFFFF));
 }
 
-json RPCImpl::controlRemoveAction(void *, const std::string &, const json &jConfig)
+json RPCImpl::controlRemoveAction(void *, const std::string &, const json &jConfig, void*, const std::string &)
 {
     return Filters::Rules::removeAction(JSON_ASSTRING(jConfig,"name",""));
 }
 
-json RPCImpl::controlSaveRunningRules(void *, const std::string &, const json &)
+json RPCImpl::controlSaveRunningRules(void *, const std::string &, const json &, void*, const std::string &)
 {
     return Filters::Rules::writeRulesFileConfig(Filters::Rules::getCurrentRunningRules());
 }
 
-json RPCImpl::controlSaveRunningActions(void *, const std::string &, const json &)
+json RPCImpl::controlSaveRunningActions(void *, const std::string &, const json &, void*, const std::string &)
 {
     return Filters::Rules::writeActionsFileConfig(Filters::Rules::getCurrentRunningActions());
 }
 
-json RPCImpl::controlAddAction(void *, const std::string &, const json &jConfig)
+json RPCImpl::controlAddAction(void *, const std::string &, const json &jConfig, void*, const std::string &)
 {
     return Filters::Rules::addAction(jConfig);
 }
 
-json RPCImpl::controlEditAction(void *, const std::string &, const json &jConfig)
+json RPCImpl::controlEditAction(void *, const std::string &, const json &jConfig, void*, const std::string &)
 {
     return Filters::Rules::editAction(jConfig);
 }
 
-json RPCImpl::controlEditRule(void *, const std::string &, const json &jConfig)
+json RPCImpl::controlEditRule(void *, const std::string &, const json &jConfig, void*, const std::string &)
 {
     return Filters::Rules::editRule(JSON_ASUINT(jConfig,"pos",0xFFFFFFFF),jConfig["rule"]);
 }
 
-json RPCImpl::controlAddRule(void *, const std::string &, const json &jConfig)
+json RPCImpl::controlAddRule(void *, const std::string &, const json &jConfig, void*, const std::string &)
 {
     return Filters::Rules::addRule(JSON_ASUINT(jConfig,"pos",0xFFFFFFFF),jConfig["rule"]);
 }
 
-json RPCImpl::controlRuleUp(void *, const std::string &, const json &jConfig)
+json RPCImpl::controlRuleUp(void *, const std::string &, const json &jConfig, void*, const std::string &)
 {
     return Filters::Rules::ruleUp(JSON_ASUINT(jConfig,"pos",0xFFFFFFFF));
 }
 
-json RPCImpl::controlRuleDown(void *, const std::string &, const json &jConfig)
+json RPCImpl::controlRuleDown(void *, const std::string &, const json &jConfig, void*, const std::string &)
 {
     return Filters::Rules::ruleDown(JSON_ASUINT(jConfig,"pos",0xFFFFFFFF));
 }
 
-json RPCImpl::controlWriteActionsFileConfig(void *, const std::string &, const json &jConfig)
+json RPCImpl::controlWriteActionsFileConfig(void *, const std::string &, const json &jConfig, void*, const std::string &)
 {
     return Filters::Rules::writeActionsFileConfig(jConfig);
 }
 
-json RPCImpl::statReadActionsFileConfig(void *, const std::string &, const json &)
+json RPCImpl::statReadActionsFileConfig(void *, const std::string &, const json &, void*, const std::string &)
 {
     return Filters::Rules::readActionsFileConfig();
 }
 
-json RPCImpl::statAreActionsModified(void *, const std::string &, const json &)
+json RPCImpl::statAreActionsModified(void *, const std::string &, const json &, void*, const std::string &)
 {
     return Filters::Rules::getActionsModified();
 }
 
-json RPCImpl::statReadRunningActions(void *, const std::string &, const json &)
+json RPCImpl::statReadRunningActions(void *, const std::string &, const json &, void*, const std::string &)
 {
     return Filters::Rules::getCurrentRunningActions();
 }
 
-json RPCImpl::statReadRunningAction(void *, const std::string &, const json &jConfig)
+json RPCImpl::statReadRunningAction(void *, const std::string &, const json &jConfig, void*, const std::string &)
 {
     return Filters::Rules::getCurrentRunningAction(JSON_ASSTRING(jConfig,"name",""));
 }
 
-json RPCImpl::RemInputFromFileConfig(void *, const std::string &, const json &jConfig)
+json RPCImpl::RemInputFromFileConfig(void *, const std::string &, const json &jConfig, void*, const std::string &)
 {
     return Input::Inputs::remInput(JSON_ASSTRING(jConfig,"id",""));
 }
 
-json RPCImpl::AddInputToFileConfig(void *, const std::string &, const json &jConfig)
+json RPCImpl::AddInputToFileConfig(void *, const std::string &, const json &jConfig, void*, const std::string &)
 {
     return Input::Inputs::addInput(jConfig);
 }
 
-json RPCImpl::statReadInputsFileConfig(void *, const std::string &, const json &)
+json RPCImpl::statReadInputsFileConfig(void *, const std::string &, const json &, void*, const std::string &)
 {
     json j;
     j["modified"] = Input::Inputs::getModified();
@@ -207,7 +207,7 @@ json RPCImpl::statReadInputsFileConfig(void *, const std::string &, const json &
     return j;
 }
 
-json RPCImpl::statGetRunningInputs(void *, const std::string &, const json &)
+json RPCImpl::statGetRunningInputs(void *, const std::string &, const json &, void*, const std::string &)
 {
     return Input::Inputs::getStats();
 }
@@ -218,7 +218,7 @@ void sleepAndExit()
     _exit(0);
 }
 
-json RPCImpl::controlReloadApp(void *, const std::string &, const json &)
+json RPCImpl::controlReloadApp(void *, const std::string &, const json &, void*, const std::string &)
 {
     json j = true;
     LOG_APP->log0(__func__,Logs::LEVEL_WARN,  "Reload requested via RPC");
@@ -227,19 +227,19 @@ json RPCImpl::controlReloadApp(void *, const std::string &, const json &)
     return j;
 }
 
-json RPCImpl::statSystemStats(void *,const std::string &, const json &)
+json RPCImpl::statSystemStats(void *,const std::string &, const json &, void*, const std::string &)
 {
     json j = Filters::Rules::getStats();
     return j;
 }
 
-json RPCImpl::controlRulesReload(void *,const std::string &, const json &)
+json RPCImpl::controlRulesReload(void *,const std::string &, const json &, void*, const std::string &)
 {
     json j = Filters::Rules::reloadRules();
     return j;
 }
 
-json RPCImpl::controlActionsReload(void *,const std::string &, const json &)
+json RPCImpl::controlActionsReload(void *,const std::string &, const json &, void*, const std::string &)
 {
     json j = Filters::Rules::reloadActions();
     return j;
