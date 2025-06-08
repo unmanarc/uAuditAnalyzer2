@@ -32,21 +32,6 @@ if (CMAKE_INSTALL_PREFIX)
     target_link_libraries(${APP_NAME} "-L${CMAKE_INSTALL_PREFIX}/lib64")
 endif()
 
-target_link_libraries(${APP_NAME} "-lmdz_xrpc_fast")
-target_link_libraries(${APP_NAME} "-lmdz_xrpc_webserver")
-target_link_libraries(${APP_NAME} "-lmdz_xrpc_common")
-target_link_libraries(${APP_NAME} "-lmdz_proto_http")
-target_link_libraries(${APP_NAME} "-lmdz_proto_mime")
-target_link_libraries(${APP_NAME} "-lmdz_thr_threads")
-target_link_libraries(${APP_NAME} "-lmdz_thr_safecontainers")
-target_link_libraries(${APP_NAME} "-lmdz_net_sockets")
-target_link_libraries(${APP_NAME} "-lmdz_prg_service")
-target_link_libraries(${APP_NAME} "-lmdz_prg_logs")
-target_link_libraries(${APP_NAME} "-lmdz_auth")
-target_link_libraries(${APP_NAME} "-lmdz_auth_remote")
-target_link_libraries(${APP_NAME} "-lmdz_thr_mutex")
-target_link_libraries(${APP_NAME} "-lmdz_mem_vars")
-target_link_libraries(${APP_NAME} "-lmdz_hlp_functions")
 
 target_link_libraries(${APP_NAME} "-lpthread")
 
@@ -60,8 +45,6 @@ endif()
 target_include_directories(${APP_NAME} PUBLIC ${OPENSSL_INCLUDE_DIRS})
 target_compile_options(${APP_NAME} PUBLIC ${OPENSSL_CFLAGS_OTHER})
 target_link_libraries(${APP_NAME} ${OPENSSL_STATIC_LDFLAGS})
-
-
 
 if (WIN32)
     target_link_libraries(${APP_NAME} "-lws2_32 -liphlpapi")
@@ -82,10 +65,33 @@ else()
     target_link_libraries(${APP_NAME} ${BOOST_REGEX_LIB})
 endif()
 
-
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(JSONCPP jsoncpp)
 link_libraries(${JSONCPP_LIBRARIES})
 target_include_directories(${APP_NAME} PUBLIC ${JSONCPP_INCLUDE_DIRS})
 target_link_libraries(${APP_NAME} ${JSONCPP_LIBRARIES})
 
+
+################################################################################
+# libMantids packages:
+pkg_check_modules(MANTIDS_LIBS REQUIRED
+    mdz_xrpc_fast
+    mdz_xrpc_webserver
+    mdz_xrpc_common
+    mdz_proto_http
+    mdz_proto_mime
+    mdz_thr_threads
+    mdz_thr_safecontainers
+    mdz_net_sockets
+    mdz_prg_service
+    mdz_prg_logs
+    mdz_auth
+    mdz_auth_remote
+    mdz_thr_mutex
+    mdz_mem_vars
+    mdz_hlp_functions
+)
+include_directories(${MANTIDS_LIBS_INCLUDE_DIRS})
+link_directories(${MANTIDS_LIBS_LIBRARY_DIRS})
+target_link_libraries(${APP_NAME} ${MANTIDS_LIBS_LIBRARIES})
+################################################################################

@@ -7,6 +7,7 @@
 #include <mdz_net_sockets/socket_tls.h>
 #include <boost/algorithm/string/predicate.hpp>
 
+#include <memory>
 #include <sstream>
 #include <ostream>
 #include <fstream>
@@ -28,8 +29,6 @@ json WebServerImpl::rmtCaller(const std::string &caller, Authentication::Manager
     json j,error;
     if (!boost::starts_with(remoteMethod, caller)) return j;
     j = Globals::getFastRPC()->runRemoteRPCMethod(JSON_ASSTRING(jInput,"target",""), remoteMethod,jInput["payload"],&error);
-
-    //std::cout << error;
 
     if (JSON_ASBOOL(error,"succeed",false) == false)
     {
@@ -63,7 +62,7 @@ json WebServerImpl::statMethods(void *, Authentication::Manager * auth, Authenti
 bool WebServerImpl::createWebServer()
 {
     std::string sAppName = Globals::getConfig_main()->get<std::string>("LoginRPCClient.AppName","UAUDITANLZ");
-    Mantids::Network::Sockets::Socket_TLS * sockWebListen = new Mantids::Network::Sockets::Socket_TLS;
+    Mantids::Network::Sockets::Socket_TLS * sockWebListen = new Mantids::Network::Sockets::Socket_TLS();
 
     uint16_t listenPort = Globals::getConfig_main()->get<uint16_t>("WebServer.ListenPort",33000);
     std::string listenAddr = Globals::getConfig_main()->get<std::string>("WebServer.ListenAddr","0.0.0.0");
@@ -146,6 +145,7 @@ bool WebServerImpl::createWebServer()
     else
     {
         LOG_APP->log0(__func__,Logs::LEVEL_CRITICAL, "Error starting Status Web Server @%s:%" PRIu16 ": %s", listenAddr.c_str(), listenPort, sockWebListen->getLastError().c_str());
+        delete sockWebListen;
         return false;
     }
 }

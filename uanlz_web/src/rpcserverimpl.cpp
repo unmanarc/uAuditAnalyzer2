@@ -5,6 +5,7 @@
 #include <mdz_net_sockets/acceptor_multithreaded.h>
 #include <mdz_xrpc_fast/fastrpc.h>
 #include <mdz_prg_logs/applog.h>
+#include <memory>
 #include <string>
 #include <inttypes.h>
 
@@ -22,7 +23,7 @@ bool RPCServerImpl::callbackOnRPCConnect(void *, Mantids::Network::Sockets::Sock
 {
     std::string rpcApiKey = sock->readStringEx<uint16_t>();
 
-    LOG_APP->log0(__func__,Logs::LEVEL_INFO, "Incomming %sRPC connection from %s", secure?"secure ":"", remoteAddr);
+    LOG_APP->log0(__func__,Logs::LEVEL_INFO, "Incoming %sRPC connection from %s", secure?"secure ":"", remoteAddr);
 
     if (rpcApiKey == Globals::getConfig_main()->get<std::string>("RPCServer.AlertsApiKey","REPLACEME_XABCXAPIX_ALERTS"))
     {
@@ -44,7 +45,7 @@ bool RPCServerImpl::callbackOnRPCConnect(void *, Mantids::Network::Sockets::Sock
 
 bool RPCServerImpl::createRPCListener()
 {
-    Mantids::Network::Sockets::Socket_TLS * sockRPCListen = new Mantids::Network::Sockets::Socket_TLS;
+    Mantids::Network::Sockets::Socket_TLS * sockRPCListen = new Mantids::Network::Sockets::Socket_TLS();
 
     uint16_t listenPort = Globals::getConfig_main()->get<uint16_t>("RPCServer.ListenPort",33001);
     std::string listenAddr = Globals::getConfig_main()->get<std::string>("RPCServer.ListenAddr","0.0.0.0");
@@ -62,7 +63,7 @@ bool RPCServerImpl::createRPCListener()
 
     Globals::setFastRPC(new Mantids::RPC::Fast::FastRPC);
 
-    Network::Sockets::Acceptors::MultiThreaded * multiThreadedAcceptor = new Network::Sockets::Acceptors::MultiThreaded;
+    Network::Sockets::Acceptors::MultiThreaded * multiThreadedAcceptor = new Network::Sockets::Acceptors::MultiThreaded();
     multiThreadedAcceptor->setMaxConcurrentClients( Globals::getConfig_main()->get<uint16_t>("RPCServer.MaxClients",512) );
     multiThreadedAcceptor->setCallbackOnConnect(callbackOnRPCConnect,nullptr);
 
@@ -70,12 +71,14 @@ bool RPCServerImpl::createRPCListener()
     {
         multiThreadedAcceptor->setAcceptorSocket(sockRPCListen);
         multiThreadedAcceptor->startThreaded();
+
         LOG_APP->log0(__func__,Logs::LEVEL_INFO,  "Accepting RPC clients @%s:%" PRIu16 " via TLS", listenAddr.c_str(), listenPort);
         return true;
     }
     else
     {
         LOG_APP->log0(__func__,Logs::LEVEL_CRITICAL, "Error starting RPC Server @%s:%" PRIu16 ": %s", listenAddr.c_str(), listenPort, sockRPCListen->getLastError().c_str());
+        delete multiThreadedAcceptor;
         return false;
     }
 }

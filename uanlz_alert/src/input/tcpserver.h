@@ -1,11 +1,12 @@
 #ifndef RECEPTORTCPSERVER_H
 #define RECEPTORTCPSERVER_H
 
-#include <boost/property_tree/ptree.hpp>
+#include <mdz_net_sockets/acceptor_multithreaded.h>
+#include "tcplineprocessor.h"
 #include <atomic>
+#include <boost/property_tree/ptree.hpp>
 #include <mutex>
 #include <set>
-#include "tcplineprocessor.h"
 
 namespace UANLZ { namespace JSONALERT { namespace Input {
 
@@ -25,6 +26,7 @@ public:
     std::string getListenAddr() const;
     uint16_t getListenPort() const;
 private:
+    Mantids::Network::Sockets::Acceptors::MultiThreaded acceptor;
     boost::property_tree::ptree config;
     std::string listenAddr, description;
     uint16_t listenPort;

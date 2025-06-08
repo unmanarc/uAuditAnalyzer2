@@ -32,18 +32,6 @@ if (CMAKE_INSTALL_PREFIX)
     target_link_libraries(${APP_NAME} "-L${CMAKE_INSTALL_PREFIX}/lib64")
 endif()
 
-target_link_libraries(${APP_NAME} "-lmdz_xrpc_fast")
-target_link_libraries(${APP_NAME} "-lmdz_thr_threads")
-target_link_libraries(${APP_NAME} "-lmdz_thr_safecontainers")
-target_link_libraries(${APP_NAME} "-lmdz_proto_linerecv")
-target_link_libraries(${APP_NAME} "-lmdz_net_sockets")
-target_link_libraries(${APP_NAME} "-lmdz_scripts_jsonexpreval")
-target_link_libraries(${APP_NAME} "-lmdz_prg_service")
-target_link_libraries(${APP_NAME} "-lmdz_prg_logs")
-target_link_libraries(${APP_NAME} "-lmdz_thr_mutex")
-target_link_libraries(${APP_NAME} "-lmdz_mem_vars")
-target_link_libraries(${APP_NAME} "-lmdz_hlp_functions")
-
 target_link_libraries(${APP_NAME} "-lpthread")
 
 option(SSLRHEL7 "OpenSSL 1.1 For Red Hat 7.x provided by EPEL" OFF)
@@ -86,3 +74,24 @@ link_libraries(${JSONCPP_LIBRARIES})
 target_include_directories(${APP_NAME} PUBLIC ${JSONCPP_INCLUDE_DIRS})
 target_link_libraries(${APP_NAME} ${JSONCPP_LIBRARIES})
 
+
+
+################################################################################
+# libMantids packages:
+pkg_check_modules(MANTIDS_LIBS REQUIRED
+    mdz_xrpc_fast
+    mdz_thr_threads
+    mdz_thr_safecontainers
+    mdz_proto_linerecv
+    mdz_net_sockets
+    mdz_scripts_jsonexpreval
+    mdz_prg_service
+    mdz_prg_logs
+    mdz_thr_mutex
+    mdz_mem_vars
+    mdz_hlp_functions
+)
+include_directories(${MANTIDS_LIBS_INCLUDE_DIRS})
+link_directories(${MANTIDS_LIBS_LIBRARY_DIRS})
+target_link_libraries(${APP_NAME} ${MANTIDS_LIBS_LIBRARIES})
+################################################################################

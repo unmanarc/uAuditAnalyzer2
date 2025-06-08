@@ -14,13 +14,11 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#include <random>
 #include <string>
 #include <thread>
 
-#include <iostream>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <mdz_mem_vars/w32compat.h>
 #endif
 
@@ -573,8 +571,9 @@ bool Rules::_addAction(const json &jConfig, bool replace)
     vector<string> arguments;
     for (uint32_t i =0; i<jConfig["args"].size();i++ )
     {
+        json arg = jConfig["args"][i];
         //AppendNewLineToEarchArgument
-        std::string argument = JSON_ASSTRING(jConfig["args"],i,"");
+        std::string argument = JSON_ASSTRING_D(arg,"");
         if (JSON_ASBOOL(jConfig,"appendNewLineToEachArgv",false)) argument+="%N%";
         arguments.push_back(argument);
     }
