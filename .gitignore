@@ -4,6 +4,7 @@
 .settings/*
 aclocal.m4
 autom4te.cache/*
+build/*
 
 config.hin
 config.h

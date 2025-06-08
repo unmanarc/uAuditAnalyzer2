@@ -4,7 +4,6 @@
 #include "../input/tcplineprocessor.h"
 
 #include <mdz_net_sockets/socket_tcp.h>
-#include <mdz_net_sockets/acceptor_multithreaded.h>
 
 #include <boost/property_tree/ini_parser.hpp>
 #include <inttypes.h>
@@ -29,7 +28,7 @@ bool logServerThr(void * obj, Socket_StreamBase * baseClientSocket, const char *
     string threadName = "IN_" + sRemotePair;
     pthread_setname_np(pthread_self(), threadName.c_str());
 
-    LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_INFO,"Receiving %sJSONTCP Incomming connection...", secure? "secure " : "");
+    LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_INFO,"Receiving %sJSONTCP Incoming connection...", secure? "secure " : "");
 
     server->addClient(lineServer);
 
@@ -40,7 +39,7 @@ bool logServerThr(void * obj, Socket_StreamBase * baseClientSocket, const char *
     switch (err)
     {
     case Parser::PARSING_SUCCEED:
-        LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_INFO,"Incomming connection finished.");
+        LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_INFO,"Incoming connection finished.");
         break;
     case Parser::PARSING_ERR_INIT:
         LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_WARN,"Connection finished with PARSING_ERR_INIT");
@@ -79,23 +78,21 @@ bool TCPServer::loadConfig(const json & jConfig)
 
 void TCPServer::startThreaded()
 {
-    Acceptors::MultiThreaded * vstreamer_syslog = new Acceptors::MultiThreaded;
+    Socket_TCP * tcpListener = new Socket_TCP();
 
-    Socket_TCP * tcpServer = new Socket_TCP;
-    if (!tcpServer->listenOn(listenPort,listenAddr.c_str(),true))
+    if (!tcpListener->listenOn(listenPort,listenAddr.c_str(),true))
     {
         LOG_APP->log0(__func__,Logs::LEVEL_ERR,"Error creating JSON TCP listener @%s:%" PRIu16,listenAddr.c_str(),listenPort);
-        delete tcpServer;
-        delete vstreamer_syslog;
+        delete tcpListener;
         return;
     }
 
-    LOG_APP->log0(__func__,Logs::LEVEL_WARN,"JSON TCP Listener listener running @%s:%" PRIu16 "...",  listenAddr.c_str(),tcpServer->getPort());
+    LOG_APP->log0(__func__,Logs::LEVEL_WARN,"JSON TCP Listener listener running @%s:%" PRIu16 "...",  listenAddr.c_str(),tcpListener->getPort());
 
     // STREAM MANAGER:
-    vstreamer_syslog->setAcceptorSocket(tcpServer);
-    vstreamer_syslog->setCallbackOnConnect(&logServerThr, this);
-    vstreamer_syslog->startThreaded();
+    acceptor.setAcceptorSocket(tcpListener);
+    acceptor.setCallbackOnConnect(&logServerThr, this);
+    acceptor.startThreaded();
 }
 
 json TCPServer::getStats()

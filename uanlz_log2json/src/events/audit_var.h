@@ -2,8 +2,8 @@
 #define VARCONTENT_H
 
 #include <string>
-#include <map>
 #include <string.h>
+#include <stdint.h>
 
 namespace UANLZ { namespace LOG2JSON { namespace AuditdEvents {
 

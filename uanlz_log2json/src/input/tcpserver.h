@@ -1,10 +1,11 @@
 #ifndef RECEPTORTCPSERVER_H
 #define RECEPTORTCPSERVER_H
 
-#include <boost/property_tree/ptree.hpp>
-#include <atomic>
-#include <mutex>
+#include <mdz_net_sockets/acceptor_multithreaded.h>
 #include "tcplineprocessor.h"
+#include <atomic>
+#include <boost/property_tree/ptree.hpp>
+#include <mutex>
 
 namespace UANLZ { namespace LOG2JSON { namespace Input {
 
@@ -29,6 +30,8 @@ public:
     void incInvalidLines();
 
 private:
+    Mantids::Network::Sockets::Acceptors::MultiThreaded acceptor;
+
     boost::property_tree::ptree config;
     std::string listenAddr, description, decoder;
     uint16_t listenPort;

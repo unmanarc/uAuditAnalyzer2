@@ -31,7 +31,7 @@ bool logServerThr(void * obj, Socket_StreamBase * baseClientSocket, const char *
     pthread_setname_np(pthread_self(), threadName.c_str());
 #endif
 
-    LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_INFO,"Receiving %srsyslog+auditd incomming connection...", secure? "secure ":"");
+    LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_INFO,"Receiving %srsyslog+auditd incoming connection...", secure? "secure ":"");
 
     server->addClient(lineServer);
 
@@ -43,7 +43,7 @@ bool logServerThr(void * obj, Socket_StreamBase * baseClientSocket, const char *
     switch (err)
     {
     case Parser::PARSING_SUCCEED:
-        LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_INFO,"Incomming connection finished.");
+        LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_INFO,"Incoming connection finished.");
         break;
     case Parser::PARSING_ERR_INIT:
         LOG_APP->log1(__func__,sRemotePair,Logs::LEVEL_WARN,"Connection finished with PARSING_ERR_INIT");
@@ -89,13 +89,11 @@ bool TCPServer::loadConfig(const string &file)
 
 void TCPServer::startThreaded()
 {
-    Acceptors::MultiThreaded * vstreamer_syslog = new Acceptors::MultiThreaded();
+    Socket_TCP * tcpServer = new Socket_TCP();
 
-    Socket_TCP * tcpServer = new Socket_TCP;
     if (!tcpServer->listenOn(listenPort,listenAddr.c_str(),true))
     {
         LOG_APP->log0(__func__,Logs::LEVEL_ERR,"Error creating TCP LOG listener @%s:%" PRIu16,listenAddr.c_str(),listenPort);
-        delete vstreamer_syslog;
         delete tcpServer;
         return;
     }
@@ -103,9 +101,9 @@ void TCPServer::startThreaded()
     LOG_APP->log0(__func__,Logs::LEVEL_WARN,"LOG Listener (with decoder:%s) listener running on TCP @%s:%" PRIu16 "...", decoder.c_str(), listenAddr.c_str(),tcpServer->getPort());
 
     // STREAM MANAGER:
-    vstreamer_syslog->setAcceptorSocket(tcpServer);
-    vstreamer_syslog->setCallbackOnConnect(&logServerThr, this);
-    vstreamer_syslog->startThreaded();
+    acceptor.setAcceptorSocket(tcpServer);
+    acceptor.setCallbackOnConnect(&logServerThr, this);
+    acceptor.startThreaded();
 }
 
 json TCPServer::getStats()
