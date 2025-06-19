@@ -65,13 +65,11 @@ TCPServer::TCPServer()
 
 bool TCPServer::loadConfig(const json & jConfig)
 {
-
     listenAddr = JSON_ASSTRING(jConfig,"ListenAddr","");
     listenPort = JSON_ASUINT(jConfig,"ListenPort",0);
     description = JSON_ASSTRING(jConfig,"Description","");
 
     LOG_APP->log0(__func__,Logs::LEVEL_INFO,"Configuring JSON input '%s' @%s:%" PRIu16,description.c_str(),listenAddr.c_str(),listenPort );
-
 
     return true;
 }
