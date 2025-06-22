@@ -1,5 +1,5 @@
 %define name uAuditAnalyzer2
-%define version 2.3.1
+%define version 2.3.2
 %define build_timestamp %{lua: print(os.date("%Y%m%d"))}
 Name:           %{name}
 Version:        %{version}
@@ -25,14 +25,14 @@ Group:          Applications/Internet
 %if 0%{?fedora} >= 33
 %define debug_package %{nil}
 %endif
-BuildRequires: libMantids-devel >= 2.8.24
+BuildRequires: libMantids-devel >= 2.8.26
 BuildRequires: %{cmake} systemd libMantids-sqlite zlib-devel boost-devel gcc-c++ jsoncpp-devel sqlite-devel
 %if 0%{?rhel} == 7
 BuildRequires:  openssl11-devel
 %else
 BuildRequires:  openssl-devel
 %endif
-Requires: libMantids >= 2.8.24
+Requires: libMantids >= 2.8.26
 Requires: libMantids-sqlite zlib boost-regex boost-system jsoncpp sqlite
 %if 0%{?rhel} == 7
 Requires:       openssl11

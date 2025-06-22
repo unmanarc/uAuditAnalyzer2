@@ -43,10 +43,11 @@ void outputDistributionThread(int threadid)
         {
             event->process();
             json eventJSON = event->getJSON();
-            delete event;
 
             // push to outputs...
             Output::Outputs::pushToOutputBases(eventJSON, event->getEventId());
+
+            delete event;
 
             // Account it.
             Events_DistributionThreads::addEventsProcessed();
@@ -62,7 +63,7 @@ void outputDistributionThread(int threadid)
         }
         else
         {
-            LOG_APP->log0(__func__,Mantids::Application::Logs::LEVEL_INFO, "No events so far for output thread #%d, triggering no event alert JSON...", threadid);
+            LOG_APP->log0(__func__,Mantids::Application::Logs::LEVEL_DEBUG, "No events so far for output thread #%d, triggering no event alert JSON...", threadid);
             json noEventsAlertJSON;
             noEventsAlertJSON["noEventsAlert"] = true;
             Output::Outputs::pushToOutputBases(noEventsAlertJSON, std::make_tuple<time_t, uint32_t, uint64_t>(0,0,0));

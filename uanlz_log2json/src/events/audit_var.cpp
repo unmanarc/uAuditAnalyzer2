@@ -17,8 +17,10 @@ Audit_Var::Audit_Var()
 
 Audit_Var::~Audit_Var()
 {
-    if (rawPure) delete [] rawPure;
-    if (rawFancy) delete [] rawFancy;
+    if (rawPure)
+        delete [] rawPure;
+    if (rawFancy)
+        delete [] rawFancy;
 }
 
 bool Audit_Var::append(Audit_Var &v)

@@ -5,13 +5,15 @@
 Author: Aarón Mizrachi <aaron@unmanarc.com>  
 License: GPLv3  
 
-uAuditAnalyzer2 is intended to be a highly-efficient application for processing auditd logs received via rsyslog. It is being actively used in many enterprise-level environments for detecting potential threats and providing instant alerts using messaging applications, bots or other means.
+uAuditAnalyzer2 is a high-performance tool designed to efficiently process auditd logs received through rsyslog. Widely deployed in enterprise environments, it excels at identifying potential security threats and delivering real-time alerts via messaging platforms, bots, or other notification systems.
+
+Additionally, uAuditAnalyzer2 can aggregate and decode auditd messages into JSON structures, making it easy to forward the data to other systems such as ELK stacks for further analysis and visualization.
 
 ## Applications
 
 ### uanlz_log2json
 
-This application is in charge of receiving the auditd logs through a centralized RSYSLOG connection. After that, log2json reassembles the disaggregated auditd messages into a single JSON message that can be sent via TCP to some downstream system (eg ELK, uAuditanalyzer Alerts, etc)
+This application is responsible for receiving auditd logs via a centralized RSYSLOG connection. It then reassembles fragmented auditd messages into a single, structured JSON format. The processed data can be forwarded in real-time over TCP to downstream systems such as ELK stacks or used by uAuditanalyzer Alerts for generating security notifications or actions.
 
 ### uanlz_alert
 
@@ -21,9 +23,7 @@ uanlz_alert uses a filter system based on a JSONPath mechanism integrated with a
 
 ### uanlz_web
 
-uanlz_web was designed to manage and monitor the health of uAuditAnalyzer services. It is designed in HTML5 + JQUERY + BOOTSTRAP, using a webservices backend made in C ++ provided by the libMantids library.
-
-
+uanlz_web is a web-based interface designed to monitor and manage the health of uAuditAnalyzer services as well as configure and maintain filters for uanlz_alert. Built using HTML5, jQuery, and Bootstrap for the frontend, it communicates with a backend service implemented in C++ leveraging the libMantids library's web services capabilities.
 
 ***
 ## Installing packages (HOWTO)
@@ -34,8 +34,6 @@ uanlz_web was designed to manage and monitor the health of uAuditAnalyzer servic
 [![Copr build status](https://copr.fedorainfracloud.org/coprs/amizrachi/unmanarc/package/uAuditAnalyzer2/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amizrachi/unmanarc/package/uAuditAnalyzer2/)
 
 ### Simple installation guide for Fedora/RHEL:
-
-
 
 To activate our repo's and download/install the software:
 
@@ -95,13 +93,13 @@ systemctl enable --now uanlz_log2json
 
 - Now you are ready to operate this service
 
-
 ## Build Requirements 
 
 This should be built on top of:
 
-- libMantids libraries (2.5.2) - https://github.com/unmanarc/libMantids
+- libMantids libraries (2.8.26) - https://github.com/unmanarc/libMantids
 - JSONCPP (AT LEAST v1.7.7, for RHEL7 you will have to build it by hand or install an external RPM)
+- BOOST libs
 - C++11
 
 ## Minimum System Requirements
@@ -116,13 +114,10 @@ YES. But in our experience, RPI4 only delivers enough power to analyze some thou
 
 ***
 
-## Commercial Support
-   
+## Professional Support
           
 ![Tekium](art/tekium_slogo.jpeg)
 
-Tekium is a cybersecurity company specialized in red team and blue team activities based in Mexico, it has clients in the financial, telecom and retail sectors.
+Tekium is a cybersecurity company specializing in incident response and threat management based in Mexico. Tekium serves clients across various sectors including finance, telecommunications, and retail. As an active contributor to this project, Tekium offers professional installation support for organizations requiring assistance with deployment.
 
-Tekium is an active sponsor of the project, and provides commercial support in the case you need it.
-
-For integration with other platforms such as the Elastic stack, SIEMs, managed security providers in-house solutions, or for any other requests for extending current functionality that you wish to see included in future versions, please contact us: [info at tekium.mx](mailto:info@tekium.mx)
+For integration with other platforms such as the Elastic stack, SIEMs, managed security providers in-house solutions, or for any other requests for extending current functionality that you wish to see included in future versions, please contact: [info at tekium.mx](mailto:info@tekium.mx)

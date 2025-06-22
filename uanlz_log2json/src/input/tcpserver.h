@@ -4,6 +4,7 @@
 #include <mdz_net_sockets/acceptor_multithreaded.h>
 #include "tcplineprocessor.h"
 #include <atomic>
+#include <set>
 #include <boost/property_tree/ptree.hpp>
 #include <mutex>
 
@@ -24,7 +25,6 @@ public:
 
     std::string getListenAddr() const;
     uint16_t getListenPort() const;
-    std::string getDecoder() const;
 
     void incProcessedLines();
     void incInvalidLines();
@@ -33,7 +33,7 @@ private:
     Mantids::Network::Sockets::Acceptors::MultiThreaded acceptor;
 
     boost::property_tree::ptree config;
-    std::string listenAddr, description, decoder;
+    std::string listenAddr, description;
     uint16_t listenPort;
     std::atomic<uint64_t> processedLinesCount, invalidLinesCount;
 

@@ -81,8 +81,7 @@ bool TCPServer::loadConfig(const string &file)
 
     listenAddr = config.get<string>("ListenAddr","127.0.0.1");
     listenPort = config.get<uint16_t>("ListenPort",10514);
-    decoder = config.get<string>("Decoder", "SYSLOG+AUDITD");
-    description = config.get<string>("Description", decoder + " log receiver @" + listenAddr + ":" + to_string(listenPort));
+    description = config.get<string>("Description", "Log receiver @" + listenAddr + ":" + to_string(listenPort));
 
     return true;
 }
@@ -98,7 +97,7 @@ void TCPServer::startThreaded()
         return;
     }
 
-    LOG_APP->log0(__func__,Logs::LEVEL_WARN,"LOG Listener (with decoder:%s) listener running on TCP @%s:%" PRIu16 "...", decoder.c_str(), listenAddr.c_str(),tcpServer->getPort());
+    LOG_APP->log0(__func__,Logs::LEVEL_WARN,"LOG Listener running on TCP @%s:%" PRIu16 "...", listenAddr.c_str(),tcpServer->getPort());
 
     // STREAM MANAGER:
     acceptor.setAcceptorSocket(tcpServer);
@@ -148,11 +147,6 @@ string TCPServer::getListenAddr() const
 uint16_t TCPServer::getListenPort() const
 {
     return listenPort;
-}
-
-string TCPServer::getDecoder() const
-{
-    return decoder;
 }
 
 void TCPServer::incProcessedLines()
