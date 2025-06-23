@@ -204,6 +204,15 @@ bool TCPLineProcessor::extractSyslogData(
 
     readPosition = progEndPos;
 
+    size_t endSyslogData = line.find(":", readPosition);
+    if (progEndPos == string::npos)
+    {
+        addInvalidLine(line);
+        return true; // Invalid format
+    }
+    readPosition = endSyslogData + 1;
+
+
     return true;
 }
 
@@ -230,7 +239,7 @@ bool TCPLineProcessor::extractAuditdHeader(
         else if (line[pos] == ':' && !insideParenthesis)
         {
             // We found the first colon that is not inside parentheses
-            auditdHeaderStr = line.substr(readPosition,pos-1);
+            auditdHeaderStr = line.substr(readPosition,pos-readPosition);
             readPosition = pos + 1;
             found = true;
             break;

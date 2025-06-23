@@ -1,0 +1,130 @@
+{
+        "AUDITD" : 
+        {
+                "id" : "1750695337.85:127726"
+        },
+        "CWD" : 
+        [
+                {
+                        "cwd" : "/root"
+                }
+        ],
+        "EOE" : 
+        [
+                null
+        ],
+        "EXECVE" : 
+        [
+                {
+                        "argc" : "3",
+                        "argv" : 
+                        [
+                                "ls",
+                                "--color=auto",
+                                "-l"
+                        ],
+                        "cmdline" : "ls --color=auto -l"
+                }
+        ],
+        "INFO" : 
+        {
+                "host" : "ROCKY2",
+                "id" : 127726,
+                "ip" : "192.168.100.201",
+                "key" : "X5_EXEC_ROOT",
+                "msecs" : 85,
+                "parserVersion" : 1,
+                "source" : "auditd",
+                "time" : "Mon Jun 23 19:15:37 2025",
+                "unixTime" : 1750695337
+        },
+        "PATH" : 
+        [
+                {
+                        "OGID" : "root",
+                        "OUID" : "root",
+                        "cap_fe" : "0",
+                        "cap_fi" : "0",
+                        "cap_fp" : "0",
+                        "cap_frootid" : "0",
+                        "cap_fver" : "0",
+                        "dev" : "fd:00",
+                        "inode" : "50735135",
+                        "item" : "0",
+                        "mode" : "0100755",
+                        "name" : "/usr/bin/ls",
+                        "nametype" : "NORMAL",
+                        "obj" : "system_u:object_r:bin_t:s0",
+                        "ogid" : "0",
+                        "ouid" : "0",
+                        "rdev" : "00:00"
+                },
+                {
+                        "OGID" : "root",
+                        "OUID" : "root",
+                        "cap_fe" : "0",
+                        "cap_fi" : "0",
+                        "cap_fp" : "0",
+                        "cap_frootid" : "0",
+                        "cap_fver" : "0",
+                        "dev" : "fd:00",
+                        "inode" : "1471940",
+                        "item" : "1",
+                        "mode" : "0100755",
+                        "name" : "/lib64/ld-linux-x86-64.so.2",
+                        "nametype" : "NORMAL",
+                        "obj" : "system_u:object_r:ld_so_t:s0",
+                        "ogid" : "0",
+                        "ouid" : "0",
+                        "rdev" : "00:00"
+                }
+        ],
+        "PROCTITLE" : 
+        [
+                {
+                        "proctitle" : "ls --color=auto -l"
+                }
+        ],
+        "SYSCALL" : 
+        [
+                {
+                        "ARCH" : "x86_64",
+                        "AUID" : "root",
+                        "EGID" : "root",
+                        "EUID" : "root",
+                        "FSGID" : "root",
+                        "FSUID" : "root",
+                        "GID" : "root",
+                        "SGID" : "root",
+                        "SUID" : "root",
+                        "SYSCALL" : "execve",
+                        "UID" : "root",
+                        "a0" : "5634561980f0",
+                        "a1" : "5634561980a0",
+                        "a2" : "563456133660",
+                        "a3" : "8",
+                        "arch" : "c000003e",
+                        "auid" : "0",
+                        "comm" : "ls",
+                        "egid" : "0",
+                        "euid" : "0",
+                        "exe" : "/usr/bin/ls",
+                        "exit" : "0",
+                        "fsgid" : "0",
+                        "fsuid" : "0",
+                        "gid" : "0",
+                        "items" : "2",
+                        "key" : "X5_EXEC_ROOT",
+                        "pid" : "665253",
+                        "ppid" : "661783",
+                        "ses" : "9",
+                        "sgid" : "0",
+                        "subj" : "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
+                        "success" : "yes",
+                        "suid" : "0",
+                        "syscall" : "59",
+                        "tty" : "pts0",
+                        "uid" : "0"
+                }
+        ]
+}
