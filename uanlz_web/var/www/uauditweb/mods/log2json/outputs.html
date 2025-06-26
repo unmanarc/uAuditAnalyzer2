@@ -25,9 +25,20 @@
         for (let output of outputStats) {
 
             $("#span-log2json-output-body").append(
-                `<div class="border rounded">
-                <b>Host/Port:</b> <span id="span-log2json-output-hostport-${i}"></span><br>
-                <b>Status:</b> <span id="span-log2json-output-status-${i}"></span>
+                `
+                    <div class="card" style="text-align: center;">
+            <div class="card-header">
+                <div style="display: flex; justify-content: space-between; align-items: left;">
+                    <span><b>Host/Port:</b> <span id="span-log2json-output-hostport-${i}"></span></span>
+                    <span><b>Status:</b> <span id="span-log2json-output-status-${i}"></span></span>
+                </div>
+            </div>
+            <div class="card-body">
+             
+
+
+                
+                
                 <hr>
                 <table width="100%">
                     <tr valign=top>
@@ -66,7 +77,12 @@
                         </td>
                     </tr>
                 </table>
-                </div><br>`
+                
+            </div>
+          </div>
+<br>
+                
+                `
             );
             
             $(`#span-log2json-output-hostport-${i}`).text(output["id"]);            
@@ -75,11 +91,11 @@
 
             if (output["connected"] == true)
             {
-                $(`#span-log2json-output-status-${i}`).append("<span class=\"badge badge-success\">Connected</span>");
+                $(`#span-log2json-output-status-${i}`).append("<span class=\"badge text-bg-success\">Connected</span>");
             }
             else
             {
-                $(`#span-log2json-output-status-${i}`).append("<span class=\"badge badge-danger\">Disconnected</span>");
+                $(`#span-log2json-output-status-${i}`).append("<span class=\"badge text-bg-danger\">Disconnected</span>");
             }
             
             $(`#span-log2json-output-perctext-${i}`).text( output["queue"]["size"] + "/" + output["queue"]["maxItems"] );

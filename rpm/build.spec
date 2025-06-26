@@ -1,5 +1,5 @@
 %define name uAuditAnalyzer2
-%define version 2.4.0
+%define version 2.4.1
 %define build_timestamp %{lua: print(os.date("%Y%m%d"))}
 Name:           %{name}
 Version:        %{version}
