@@ -1,4 +1,7 @@
-<%include:/mods/alerts/z.inc.header.html%>
+<%include:/inc.header.html%>
+<%include:/inc.layout.leftpanel.header.html%>
+<%include:/mods/alerts/inc.links.html%>
+<%include:/inc.layout.leftpanel.middle.html%>
 
 <script>
   document.getElementById("apptitle").innerHTML = "Alerts &#9658; JSON Alerts - Add New Action";
@@ -126,9 +129,7 @@
       document.getElementById(`formArg${argn}`).remove();
     }
   }
-
 </script>
-
 
 <form>
   <div class="form-group">
@@ -154,7 +155,7 @@
 
   <hr>
 
-  <table width=80% align=center>
+  <table width=100% align=center>
     <tr>
       <td>
         <label for="actionDescription"><b>Program Arguments:</b></label>
@@ -184,4 +185,5 @@
   <button class="btn btn-success " id="EditButton" role="button" onclick="javascript:addAction('edit')" style="visibility: collapse; display: none;">Edit...</a>
 </div>
 
-<%include:/mods/alerts/z.inc.footer.html%>
+<%include:/inc.layout.leftpanel.footer.html%>
+<%include:/inc.footer.html%>

@@ -1,5 +1,7 @@
-<%include:/mods/alerts/z.inc.header.html%>
-
+<%include:/inc.header.html%>
+<%include:/inc.layout.leftpanel.header.html%>
+<%include:/mods/alerts/inc.links.html%>
+<%include:/inc.layout.leftpanel.middle.html%>
 <script>
   document.getElementById("apptitle").innerHTML = "Alerts &#9658; JSON Alerts Current Inputs Stats";
 
@@ -10,15 +12,8 @@
   }
 </script>
 
-
-
-
-
 <span id="span-alerts-input-body">
 </span>
-
-
-
 
 <script>
 
@@ -29,13 +24,17 @@
 
     for (let input of inputStats) {
       $("#span-alerts-input-body").append(
-        '<hr><br><div class="container">' +
-        `<b>Source Description: </b><span id="span-alerts-input-description-${i}"></span>` +
-        '<table class="table table-striped">' +
-        '<thead><tr><th width=50%>Incoming connection from<br>(IP Address)</th><th>Processed JSON Elements</th><th>Dropped JSON Elements</th></tr></thead>' +
-        `<tbody id="tbody-alerts-input-${i}"></tbody>` +
-        '</table>' +
-        '</div>'
+        `
+        <hr>
+        <br>
+        <div class="container">
+        <b>Source Description: </b><span id="span-alerts-input-description-${i}"></span>
+
+        <table class="table table-striped">
+          <thead><tr><th width=50%>Incoming connection from<br>(IP Address)</th><th>Processed JSON Elements</th><th>Dropped JSON Elements</th></tr></thead>
+          <tbody id="tbody-alerts-input-${i}"></tbody>
+        </table>
+        </div>`
       );
       $(`#span-alerts-input-description-${i}`).text(input["description"]);
       let x = 0;
@@ -73,4 +72,5 @@
   }
 </script>
 
-<%include:/mods/alerts/z.inc.footer.html%>
+<%include:/inc.layout.leftpanel.footer.html%>
+<%include:/inc.footer.html%>

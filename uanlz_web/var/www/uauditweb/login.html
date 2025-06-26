@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-100" data-bs-theme="auto">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>uAuditAnalyzer Login</title>
-    <link rel="stylesheet" href="/assets/css/bootstrap.min.css" type="text/css">
-    <link rel="stylesheet" href="/assets/css/login.css" type="text/css">
-    <script src="/assets/js/jquery-3.6.0.min.js" type="text/javascript"></script>
-    <script src="/assets/js/mantids_login.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="assets/css/login.css" type="text/css">
+    <script src="assets/js/jquery.min.js" type="text/javascript"></script>
+    <script src="assets/js/mantids_login.js" type="text/javascript"></script>
 </head>
 
 <%jvar/csrfToken:csrfToken%>
@@ -18,46 +18,69 @@
 <%jvar/domain:domain%>
 <%jvar/maxAge:maxAge%>
 
-<body onload="javascript:ajaxLoginStart()">
-    <main class="d-flex align-items-center min-vh-100 py-3 py-md-0">
+<body onload="javascript:ajaxLoginStart()" class="d-flex flex-column h-100">
+    <!-- Added an outer container with flex to vertically center -->
+    <div class="d-flex align-items-center justify-content-center vh-100">
         <div class="container">
-            <div class="card login-card">
-                <div class="row no-gutters">
-                    <div class="col-md-5">
-                        <img src="/assets/images/login.jpg" alt="login" class="login-card-img">
-                    </div>
-
-                    <div class="col-md-7">
-                        <div class="card-body  align-items-center justify-content-center">
-
-                            <table width=100% id=""><tr><td align="center">
-                                <div class="brand-wrapper">
-                                    <img src="/assets/images/logo.jpg" alt="logo" class="logo">
-                                    <p class="login-card-header-text text-center" id="version"></p>
-                                    <p class="login-card-header-message text-center" id="message">_</p>
+            <div class="row justify-content-center">
+                <div class="col-md-4" style="min-width: 400px;">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="brand-wrapper">
+                                <div class="d-flex justify-content-center">
+                                    <img src="assets/images/logo.jpg" alt="logo" class="logo" width="300">
                                 </div>
-                            </td></tr></table>
+                                <p class="login-card-header-text" id="version"></p>
+                                <p class="login-card-header-message" id="message">_</p>
+                            </div>
+    
+                            <div id="logoutform">
+                                <form action="#!">
+                                    <button name="logout" type="button" class="w-100 btn bg-black text-white"
+                                        style="padding: 8px; font-size: 14px;" onclick="javascript:ajaxLogout()">Logout</button>
+                                </form>
+                            </div>
+                            <div id="loginform">
+                                <form action="#!">
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label" style="font-size: 0.9rem;">Username</label>
+                                        <input type="text" class="form-control" name="username" id="username" name="username" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label" style="font-size: 0.9rem;">Password</label>
+                                        <input type="password" class="form-control" name="password" id="password" name="password" placeholder="" required>
+                                    </div>
+                                    &nbsp;
+                                    <button  name="login" type="button" class="w-100 btn bg-black text-white"
+                                        style="padding: 8px; font-size: 14px;" onclick="javascript:ajaxLogin()">Login</button>
+                                </form>
+                            </div>
 
-                            <table width=100% id="loginform"><tr><td align="center"><form action="#!">
-                                <p class="login-card-description">Sign into your account</p>
-
-                                <div class="form-group"> <label for="username" class="sr-only">Username</label> <input type="username" name="username" id="username" class="form-control" placeholder="Username"> </div>
-                                <div class="form-group mb-4"> <label for="password" class="sr-only">Password</label> <input type="password" name="password" id="password" class="form-control" placeholder="***********"></div>
-                                <input name="login" id="login" class="btn btn-block login-btn mb-4" type="button" value="Login" onclick="javascript:ajaxLogin()">
-                            </form></td></tr></table>
-
-                            <table width=100% id="logoutform"><tr><td align="center"><form action="#!">
-                                <input name="logout" id="logout" class="btn btn-block login-btn mb-4" type="button" value="Logout" onclick="javascript:ajaxLogout()">
-                            </form></td></tr></table>
+                            <div class="row text-center justify-content-center" style="font-size: 10px">                               
+                                <a href="https://github.com/unmanarc/uAuditAnalyzer2"><br> Go To uAuditAnalyzer Project Page...</a><br>Licenced under GPLv3
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <p class="login-card-footer-text"><a href="https://github.com/unmanarc/uAuditAnalyzer2"> Go To uAuditAnalyzer
-                    Project Page...</a><br>Licenced under GPLv3</p>
         </div>
-    </main>
-    <script src="/assets/js/bootstrap.min.js" type="text/javascript"></script>
+    </div>
+
+    <script>
+        $('#username').keypress(function (e) {
+            if (e.which === 13) { // Enter key
+                $('#password').focus();
+            }
+        });
+        $('#password').keypress(function (e) {
+            var key = e.which;
+            if (key == 13)  // the enter key code
+            {
+                ajaxLogin();
+            }
+        });
+    </script>
+    <script src="assets/js/bootstrap.min.js" type="text/javascript"></script>
 </body>
 
 </html>

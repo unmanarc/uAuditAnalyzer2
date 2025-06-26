@@ -1,7 +1,10 @@
-<%include:/mods/log2json/z.inc.header.html%>
+<%include:/inc.header.html%>
+<%include:/inc.layout.leftpanel.header.html%>
+<%include:/mods/log2json/inc.links.html%>
+<%include:/inc.layout.leftpanel.middle.html%>
 
 <script>
-  document.getElementById("apptitle").innerHTML = "Log Dissector &#9658; Syslog Incoming Auditd Events";
+  document.getElementById("apptitle").innerHTML = "Log-&gt;JSON Dissector &#9658; Syslog Incoming Auditd Events";
   document.getElementById('mainview-log2json-events-link').style.color = "white";
 
   // Default Main View:
@@ -111,4 +114,5 @@ $(`#log2json-eventsQueueSize`).text( filterStats["eventsQueue"]["curSize"] + "/"
   }
 </script>
 
-<%include:/mods/log2json/z.inc.footer.html%>
+<%include:/inc.layout.leftpanel.footer.html%>
+<%include:/inc.footer.html%>

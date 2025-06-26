@@ -1,4 +1,7 @@
-<%include:/mods/alerts/z.inc.header.html%>
+<%include:/inc.header.html%>
+<%include:/inc.layout.leftpanel.header.html%>
+<%include:/mods/alerts/inc.links.html%>
+<%include:/inc.layout.leftpanel.middle.html%>
 
 <script>
   document.getElementById("apptitle").innerHTML = "Alerts &#9658; JSON Alerts Inputs Configuration";
@@ -30,7 +33,7 @@
           document.getElementById("span-alerts-inputsmodified-body").style.visibility = "collapse";
           document.getElementById("span-alerts-inputsmodified-body").style.display = "none";
 
-          setTimeout(() => { document.location = "./events"; }, 4000);         
+          setTimeout(() => { location.reload(); }, 4000);
         }
         else
         {
@@ -112,15 +115,16 @@
 
     for (let input of inputs) {
       $("#span-alerts-inputsconfig-body").append(
-        '<div class="alert alert-dark alert-dismissible fade show" role="alert">' +
-        `<b>Description: </b><span id="span-alerts-inputsconfig-description-${i}"></span><br>` +
-        `<b>Listen Address: </b><span id="span-alerts-inputsconfig-laddr-${i}"></span><br>` +
-        `<b>Listen Port: </b><span id="span-alerts-inputsconfig-lport-${i}"></span><br>` +
-        `<input type="hidden" id="span-alerts-inputsconfig-id-${i}">`+
-        `<button type="button" class="close" onclick="javascript:removeInput('${i}')" aria-label="Close">`+
-          '<span aria-hidden="true">&times;</span>' +
-        '</button>' +
-        '</div>'
+        `
+        <div class="alert alert-dark alert-dismissible fade show" role="alert">
+          <b>Description: </b><span id="span-alerts-inputsconfig-description-${i}"></span><br>
+          <b>Listen Address: </b><span id="span-alerts-inputsconfig-laddr-${i}"></span><br>
+          <b>Listen Port: </b><span id="span-alerts-inputsconfig-lport-${i}"></span><br>
+          <input type="hidden" id="span-alerts-inputsconfig-id-${i}">
+          <button type="button" class="close" onclick="javascript:removeInput('${i}')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>`
       );
       $(`#span-alerts-inputsconfig-description-${i}`).text(input["Description"]);
       $(`#span-alerts-inputsconfig-laddr-${i}`).text(input["ListenAddr"]);
@@ -158,4 +162,5 @@
   }
 </script>
 
-<%include:/mods/alerts/z.inc.footer.html%>
+<%include:/inc.layout.leftpanel.footer.html%>
+<%include:/inc.footer.html%>

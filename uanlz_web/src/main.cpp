@@ -50,7 +50,7 @@ public:
 
         LOG_APP->log0(__func__,Logs::LEVEL_INFO,  "Looking for static login resources...");
 
-        auto staticContent = Globals::getLoginRPCClient()->getRemoteAuthManager()->getStaticContent();
+        auto staticContent = Globals::getLoginRPCClient()->getRemoteAuthManager()->getStaticContent2();
 
         for ( unsigned int i=0; i<staticContent.size(); i++ )
         {
